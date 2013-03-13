@@ -11,11 +11,37 @@ from xml.etree import ElementTree
 def main():
     parser = _get_option_parser()
     options = _get_validated_options(parser)
-    xml_tree = _get_xml_tree(options, parser)
-    root_attributes = _get_root_attributes(xml_tree)
     db = RobotDatabase(options)
-    db.push(('INSERT INTO test_run (generated_at, generator) VALUES (?, ?)', root_attributes))
-    db.commit()
+    xml_tree = _get_xml_tree(options, parser)
+    test_run_db_id = _insert_test_run(xml_tree, db)
+    _insert_suites(xml_tree.getroot(), test_run_db_id, db)
+
+def _insert_test_run(xml_tree, db):
+    test_run_values = _get_root_attributes(xml_tree)
+    db.push(('INSERT INTO test_run (generated_at, generator) VALUES (?, ?)', test_run_values))
+    return db.commit()
+
+def _insert_suites(parent_element, test_run_db_id, db, parent_suite_db_id="NULL"):
+    for suite in parent_element.findall('suite'):
+        suite_values = _get_suite_attributes(suite, test_run_db_id, parent_suite_db_id)
+        db.push(('INSERT INTO suite (test_run_id, parent_id, name, source) VALUES (?, ?, ?, ?)', suite_values))
+        inserted_db_id = db.commit()
+        _insert_suites(suite, test_run_db_id, db, inserted_db_id)
+
+def _get_root_attributes(xml_tree):
+    root_element = xml_tree.getroot()
+    return (
+        _get_formatted_timestamp(root_element),
+        root_element.get('generator')
+    )
+
+def _get_suite_attributes(suite_element, test_run_id, parent_suite_db_id):
+    return (
+        test_run_id,
+        parent_suite_db_id,
+        suite_element.get('source'),
+        suite_element.get('name')
+    )
 
 def _exit_with_help(parser, message=None):
     if message:
@@ -40,13 +66,6 @@ def _get_formatted_timestamp(root_element):
     generated_at = root_element.get('generated').split('.')[0]
     return datetime.strptime(generated_at, '%Y%m%d %H:%M:%S')
 
-def _get_root_attributes(xml_tree):
-    root_element = xml_tree.getroot()
-    return (
-        _get_formatted_timestamp(root_element),
-        root_element.get('generator')
-    )
-
 def _get_validated_options(parser):
     if len(sys.argv) < 2:
         _exit_with_help(parser)
@@ -70,6 +89,14 @@ class RobotDatabase(object):
             '''CREATE TABLE if not exists test_run (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                     generated_at TEXT,
                                                     generator TEXT)''')
+
+        self.push(
+            '''CREATE TABLE if not exists suite (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                 test_run_id INTEGER NOT NULL,
+                                                 parent_id INTEGER,
+                                                 name TEXT NOT NULL,
+                                                 source TEXT)''')
+
         self.commit()
 
     def push(self, *sql_statements):
@@ -81,12 +108,13 @@ class RobotDatabase(object):
         cursor = connection.cursor()
         for statement in self.sql_statements:
             if isinstance(statement, basestring):
-                cursor.execute(statement)
+                cursor = cursor.execute(statement)
             else:
-                cursor.execute(*statement)
+                cursor = cursor.execute(*statement)
             connection.commit()
         self.sql_statements = []
         connection.close()
+        return cursor.lastrowid
 
 if __name__ == '__main__':
     main()
