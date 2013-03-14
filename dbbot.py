@@ -3,68 +3,152 @@
 import sys
 import optparse
 import sqlite3
-from datetime import datetime
-from os.path import abspath, exists, join
-from xml.etree import ElementTree
+from os.path import exists
+from robot.result import ExecutionResult
 
 
 def main():
     parser = _get_option_parser()
     options = _get_validated_options(parser)
-    db = RobotDatabase(options)
-    xml_tree = _get_xml_tree(options, parser)
-    test_run_db_id = _insert_test_run(xml_tree, db)
-    _insert_suites(xml_tree.getroot(), test_run_db_id, db)
+    output_xml_file = ExecutionResult(options.file_path)
+    results_dictionary = parse_test_run(output_xml_file)
+    print results_dictionary
+    # TODO: creating the respective SQL inserts
 
-def _insert_test_run(xml_tree, db):
-    test_run_values = _get_root_attributes(xml_tree)
-    db.push(('INSERT INTO test_run (generated_at, generator) VALUES (?, ?)', test_run_values))
-    return db.commit()
+def parse_test_run(results):
+    return {
+        'source_file': results.source,
+        'generator': results.generator,
+        'statistics': parse_statistics(results.statistics),
+        'messages': parse_messages(results.errors.messages),
+        'suites': parse_suites(results.suite),
+    }
 
-def _insert_suites(parent_element, test_run_db_id, db, parent_suite_db_id="NULL"):
-    for suite in parent_element.findall('suite'):
-        suite_values = _get_suite_attributes(suite, test_run_db_id, parent_suite_db_id)
-        db.push(('INSERT INTO suite (test_run_id, parent_id, name, source) VALUES (?, ?, ?, ?)', suite_values))
-        inserted_db_id = db.commit()
-        _insert_suites(suite, test_run_db_id, db, inserted_db_id)
+def parse_statistics(statistics):
+    return {
+        'total': get_total_statistics(statistics),
+        'tag': get_tag_statistics(statistics),
+        'suite': get_suite_statistics(statistics),
+    }
 
-def _get_root_attributes(xml_tree):
-    root_element = xml_tree.getroot()
-    return (
-        _get_formatted_timestamp(root_element),
-        root_element.get('generator')
-    )
+def get_total_statistics(statistics):
+    return {
+        'all': _get_total_stat(statistics.total.all),
+        'critical': _get_total_stat(statistics.total.critical),
+    }
 
-def _get_suite_attributes(suite_element, test_run_id, parent_suite_db_id):
-    return (
-        test_run_id,
-        parent_suite_db_id,
-        suite_element.get('source'),
-        suite_element.get('name')
-    )
+def _get_total_stat(stat):
+    return {
+        'name': stat.name,
+        'elapsed': stat.elapsed,
+        'passed': stat.passed,
+        'failed': stat.failed,
+        }
 
-def _exit_with_help(parser, message=None):
-    if message:
-        sys.stderr.write('Error: %s\n\n' % message)
-    parser.print_help()
-    exit(1)
+def get_tag_statistics(statistics):
+    return [_get_parsed_tag_stat(tag) for tag in statistics.tags.tags.values()]
+
+def _get_parsed_tag_stat(stat):
+    return {
+        'name': stat.name,
+        'links': stat.links,
+        'doc': stat.doc,
+        'non_critical': stat.non_critical,
+        'elapsed': stat.elapsed,
+        'failed': stat.failed,
+        'critical': stat.critical,
+        'combined': stat.combined,
+        'passed': stat.passed,
+        }
+
+def get_suite_statistics(statistics):
+    return [_get_parsed_suite_stat(suite.stat) for suite in statistics.suite.suites]
+
+def _get_parsed_suite_stat(stat):
+    return {
+        'id': stat.id,
+        'name': stat.name,
+        'elapsed': stat.elapsed,
+        'failed': stat.failed,
+        'passed': stat.passed,
+        }
+
+def parse_suites(suite):
+    return [_get_parsed_suite(subsuite) for subsuite in suite.suites]
+
+def _get_parsed_suite(subsuite):
+    return {
+        'name': subsuite.name,
+        'id': subsuite.id,
+        'source': subsuite.source,
+        'doc': subsuite.doc,
+        'start_time': subsuite.starttime,
+        'end_time': subsuite.endtime,
+        'keywords': parse_keywords(subsuite.keywords),
+        'tests': parse_tests(subsuite.tests),
+        'suites': parse_suites(subsuite),
+        }
+
+def parse_tests(tests):
+    return [_get_parsed_test(test) for test in tests]
+
+def _get_parsed_test(test):
+    return {
+        'id': test.id,
+        'name': test.name,
+        'timeout': test.timeout,
+        'doc': test.doc,
+        'status': test.status,
+        'tags': parse_tags(test.tags),
+        'keywords': parse_keywords(test.keywords),
+        }
+
+def parse_keywords(keywords):
+    return [_get_parsed_keyword(keyword) for keyword in keywords]
+
+def _get_parsed_keyword(keyword):
+    return {
+        'name': keyword.name,
+        'type': keyword.type,
+        'timeout': keyword.timeout,
+        'doc': keyword.doc,
+        'status': keyword.status,
+        'messages': parse_messages(keyword.messages),
+        'args': parse_args(keyword.args),
+        'keywords': parse_keywords(keyword.keywords)
+    }
+
+def parse_args(args):
+    return [_get_parsed_arg(arg) for arg in args]
+
+def _get_parsed_arg(arg):
+    return {
+        'content': arg,
+    }
+
+def parse_tags(tags):
+    return [_get_parsed_tag(tag) for tag in tags]
+
+def _get_parsed_tag(tag):
+    return {
+        'content': tag,
+    }
+
+def _get_parsed_message(message):
+    return {
+        'level': message.level,
+        'timestamp': message.timestamp,
+        'content': message,
+    }
+
+def parse_messages(messages):
+    return [_get_parsed_message(message) for message in messages]
 
 def _get_option_parser():
     parser = optparse.OptionParser()
     parser.add_option('--file', dest='file_path')
     parser.add_option('--db', dest='db_file_path', default='results.db')
     return parser
-
-def _get_xml_tree(options, parser):
-    try:
-        xml_tree = ElementTree.parse(options.file_path)
-    except ElementTree.ParseError:
-        _exit_with_help(parser, 'Invalid XML file')
-    return xml_tree
-
-def _get_formatted_timestamp(root_element):
-    generated_at = root_element.get('generated').split('.')[0]
-    return datetime.strptime(generated_at, '%Y%m%d %H:%M:%S')
 
 def _get_validated_options(parser):
     if len(sys.argv) < 2:
@@ -76,27 +160,21 @@ def _get_validated_options(parser):
         _exit_with_help(parser, 'File not found')
     return options
 
+def _exit_with_help(parser, message=None):
+    if message:
+        sys.stderr.write('Error: %s\n\n' % message)
+    parser.print_help()
+    exit(1)
+
 
 class RobotDatabase(object):
-
     def __init__(self, options):
         self.sql_statements = []
         self.options = options
         self._init_tables()
 
     def _init_tables(self):
-        self.push(
-            '''CREATE TABLE if not exists test_run (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                    generated_at TEXT,
-                                                    generator TEXT)''')
-
-        self.push(
-            '''CREATE TABLE if not exists suite (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                 test_run_id INTEGER NOT NULL,
-                                                 parent_id INTEGER,
-                                                 name TEXT NOT NULL,
-                                                 source TEXT)''')
-
+        # TODO: Initialize the tables here
         self.commit()
 
     def push(self, *sql_statements):
