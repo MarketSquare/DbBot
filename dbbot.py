@@ -44,7 +44,7 @@ def _get_total_stat(stat):
         'elapsed': stat.elapsed,
         'passed': stat.passed,
         'failed': stat.failed,
-        }
+    }
 
 def get_tag_statistics(statistics):
     return [_get_parsed_tag_stat(tag) for tag in statistics.tags.tags.values()]
@@ -60,27 +60,27 @@ def _get_parsed_tag_stat(stat):
         'critical': stat.critical,
         'combined': stat.combined,
         'passed': stat.passed,
-        }
+    }
 
 def get_suite_statistics(statistics):
     return [_get_parsed_suite_stat(suite.stat) for suite in statistics.suite.suites]
 
 def _get_parsed_suite_stat(stat):
     return {
-        'id': stat.id,
+        'suite': stat.id, #TODO: db id or xml attribute id?
         'name': stat.name,
         'elapsed': stat.elapsed,
         'failed': stat.failed,
         'passed': stat.passed,
-        }
+    }
 
 def parse_suites(suite):
     return [_get_parsed_suite(subsuite) for subsuite in suite.suites]
 
 def _get_parsed_suite(subsuite):
     return {
-        'name': subsuite.name,
         'id': subsuite.id,
+        'name': subsuite.name,
         'source': subsuite.source,
         'doc': subsuite.doc,
         'start_time': subsuite.starttime,
@@ -88,7 +88,7 @@ def _get_parsed_suite(subsuite):
         'keywords': parse_keywords(subsuite.keywords),
         'tests': parse_tests(subsuite.tests),
         'suites': parse_suites(subsuite),
-        }
+    }
 
 def parse_tests(tests):
     return [_get_parsed_test(test) for test in tests]
@@ -102,7 +102,7 @@ def _get_parsed_test(test):
         'status': test.status,
         'tags': parse_tags(test.tags),
         'keywords': parse_keywords(test.keywords),
-        }
+    }
 
 def parse_keywords(keywords):
     return [_get_parsed_keyword(keyword) for keyword in keywords]
