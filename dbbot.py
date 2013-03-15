@@ -4,6 +4,7 @@ import sys
 import optparse
 import sqlite3
 from os.path import exists
+from datetime import datetime
 from robot.result import ExecutionResult
 
 # -- for debugging purposes only
@@ -95,8 +96,8 @@ def _get_parsed_suite(subsuite):
         'name': subsuite.name,
         'source': subsuite.source,
         'doc': subsuite.doc,
-        'start_time': subsuite.starttime,
-        'end_time': subsuite.endtime,
+        'start_time': _format_timestamp(subsuite.starttime),
+        'end_time': _format_timestamp(subsuite.endtime),
         'keywords': parse_keywords(subsuite.keywords),
         'tests': parse_tests(subsuite.tests),
         'suites': parse_suites(subsuite),
@@ -150,12 +151,15 @@ def _get_parsed_tag(tag):
 def _get_parsed_message(message):
     return {
         'level': message.level,
-        'timestamp': message.timestamp,
-        'content': message,
+        'timestamp': _format_timestamp(message.timestamp),
+        'content': message.message,
     }
 
 def parse_messages(messages):
     return [_get_parsed_message(message) for message in messages]
+
+def _format_timestamp(timestamp):
+    return str(datetime.strptime(timestamp.split('.')[0], '%Y%m%d %H:%M:%S'))
 
 def _get_option_parser():
     parser = optparse.OptionParser()
