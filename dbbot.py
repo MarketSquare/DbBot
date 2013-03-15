@@ -80,7 +80,7 @@ def get_suite_statistics(statistics):
 
 def _get_parsed_suite_stat(stat):
     return {
-        'suite': stat.id,
+        'suite_id': stat.id,
         'name': stat.name,
         'elapsed': stat.elapsed,
         'failed': stat.failed,
