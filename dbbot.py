@@ -259,8 +259,7 @@ class RobotDatabase(object):
         self.commit()
 
     def push(self, *sql_statements):
-        for statement in sql_statements:
-            self.sql_statements.append(statement)
+        self.sql_statements.extend(sql_statements)
 
     def commit(self):
         connection = sqlite3.connect(self.options.db_file_path)
