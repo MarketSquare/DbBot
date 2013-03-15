@@ -13,8 +13,15 @@ def main():
     output_xml_file = ExecutionResult(options.file_path)
     results_dictionary = parse_test_run(output_xml_file)
 
-    db = RobotDatabase(options)
-    # TODO: creating the respective SQL inserts
+    # TODO: more detailed exceptions
+    try:
+        db = RobotDatabase(options)
+        db.insert_into_db(results_dictionary)
+    except Exception, message:
+        output_error_message(message)
+    finally:
+        db.close()
+
 
 def parse_test_run(results):
     return {
@@ -67,7 +74,7 @@ def get_suite_statistics(statistics):
 
 def _get_parsed_suite_stat(stat):
     return {
-        'suite': stat.id, #TODO: db id or xml attribute id?
+        'suite': stat.id,
         'name': stat.name,
         'elapsed': stat.elapsed,
         'failed': stat.failed,
@@ -163,20 +170,27 @@ def _get_validated_options(parser):
 
 def _exit_with_help(parser, message=None):
     if message:
-        sys.stderr.write('Error: %s\n\n' % message)
+        output_error_message(message)
     parser.print_help()
     exit(1)
+
+def output_error_message(message):
+    sys.stderr.write('Error: %s\n\n' % message)
 
 
 class RobotDatabase(object):
     def __init__(self, options):
         self.sql_statements = []
-        self.options = options
+        self.connection = sqlite3.connect(options.db_file_path)
+        self._enable_foreign_keys()
         self._init_tables()
 
-    def _init_tables(self):
+    def _enable_foreign_keys(self):
+        self._push('pragma foreign_keys = on')
+        self._commit()
 
-        self.push('''CREATE TABLE  IF NOT EXISTS test_runs (id INTEGER PRIMARY KEY AUTOINCREMENT,
+    def _init_tables(self):
+        self._push('''CREATE TABLE  IF NOT EXISTS test_runs (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                          source_file TEXT,
                                                          generator TEXT,
                                                          errors_id INTEGER,
@@ -184,17 +198,17 @@ class RobotDatabase(object):
                                                          suite_id INTEGER NOT NULL)''')
 
         # has 0-n messages
-        self.push('''CREATE TABLE  IF NOT EXISTS test_run_errors (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE  IF NOT EXISTS test_run_errors (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                                  test_run_id INTEGER NOT NULL)''')
 
         # has 0-n stats (tag)
         # has 0-n stats (suite)
-        self.push('''CREATE TABLE  IF NOT EXISTS test_run_statistics (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE  IF NOT EXISTS test_run_statistics (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                          test_run_id INTEGER NOT NULL,
                                                          stats_all_id INTEGER,
                                                          stats_critical_id INTEGER)''')
 
-        self.push('''CREATE TABLE  IF NOT EXISTS stats (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE  IF NOT EXISTS stats (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                        test_run_statistics_id INTEGER NOT NULL,
                                                        suite_id INTEGER,
                                                        name TEXT,
@@ -208,7 +222,7 @@ class RobotDatabase(object):
                                                        passed INTEGER)''')
 
         # has 0-n suites (as sub-suites)
-        self.push('''CREATE TABLE  IF NOT EXISTS suites (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE  IF NOT EXISTS suites (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                         parent_id INTEGER,
                                                         setup_keyword_id INTEGER,
                                                         teardown_keyword_id INTEGER,
@@ -221,7 +235,7 @@ class RobotDatabase(object):
         # has 0-n tags
         # has 0-n keywords
         # has 0-n messages
-        self.push('''CREATE TABLE  IF NOT EXISTS tests (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE  IF NOT EXISTS tests (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                        suite_id INTEGER NOT NULL,
                                                        name TEXT,
                                                        timeout TEXT,
@@ -231,7 +245,7 @@ class RobotDatabase(object):
         # parent_id can be suite_id, test_id or keyword_id
         # has 0-n messages
         # has 0-n keywords (as sub-keywords)
-        self.push('''CREATE TABLE  IF NOT EXISTS keywords (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE  IF NOT EXISTS keywords (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                            parent_id INTEGER NOT NULL,
                                                            name TEXT,
                                                            type TEXT,
@@ -241,38 +255,41 @@ class RobotDatabase(object):
                                                            argument_id INTEGER)''')
 
         # parent_id: test_id, test_run_errors_id or keyword_id
-        self.push('''CREATE TABLE  IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE  IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                           parent_id INTEGER NOT NULL,
                                                           level TEXT,
                                                           timestamp DATETIME,
                                                           content TEXT)''')
 
-        self.push('''CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                       test_id INTEGER NOT NULL,
                                                       content TEXT)''')
 
-        self.push('''CREATE TABLE  IF NOT EXISTS arguments (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE  IF NOT EXISTS arguments (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                            test_id INTEGER NOT NULL,
                                                            content TEXT)''')
 
+        self._commit()
 
-        self.commit()
-
-    def push(self, *sql_statements):
+    def _push(self, *sql_statements):
         self.sql_statements.extend(sql_statements)
 
-    def commit(self):
-        connection = sqlite3.connect(self.options.db_file_path)
-        cursor = connection.cursor()
+    def _commit(self):
+        cursor = self.connection.cursor()
         for statement in self.sql_statements:
             if isinstance(statement, basestring):
                 cursor = cursor.execute(statement)
             else:
                 cursor = cursor.execute(*statement)
-            connection.commit()
+            self.connection.commit()
         self.sql_statements = []
-        connection.close()
-        return cursor.lastrowid
+
+    def insert_into_db(self, dictionary):
+        pass
+
+    def close(self):
+        self.connection.close()
+
 
 if __name__ == '__main__':
     main()
