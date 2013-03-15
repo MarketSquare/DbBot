@@ -21,7 +21,7 @@ def parse_test_run(results):
         'source_file': results.source,
         'generator': results.generator,
         'statistics': parse_statistics(results.statistics),
-        'messages': parse_messages(results.errors.messages),
+        'errors': parse_messages(results.errors.messages),
         'suites': parse_suites(results.suite),
     }
 
@@ -115,11 +115,11 @@ def _get_parsed_keyword(keyword):
         'doc': keyword.doc,
         'status': keyword.status,
         'messages': parse_messages(keyword.messages),
-        'args': parse_args(keyword.args),
+        'arguments': parse_arguments(keyword.args),
         'keywords': parse_keywords(keyword.keywords)
     }
 
-def parse_args(args):
+def parse_arguments(args):
     return [_get_parsed_arg(arg) for arg in args]
 
 def _get_parsed_arg(arg):
