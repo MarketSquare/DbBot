@@ -6,6 +6,11 @@ import sqlite3
 from os.path import exists
 from robot.result import ExecutionResult
 
+# -- for debugging purposes only
+import json
+def pprint(payload):
+    print json.dumps(payload, sort_keys=True, indent=2)
+# ---
 
 def main():
     parser = _get_option_parser()
@@ -285,7 +290,7 @@ class RobotDatabase(object):
         self.sql_statements = []
 
     def insert_into_db(self, dictionary):
-        pass
+        pprint(dictionary)
 
     def close(self):
         self.connection.close()
