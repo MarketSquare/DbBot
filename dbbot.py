@@ -199,84 +199,104 @@ class RobotDatabase(object):
         self._commit()
 
     def _init_tables(self):
-        self._push('''CREATE TABLE  IF NOT EXISTS test_runs (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                         source_file TEXT,
-                                                         generator TEXT,
-                                                         errors_id INTEGER,
-                                                         statistics_id INTEGER,
-                                                         suite_id INTEGER NOT NULL)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS test_runs (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        source_file TEXT,
+                        generator TEXT,
+                        errors_id INTEGER,
+                        statistics_id INTEGER,
+                        suite_id INTEGER NOT NULL
+                    )''')
 
         # has 0-n messages
-        self._push('''CREATE TABLE  IF NOT EXISTS test_run_errors (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                                 test_run_id INTEGER NOT NULL)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS test_run_errors (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        test_run_id INTEGER NOT NULL
+                    )''')
 
         # has 0-n stats (tag)
         # has 0-n stats (suite)
-        self._push('''CREATE TABLE  IF NOT EXISTS test_run_statistics (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                         test_run_id INTEGER NOT NULL,
-                                                         stats_all_id INTEGER,
-                                                         stats_critical_id INTEGER)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS test_run_statistics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        test_run_id INTEGER NOT NULL,
+                        stats_all_id INTEGER,
+                        stats_critical_id INTEGER
+                    )''')
 
-        self._push('''CREATE TABLE  IF NOT EXISTS stats (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                       test_run_statistics_id INTEGER NOT NULL,
-                                                       suite_id INTEGER,
-                                                       name TEXT,
-                                                       links TEXT,
-                                                       doc TEXT,
-                                                       non_critical INTEGER,
-                                                       elapsed INTEGER,
-                                                       failed INTEGER,
-                                                       critical INTEGER,
-                                                       combined TEXT,
-                                                       passed INTEGER)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS stats (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        test_run_statistics_id INTEGER NOT NULL,
+                        suite_id INTEGER,
+                        name TEXT,
+                        links TEXT,
+                        doc TEXT,
+                        non_critical INTEGER,
+                        elapsed INTEGER,
+                        failed INTEGER,
+                        critical INTEGER,
+                        combined TEXT,
+                        passed INTEGER
+                    )''')
 
         # has 0-n suites (as sub-suites)
-        self._push('''CREATE TABLE  IF NOT EXISTS suites (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                        parent_id INTEGER,
-                                                        setup_keyword_id INTEGER,
-                                                        teardown_keyword_id INTEGER,
-                                                        name TEXT,
-                                                        source TEXT,
-                                                        doc TEXT,
-                                                        start_time DATETIME,
-                                                        end_time DATETIME)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS suites (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        parent_id INTEGER,
+                        setup_keyword_id INTEGER,
+                        teardown_keyword_id INTEGER,
+                        name TEXT,
+                        source TEXT,
+                        doc TEXT,
+                        start_time DATETIME,
+                        end_time DATETIME
+                    )''')
 
         # has 0-n tags
         # has 0-n keywords
         # has 0-n messages
-        self._push('''CREATE TABLE  IF NOT EXISTS tests (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                       suite_id INTEGER NOT NULL,
-                                                       name TEXT,
-                                                       timeout TEXT,
-                                                       doc TEXT,
-                                                       status TEXT)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS tests (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        suite_id INTEGER NOT NULL,
+                        name TEXT,
+                        timeout TEXT,
+                        doc TEXT,
+                        status TEXT
+                    )''')
 
         # parent_id can be suite_id, test_id or keyword_id
         # has 0-n messages
         # has 0-n keywords (as sub-keywords)
-        self._push('''CREATE TABLE  IF NOT EXISTS keywords (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                           parent_id INTEGER NOT NULL,
-                                                           name TEXT,
-                                                           type TEXT,
-                                                           timeout TEXT,
-                                                           doc TEXT,
-                                                           status TEXT,
-                                                           argument_id INTEGER)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS keywords (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        parent_id INTEGER NOT NULL,
+                        name TEXT,
+                        type TEXT,
+                        timeout TEXT,
+                        doc TEXT,
+                        status TEXT,
+                        argument_id INTEGER
+                    )''')
 
         # parent_id: test_id, test_run_errors_id or keyword_id
-        self._push('''CREATE TABLE  IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                          parent_id INTEGER NOT NULL,
-                                                          level TEXT,
-                                                          timestamp DATETIME,
-                                                          content TEXT)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS messages (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        parent_id INTEGER NOT NULL,
+                        level TEXT,
+                        timestamp DATETIME,
+                        content TEXT
+                    )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                      test_id INTEGER NOT NULL,
-                                                      content TEXT)''')
+        self._push('''CREATE TABLE IF NOT EXISTS tags (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        test_id INTEGER NOT NULL,
+                        content TEXT
+                    )''')
 
-        self._push('''CREATE TABLE  IF NOT EXISTS arguments (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                           test_id INTEGER NOT NULL,
-                                                           content TEXT)''')
+        self._push('''CREATE TABLE  IF NOT EXISTS arguments (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        test_id INTEGER NOT NULL,
+                        content TEXT
+                    )''')
 
         self._commit()
 
