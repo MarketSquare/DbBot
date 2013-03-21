@@ -34,54 +34,38 @@ def parse_test_run(results):
         'generator': results.generator,
         'statistics': parse_statistics(results.statistics),
         'errors': parse_messages(results.errors.messages),
-        'suites': parse_suites(results.suite),
+        'suites': parse_suites(results.suite)
     }
 
 def parse_statistics(statistics):
     return {
-        'total': get_total_statistics(statistics),
-        'tag': get_tag_statistics(statistics),
-        'suite': get_suite_statistics(statistics),
+        'total_statistics': get_total_statistics(statistics),
+        'tag_statistics': get_tag_statistics(statistics),
+        'suite_statistics': get_suite_statistics(statistics)
     }
 
 def get_total_statistics(statistics):
-    return {
-        'all': _get_total_stat(statistics.total.all),
-        'critical': _get_total_stat(statistics.total.critical),
-    }
-
-def _get_total_stat(stat):
-    return {
-        'name': stat.name,
-        'elapsed': stat.elapsed,
-        'passed': stat.passed,
-        'failed': stat.failed,
-    }
+    return [
+        { 'stats': _get_parsed_stat(statistics.total.all) },
+        { 'stats': _get_parsed_stat(statistics.total.critical) }
+    ]
 
 def get_tag_statistics(statistics):
-    return [_get_parsed_tag_stat(tag) for tag in statistics.tags.tags.values()]
-
-def _get_parsed_tag_stat(stat):
     return {
-        'name': stat.name,
-        'doc': stat.doc,
-        'non_critical': stat.non_critical,
-        'elapsed': stat.elapsed,
-        'failed': stat.failed,
-        'critical': stat.critical,
-        'combined': stat.combined,
-        'passed': stat.passed,
+        'stats': [_get_parsed_stat(tag) for tag in statistics.tags.tags.values()]
     }
 
 def get_suite_statistics(statistics):
-    return [_get_parsed_suite_stat(suite.stat) for suite in statistics.suite.suites]
+    return {
+        'stats': [_get_parsed_stat(suite.stat) for suite in statistics.suite.suites]
+    }
 
-def _get_parsed_suite_stat(stat):
+def _get_parsed_stat(stat):
     return {
         'name': stat.name,
         'elapsed': stat.elapsed,
         'failed': stat.failed,
-        'passed': stat.passed,
+        'passed': stat.passed
     }
 
 def parse_suites(suite):
@@ -96,7 +80,7 @@ def _get_parsed_suite(subsuite):
         'end_time': _format_timestamp(subsuite.endtime),
         'keywords': parse_keywords(subsuite.keywords),
         'tests': parse_tests(subsuite.tests),
-        'suites': parse_suites(subsuite),
+        'suites': parse_suites(subsuite)
     }
 
 def parse_tests(tests):
@@ -109,7 +93,7 @@ def _get_parsed_test(test):
         'doc': test.doc,
         'status': test.status,
         'tags': parse_tags(test.tags),
-        'keywords': parse_keywords(test.keywords),
+        'keywords': parse_keywords(test.keywords)
     }
 
 def parse_keywords(keywords):
@@ -128,26 +112,19 @@ def _get_parsed_keyword(keyword):
     }
 
 def parse_arguments(args):
-    return [_get_parsed_arg(arg) for arg in args]
-
-def _get_parsed_arg(arg):
-    return {
-        'content': arg,
-    }
+    return [_format_parsed_content(arg) for arg in args]
 
 def parse_tags(tags):
-    return [_get_parsed_tag(tag) for tag in tags]
+    return [_format_parsed_content(tag) for tag in tags]
 
-def _get_parsed_tag(tag):
-    return {
-        'content': tag,
-    }
+def _format_parsed_content(content):
+    return { 'content': content }
 
 def _get_parsed_message(message):
     return {
         'level': message.level,
         'timestamp': _format_timestamp(message.timestamp),
-        'content': message.message,
+        'content': message.message
     }
 
 def parse_messages(messages):
@@ -189,12 +166,6 @@ class RobotDatabase(object):
         self._enable_foreign_keys()
         self._init_schema()
 
-    def insert(self, dictionary):
-        test_run_id = self._insert_test_run(dictionary)
-        self._insert_suites(dictionary['suites'], test_run_id)
-        self._insert_test_run_statistics(dictionary['statistics'], test_run_id)
-        self._insert_test_run_errors(dictionary['errors'], test_run_id)
-
     def close(self):
         self.connection.close()
 
@@ -206,107 +177,99 @@ class RobotDatabase(object):
         self._execute('''CREATE TABLE IF NOT EXISTS test_runs (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         source_file TEXT,
-                        generator TEXT,
-                        errors_id INTEGER,
-                        statistics_id INTEGER,
-                        suite_id INTEGER,
-                        FOREIGN KEY(suite_id) REFERENCES suites(id)
+                        generator TEXT
                     )''')
 
-        # has 0-n messages
-        self._execute('''CREATE TABLE IF NOT EXISTS test_run_errors (
+        self._execute('''CREATE TABLE IF NOT EXISTS errors (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_run_id INTEGER,
-                        FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
+                        parent_id INTEGER,
+                        FOREIGN KEY(parent_id) REFERENCES test_runs(id)
                     )''')
 
-        # has 0-n stats (tag)
-        # has 0-n stats (suite)
-        self._execute('''CREATE TABLE IF NOT EXISTS test_run_statistics (
+        self._execute('''CREATE TABLE IF NOT EXISTS statistics (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_run_id INTEGER,
-                        FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
+                        parent_id INTEGER,
+                        FOREIGN KEY(parent_id) REFERENCES test_runs(id)
+                    )''')
+
+        self._execute('''CREATE TABLE IF NOT EXISTS total_statistics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        parent_id INTEGER,
+                        FOREIGN KEY(parent_id) REFERENCES statistics(id)
+                    )''')
+
+        self._execute('''CREATE TABLE IF NOT EXISTS tag_statistics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        parent_id INTEGER,
+                        FOREIGN KEY(parent_id) REFERENCES statistics(id)
+                    )''')
+
+        self._execute('''CREATE TABLE IF NOT EXISTS suite_statistics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        parent_id INTEGER,
+                        FOREIGN KEY(parent_id) REFERENCES statistics(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS stats (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_run_statistics_id INTEGER,
+                        parent_id INTEGER,
                         name TEXT,
-                        links TEXT,
-                        doc TEXT,
-                        non_critical INTEGER,
                         elapsed INTEGER,
                         failed INTEGER,
-                        critical INTEGER,
-                        combined TEXT,
-                        passed INTEGER,
-                        FOREIGN KEY(test_run_statistics_id) REFERENCES test_run_statistics(id)
+                        passed INTEGER
                     )''')
 
-        # has 0-n suites (as sub-suites)
         self._execute('''CREATE TABLE IF NOT EXISTS suites (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         parent_id INTEGER,
-                        setup_keyword_id INTEGER,
-                        teardown_keyword_id INTEGER,
                         name TEXT,
                         source TEXT,
                         doc TEXT,
                         start_time DATETIME,
-                        end_time DATETIME,
-                        FOREIGN KEY(setup_keyword_id) REFERENCES keywords(id),
-                        FOREIGN KEY(teardown_keyword_id) REFERENCES keywords(id)
+                        end_time DATETIME
                     )''')
 
-        # has 0-n tags
-        # has 0-n keywords
-        # has 0-n messages
         self._execute('''CREATE TABLE IF NOT EXISTS tests (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        suite_id INTEGER,
+                        parent_id INTEGER,
                         name TEXT,
                         timeout TEXT,
                         doc TEXT,
                         status TEXT,
-                        FOREIGN KEY(suite_id) REFERENCES suites(id)
+                        FOREIGN KEY(parent_id) REFERENCES suites(id)
                     )''')
 
-        # parent_id can be suite_id, test_id or keyword_id
-        # has 0-n messages
-        # has 0-n keywords (as sub-keywords)
-        self._execute('''CREATE TABLE  IF NOT EXISTS keywords (
+        self._execute('''CREATE TABLE IF NOT EXISTS keywords (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         parent_id INTEGER,
                         name TEXT,
                         type TEXT,
                         timeout TEXT,
                         doc TEXT,
-                        status TEXT,
-                        argument_id INTEGER,
-                        FOREIGN KEY(argument_id) REFERENCES arguments(id)
+                        status TEXT
                     )''')
 
-        # parent_id: test_id, test_run_errors_id or keyword_id
-        self._execute('''CREATE TABLE  IF NOT EXISTS messages (
+        self._execute('''CREATE TABLE IF NOT EXISTS messages (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         parent_id INTEGER,
                         level TEXT,
                         timestamp DATETIME,
-                        content TEXT
+                        content TEXT,
+                        FOREIGN KEY(parent_id) REFERENCES keywords(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS tags (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_id INTEGER,
+                        parent_id INTEGER,
                         content TEXT,
-                        FOREIGN KEY(test_id) REFERENCES tests(id)
+                        FOREIGN KEY(parent_id) REFERENCES tests(id)
                     )''')
 
         self._execute('''CREATE TABLE  IF NOT EXISTS arguments (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        keyword_id INTEGER,
+                        parent_id INTEGER,
                         content TEXT,
-                        FOREIGN KEY(keyword_id) REFERENCES keywords(id)
+                        FOREIGN KEY(parent_id) REFERENCES keywords(id)
                     )''')
 
     def _execute(self, statement, values=[]):
@@ -315,80 +278,36 @@ class RobotDatabase(object):
         self.connection.commit()
         return cursor.lastrowid
 
-    def _insert_messages(self, messages, parent_id):
-        for message in messages:
-            message['parent_id'] = parent_id
-            self._to_table('messages', message)
+    def insert(self, dictionary):
+        self._insert_table('test_runs', dictionary)
 
-    def _insert_test_run_errors(self, errors, test_run_id):
-        test_run_errors = {
-            'test_run_id': test_run_id
-        }
-        test_run_errors_id = self._to_table('test_run_errors', test_run_errors)
-        self._insert_messages(errors, test_run_errors_id)
+    def _insert_table(self, db_table_name, items, parent_id=None):
+        if type(items) is not list:
+            items = [items]
+        [self._insert_row(db_table_name, item, parent_id) for item in items]
 
-    def _insert_arguments(self, arguments, keyword_id):
-        for argument in arguments:
-            argument['keyword_id'] = keyword_id
-            self._to_table('arguments', argument)
+    def _insert_row(self, db_table_name, object, parent_id=None):
+        if not parent_id is None:
+            object['parent_id'] = parent_id
+        keys, values = self._get_parent_values(object)
+        query = self._make_insert_query(db_table_name, keys)
+        last_inserted_row_id = self._execute(query, values)
+        for key in list(set(object.keys()) - set(keys)):
+            self._insert_table(key, object[key], last_inserted_row_id)
 
-    def _insert_test_run_statistics(self, statistics, test_run_id):
-        test_run_statistics = {
-            'test_run_id': test_run_id
-        }
-        test_runs_statistics_id = self._to_table('test_run_statistics', test_run_statistics)
-        self._insert_stat(statistics['total']['all'], test_runs_statistics_id)
-        self._insert_stat(statistics['total']['critical'], test_runs_statistics_id)
-        for stat in statistics['tag']:
-            self._insert_stat(stat, test_runs_statistics_id)
-        for stat in statistics['suite']:
-            self._insert_stat(stat, test_runs_statistics_id)
-
-    def _insert_stat(self, stat, test_run_statistics_id):
-        stat['test_run_statistics_id'] = test_run_statistics_id
-        self._to_table('stats', stat)
-
-    def _insert_test_run(self, test_run):
-        return self._to_table('test_runs', test_run)
-
-    def _insert_suites(self, suites, parent_id):
-        for suite in suites:
-            suite['parent_id'] = parent_id
-            suite_id = self._to_table('suites', suite)
-
-            self._insert_keywords(suite['keywords'], suite_id)
-            self._insert_tests(suite['tests'], suite_id)
-            self._insert_suites(suite['suites'], suite_id)
-
-    def _insert_keywords(self, keywords, parent_id):
-        for keyword in keywords:
-            keyword['parent_id'] = parent_id
-            keyword_id = self._to_table('keywords', keyword)
-            self._insert_messages(keyword['messages'], keyword_id)
-            self._insert_arguments(keyword['arguments'], keyword_id)
-            self._insert_keywords(keyword['keywords'], keyword_id)
-
-    def _insert_tests(self, tests, suite_id):
-        for test in tests:
-            test['suite_id'] = suite_id
-            test_id = self._to_table('tests', test)
-            self._insert_tags(test['tags'], test_id)
-            self._insert_keywords(test['keywords'], test_id)
-
-    def _insert_tags(self, tags, test_id):
-        for tag in tags:
-            tag['test_id'] = test_id
-            self._to_table('tags', tag)
-
-    def _to_table(self, tablename, data):
+    def _get_parent_values(self, object):
         keys = []
         values = []
-        for key, value in data.iteritems():
+        for key, value in object.iteritems():
             if not isinstance(value, (list, dict)):
                 keys.append(key)
                 values.append(value)
-        query = 'INSERT INTO %s(%s) VALUES (%s)' % (tablename, ",".join(keys), ','.join(['?'] * len(keys)))
-        return self._execute(query, values)
+        return keys, values
+
+    def _make_insert_query(self, db_table_name, keys):
+        column_names = ",".join(keys)
+        value_placeholders = ','.join(['?'] * len(keys))
+        return 'INSERT INTO %s(%s) VALUES (%s)' % (db_table_name, column_names, value_placeholders)
 
 
 if __name__ == '__main__':
