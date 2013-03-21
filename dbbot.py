@@ -317,28 +317,26 @@ class RobotDatabase(object):
 
     def _insert_messages(self, messages, parent_id):
         for message in messages:
-            parent_values = self._remove_children(message)
-            parent_values['parent_id'] = parent_id
-            self._insert_dictionary('messages', parent_values)
+            message['parent_id'] = parent_id
+            self._to_table('messages', message)
 
     def _insert_test_run_errors(self, errors, test_run_id):
-        parent_values = {
+        test_run_errors = {
             'test_run_id': test_run_id
         }
-        test_run_errors_id = self._insert_dictionary('test_run_errors', parent_values)
+        test_run_errors_id = self._to_table('test_run_errors', test_run_errors)
         self._insert_messages(errors, test_run_errors_id)
 
     def _insert_arguments(self, arguments, keyword_id):
         for argument in arguments:
-            parent_values = self._remove_children(argument)
-            parent_values['keyword_id'] = keyword_id
-            self._insert_dictionary('arguments', parent_values)
+            argument['keyword_id'] = keyword_id
+            self._to_table('arguments', argument)
 
     def _insert_test_run_statistics(self, statistics, test_run_id):
-        parent_values = {
+        test_run_statistics = {
             'test_run_id': test_run_id
         }
-        test_runs_statistics_id = self._insert_dictionary('test_run_statistics', parent_values)
+        test_runs_statistics_id = self._to_table('test_run_statistics', test_run_statistics)
         self._insert_stat(statistics['total']['all'], test_runs_statistics_id)
         self._insert_stat(statistics['total']['critical'], test_runs_statistics_id)
         for stat in statistics['tag']:
@@ -348,58 +346,49 @@ class RobotDatabase(object):
 
     def _insert_stat(self, stat, test_run_statistics_id):
         stat['test_run_statistics_id'] = test_run_statistics_id
-        self._insert_dictionary('stats', stat)
+        self._to_table('stats', stat)
 
     def _insert_test_run(self, test_run):
-        parent_values = self._remove_children(test_run)
-        return self._insert_dictionary('test_runs', parent_values)
+        return self._to_table('test_runs', test_run)
 
     def _insert_suites(self, suites, parent_id):
         for suite in suites:
-            parent_values = self._remove_children(suite)
-            parent_values['parent_id'] = parent_id
-            suite_id = self._insert_dictionary('suites', parent_values)
+            suite['parent_id'] = parent_id
+            suite_id = self._to_table('suites', suite)
+
             self._insert_keywords(suite['keywords'], suite_id)
             self._insert_tests(suite['tests'], suite_id)
             self._insert_suites(suite['suites'], suite_id)
 
     def _insert_keywords(self, keywords, parent_id):
         for keyword in keywords:
-            parent_values = self._remove_children(keyword)
-            parent_values['parent_id'] = parent_id
-            keyword_id = self._insert_dictionary('keywords', parent_values)
+            keyword['parent_id'] = parent_id
+            keyword_id = self._to_table('keywords', keyword)
             self._insert_messages(keyword['messages'], keyword_id)
             self._insert_arguments(keyword['arguments'], keyword_id)
             self._insert_keywords(keyword['keywords'], keyword_id)
 
     def _insert_tests(self, tests, suite_id):
         for test in tests:
-            parent_values = self._remove_children(test)
-            parent_values['suite_id'] = suite_id
-            test_id = self._insert_dictionary('tests', parent_values)
+            test['suite_id'] = suite_id
+            test_id = self._to_table('tests', test)
             self._insert_tags(test['tags'], test_id)
             self._insert_keywords(test['keywords'], test_id)
 
     def _insert_tags(self, tags, test_id):
         for tag in tags:
-            parent_values = self._remove_children(tag)
-            parent_values['test_id'] = test_id
-            self._insert_dictionary('tags', parent_values)
+            tag['test_id'] = test_id
+            self._to_table('tags', tag)
 
-    def _insert_dictionary(self, tablename, data):
-        fields = data.keys()
-        values = data.values()
-        fieldlist = ",".join(fields)
-        placeholderlist = ','.join(['?'] * len(fields))
-        query = 'INSERT INTO %s(%s) VALUES (%s)' % (tablename, fieldlist, placeholderlist)
+    def _to_table(self, tablename, data):
+        keys = []
+        values = []
+        for key, value in data.iteritems():
+            if not isinstance(value, (list, dict)):
+                keys.append(key)
+                values.append(value)
+        query = 'INSERT INTO %s(%s) VALUES (%s)' % (tablename, ",".join(keys), ','.join(['?'] * len(keys)))
         return self._execute(query, values)
-
-    def _remove_children(self, dictionary):
-        stripped_dictionary = deepcopy(dictionary)
-        for key in stripped_dictionary.keys():
-            if isinstance(stripped_dictionary[key], (list, dict)):
-                stripped_dictionary.pop(key)
-        return stripped_dictionary
 
 
 if __name__ == '__main__':
