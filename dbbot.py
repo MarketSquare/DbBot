@@ -13,9 +13,10 @@ def main():
     options = _get_validated_options(parser)
     output_xml_file = ExecutionResult(options.file_path)
     results_dictionary = parse_test_run(output_xml_file)
-    db = RobotDatabase(options)
     try:
-        db.push(results_dictionary)
+        db = RobotDatabase(options.db_file_path)
+        db.dict_to_inserts(results_dictionary)
+        db.commit()
     except Exception, message:
         output_error_message(message)
     finally:
@@ -161,25 +162,25 @@ def output_error_message(message):
 
 
 class RobotDatabase(object):
-    def __init__(self, options):
-        self.connection = sqlite3.connect(options.db_file_path)
+    def __init__(self, db_file_path):
+        self.connection = sqlite3.connect(db_file_path)
         self._init_schema()
 
     def _init_schema(self):
-        self._execute('''CREATE TABLE IF NOT EXISTS test_runs (
+        self._push('''CREATE TABLE IF NOT EXISTS test_runs (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         source_file TEXT NOT NULL,
                         generator TEXT NOT NULL
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS statistics (
+        self._push('''CREATE TABLE IF NOT EXISTS statistics (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_run_id INTEGER NOT NULL,
                         name TEXT NOT NULL,
                         FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS stats (
+        self._push('''CREATE TABLE IF NOT EXISTS stats (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         statistic_id INTEGER NOT NULL,
                         name TEXT NOT NULL,
@@ -189,7 +190,7 @@ class RobotDatabase(object):
                         FOREIGN KEY(statistic_id) REFERENCES statistics(id)
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS suites (
+        self._push('''CREATE TABLE IF NOT EXISTS suites (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_run_id INTEGER,
                         suite_id INTEGER,
@@ -203,7 +204,7 @@ class RobotDatabase(object):
                         FOREIGN KEY(suite_id) REFERENCES suites(id)
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS tests (
+        self._push('''CREATE TABLE IF NOT EXISTS tests (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         suite_id INTEGER NOT NULL,
                         xml_id TEXT UNIQUE NOT NULL,
@@ -214,7 +215,7 @@ class RobotDatabase(object):
                         FOREIGN KEY(suite_id) REFERENCES suites(id)
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS keywords (
+        self._push('''CREATE TABLE IF NOT EXISTS keywords (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_id INTEGER,
                         keyword_id INTEGER,
@@ -229,7 +230,7 @@ class RobotDatabase(object):
                         FOREIGN KEY(suite_id) REFERENCES suites(id)
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS messages (
+        self._push('''CREATE TABLE IF NOT EXISTS messages (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         keyword_id INTEGER NOT NULL,
                         level TEXT NOT NULL,
@@ -238,7 +239,7 @@ class RobotDatabase(object):
                         FOREIGN KEY(keyword_id) REFERENCES keywords(id)
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS errors (
+        self._push('''CREATE TABLE IF NOT EXISTS errors (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_run_id INTEGER NOT NULL,
                         level TEXT NOT NULL,
@@ -247,14 +248,14 @@ class RobotDatabase(object):
                         FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS tags (
+        self._push('''CREATE TABLE IF NOT EXISTS tags (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_id INTEGER NOT NULL,
                         content TEXT NOT NULL,
                         FOREIGN KEY(test_id) REFERENCES tests(id)
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS arguments (
+        self._push('''CREATE TABLE IF NOT EXISTS arguments (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         keyword_id INTEGER NOT NULL,
                         content TEXT NOT NULL,
@@ -262,13 +263,15 @@ class RobotDatabase(object):
                     )''')
 
     def close(self):
-        self.connection.commit()
         self.connection.close()
 
-    def push(self, dictionary):
+    def commit(self):
+        self.connection.commit()
+
+    def dict_to_inserts(self, dictionary):
         self._insert_all_elements('test_runs', dictionary)
 
-    def _execute(self, sql_statement, values=[]):
+    def _push(self, sql_statement, values=[]):
         cursor = self.connection.execute(sql_statement, values)
         return cursor.lastrowid
 
@@ -282,7 +285,7 @@ class RobotDatabase(object):
             element[parent_reference[0]] = parent_reference[1]
         keys, values = self._get_parent_values(element)
         query = self._make_insert_query(db_table_name, keys)
-        last_inserted_row_id = self._execute(query, values)
+        last_inserted_row_id = self._push(query, values)
         parent_reference = ("%s_id" % db_table_name[:-1], last_inserted_row_id)
         for key in list(set(element.keys()) - set(keys)):
             self._insert_all_elements(key, element[key], parent_reference)
