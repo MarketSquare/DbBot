@@ -9,156 +9,177 @@ from robot.result import ExecutionResult
 
 
 def main():
-    parser = _get_option_parser()
-    options = _get_validated_options(parser)
-    output_xml_file = ExecutionResult(options.file_path)
-    results_dictionary = parse_test_run(output_xml_file)
-    db = RobotDatabase(options.db_file_path)
     try:
-        db.dict_to_sql(results_dictionary)
+        config = ConfigurationParser()
+        output_xml_file = ExecutionResult(config.file_path)
+        parser = RobotOutputParser(output_xml_file)
+        test_run = parser.parse_results()
+    except Exception, message:
+        _output_error_and_exit('Error: %s\n\n' % message)
+    db = RobotDatabase(config.db_file_path)
+    try:
+        db.dict_to_sql(test_run)
         db.commit()
     except Exception, message:
-        output_error_message(message)
+        _output_error_and_exit('Database error: %s\n\n' % message)
     finally:
         db.close()
 
 
-def parse_test_run(results):
-    return {
-        'source_file': results.source,
-        'generator': results.generator,
-        'statistics': parse_statistics(results.statistics),
-        'errors': parse_messages(results.errors.messages),
-        'suites': parse_suites(results.suite)
-    }
-
-def parse_statistics(statistics):
-    return [
-        get_total_all_statistics(statistics),
-        get_total_critical_statistics(statistics),
-        get_tag_statistics(statistics),
-        get_suite_statistics(statistics)
-    ]
-
-def get_total_all_statistics(statistics):
-    return {
-        'name': 'total', 'stats': _get_parsed_stat(statistics.total.all)
-    }
-
-def get_total_critical_statistics(statistics):
-    return {
-        'name': 'critical', 'stats': _get_parsed_stat(statistics.total.critical)
-    }
-
-def get_tag_statistics(statistics):
-    return {
-        'name': 'tag', 'stats': [_get_parsed_stat(tag) for tag in statistics.tags.tags.values()]
-    }
-
-def get_suite_statistics(statistics):
-    return {
-        'name': 'suite', 'stats': [_get_parsed_stat(suite.stat) for suite in statistics.suite.suites]
-    }
-
-def _get_parsed_stat(stat):
-    return {
-        'name': stat.name,
-        'elapsed': stat.elapsed,
-        'failed': stat.failed,
-        'passed': stat.passed
-    }
-
-def parse_suites(suite):
-    return [_get_parsed_suite(subsuite) for subsuite in suite.suites]
-
-def _get_parsed_suite(subsuite):
-    return {
-        'xml_id': subsuite.id,
-        'name': subsuite.name,
-        'source': subsuite.source,
-        'doc': subsuite.doc,
-        'start_time': _format_timestamp(subsuite.starttime),
-        'end_time': _format_timestamp(subsuite.endtime),
-        'keywords': parse_keywords(subsuite.keywords),
-        'tests': parse_tests(subsuite.tests),
-        'suites': parse_suites(subsuite)
-    }
-
-def parse_tests(tests):
-    return [_get_parsed_test(test) for test in tests]
-
-def _get_parsed_test(test):
-    return {
-        'xml_id': test.id,
-        'name': test.name,
-        'timeout': test.timeout,
-        'doc': test.doc,
-        'status': test.status,
-        'tags': parse_tags(test.tags),
-        'keywords': parse_keywords(test.keywords)
-    }
-
-def parse_keywords(keywords):
-    return [_get_parsed_keyword(keyword) for keyword in keywords]
-
-def _get_parsed_keyword(keyword):
-    return {
-        'name': keyword.name,
-        'type': keyword.type,
-        'timeout': keyword.timeout,
-        'doc': keyword.doc,
-        'status': keyword.status,
-        'messages': parse_messages(keyword.messages),
-        'arguments': parse_arguments(keyword.args),
-        'keywords': parse_keywords(keyword.keywords)
-    }
-
-def parse_arguments(args):
-    return [_get_parsed_content(arg) for arg in args]
-
-def parse_tags(tags):
-    return [_get_parsed_content(tag) for tag in tags]
-
-def _get_parsed_content(content):
-    return { 'content': content }
-
-def parse_messages(messages):
-    return [_get_parsed_message(message) for message in messages]
-
-def _get_parsed_message(message):
-    return {
-        'level': message.level,
-        'timestamp': _format_timestamp(message.timestamp),
-        'content': message.message
-    }
-
-def _format_timestamp(timestamp):
-    return str(datetime.strptime(timestamp.split('.')[0], '%Y%m%d %H:%M:%S'))
-
-def _get_option_parser():
-    parser = optparse.OptionParser()
-    parser.add_option('--file', dest='file_path')
-    parser.add_option('--db', dest='db_file_path', default='results.db')
-    return parser
-
-def _get_validated_options(parser):
-    if len(sys.argv) < 2:
-        _exit_with_help(parser)
-    options, args = parser.parse_args()
-    if args:
-        _exit_with_help(parser)
-    if not exists(options.file_path):
-        _exit_with_help(parser, 'File not found')
-    return options
-
-def _exit_with_help(parser, message=None):
-    if message:
-        output_error_message(message)
-    parser.print_help()
+def _output_error_and_exit(message=None):
+    sys.stderr.write(message)
     exit(1)
 
-def output_error_message(message):
-    sys.stderr.write('Error: %s\n\n' % message)
+
+class ConfigurationParser(object):
+    def __init__(self):
+        self.parser = optparse.OptionParser()
+        self._add_parser_options()
+        self.options = self._get_validated_options()
+
+    @property
+    def file_path(self):
+        return self.options.file_path
+
+    @property
+    def db_file_path(self):
+        return self.options.db_file_path
+
+    def _add_parser_options(self):
+        self.parser.add_option('--file', dest='file_path')
+        self.parser.add_option('--db', dest='db_file_path', default='results.db')
+
+    def _get_validated_options(self):
+        if len(sys.argv) < 2:
+            self._exit_with_help()
+        options, args = self.parser.parse_args()
+        if args:
+            print args
+            self._exit_with_help()
+        if not exists(options.file_path):
+            raise Exception('File "%s" not exists.' % options.file_path)
+        return options
+
+    def _exit_with_help(self):
+        self.parser.print_help()
+        exit(1)
+
+
+class RobotOutputParser(object):
+    def __init__(self, output_file):
+        self.test_run = output_file
+
+    def parse_results(self):
+        return {
+            'source_file': self.test_run.source,
+            'generator': self.test_run.generator,
+            'statistics': self.parse_statistics(),
+            'errors': self._parse_messages(self.test_run.errors.messages),
+            'suites': self._parse_suites(self.test_run.suite)
+        }
+
+    def parse_statistics(self):
+        return [
+            self.total_statistics(),
+            self.critical_statistics(),
+            self.tag_statistics(),
+            self.suite_statistics()
+        ]
+
+    def total_statistics(self):
+        return {
+            'name': 'total', 'stats': self._get_parsed_stat(self.test_run.statistics.total.all)
+        }
+
+    def critical_statistics(self):
+        return {
+            'name': 'critical', 'stats': self._get_parsed_stat(self.test_run.statistics.total.critical)
+        }
+
+    def tag_statistics(self):
+        return {
+            'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in self.test_run.statistics.tags.tags.values()]
+        }
+
+    def suite_statistics(self):
+        return {
+            'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in self.test_run.statistics.suite.suites]
+        }
+
+    def _get_parsed_stat(self, stat):
+        return {
+            'name': stat.name,
+            'elapsed': stat.elapsed,
+            'failed': stat.failed,
+            'passed': stat.passed
+        }
+
+    def _parse_suites(self, suite):
+        return [self._get_parsed_suite(subsuite) for subsuite in suite.suites]
+
+    def _get_parsed_suite(self, subsuite):
+        return {
+            'xml_id': subsuite.id,
+            'name': subsuite.name,
+            'source': subsuite.source,
+            'doc': subsuite.doc,
+            'start_time': self._format_timestamp(subsuite.starttime),
+            'end_time': self._format_timestamp(subsuite.endtime),
+            'keywords': self._parse_keywords(subsuite.keywords),
+            'tests': self._parse_tests(subsuite.tests),
+            'suites': self._parse_suites(subsuite)
+        }
+
+    def _parse_tests(self, tests):
+        return [self._get_parsed_test(test) for test in tests]
+
+    def _get_parsed_test(self, test):
+        return {
+            'xml_id': test.id,
+            'name': test.name,
+            'timeout': test.timeout,
+            'doc': test.doc,
+            'status': test.status,
+            'tags': self._parse_tags(test.tags),
+            'keywords': self._parse_keywords(test.keywords)
+        }
+
+    def _parse_keywords(self, keywords):
+        return [self._get_parsed_keyword(keyword) for keyword in keywords]
+
+    def _get_parsed_keyword(self, keyword):
+        return {
+            'name': keyword.name,
+            'type': keyword.type,
+            'timeout': keyword.timeout,
+            'doc': keyword.doc,
+            'status': keyword.status,
+            'messages': self._parse_messages(keyword.messages),
+            'arguments': self._parse_arguments(keyword.args),
+            'keywords': self._parse_keywords(keyword.keywords)
+        }
+
+    def _parse_arguments(self, args):
+        return [self._get_parsed_content(arg) for arg in args]
+
+    def _parse_tags(self, tags):
+        return [self._get_parsed_content(tag) for tag in tags]
+
+    def _get_parsed_content(self, content):
+        return { 'content': content }
+
+    def _parse_messages(self, messages):
+        return [self._get_parsed_message(message) for message in messages]
+
+    def _get_parsed_message(self, message):
+        return {
+            'level': message.level,
+            'timestamp': self._format_timestamp(message.timestamp),
+            'content': message.message
+        }
+
+    def _format_timestamp(self, timestamp):
+        return str(datetime.strptime(timestamp.split('.')[0], '%Y%m%d %H:%M:%S'))
 
 
 class RobotDatabase(object):
