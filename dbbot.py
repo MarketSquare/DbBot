@@ -32,26 +32,26 @@ def _output_error_and_exit(message=None):
 
 class ConfigurationParser(object):
     def __init__(self):
-        self.parser = OptionParser()
+        self._parser = OptionParser()
         self._add_parser_options()
-        self.options = self._get_validated_options()
+        self._options = self._get_validated_options()
 
     @property
     def file_path(self):
-        return self.options.file_path
+        return self._options.file_path
 
     @property
     def db_file_path(self):
-        return self.options.db_file_path
+        return self._options.db_file_path
 
     def _add_parser_options(self):
-        self.parser.add_option('--file', dest='file_path')
-        self.parser.add_option('--db', dest='db_file_path', default='results.db')
+        self._parser.add_option('--file', dest='file_path')
+        self._parser.add_option('--db', dest='db_file_path', default='results.db')
 
     def _get_validated_options(self):
         if len(sys.argv) < 2:
             self._exit_with_help()
-        options, args = self.parser.parse_args()
+        options, args = self._parser.parse_args()
         if args:
             self._exit_with_help()
         if not exists(options.file_path):
@@ -59,21 +59,21 @@ class ConfigurationParser(object):
         return options
 
     def _exit_with_help(self):
-        self.parser.print_help()
+        self._parser.print_help()
         exit(1)
 
 
 class RobotOutputParser(object):
     def __init__(self, output_file):
-        self.test_run = output_file
+        self._test_run = output_file
 
     def results_to_dict(self):
         return {
-            'source_file': self.test_run.source,
-            'generator': self.test_run.generator,
+            'source_file': self._test_run.source,
+            'generator': self._test_run.generator,
             'statistics': self.parse_statistics(),
-            'errors': self._parse_messages(self.test_run.errors.messages),
-            'suites': self._parse_suites(self.test_run.suite)
+            'errors': self._parse_messages(self._test_run.errors.messages),
+            'suites': self._parse_suites(self._test_run.suite)
         }
 
     def parse_statistics(self):
@@ -86,22 +86,22 @@ class RobotOutputParser(object):
 
     def total_statistics(self):
         return {
-            'name': 'total', 'stats': self._get_parsed_stat(self.test_run.statistics.total.all)
+            'name': 'total', 'stats': self._get_parsed_stat(self._test_run.statistics.total.all)
         }
 
     def critical_statistics(self):
         return {
-            'name': 'critical', 'stats': self._get_parsed_stat(self.test_run.statistics.total.critical)
+            'name': 'critical', 'stats': self._get_parsed_stat(self._test_run.statistics.total.critical)
         }
 
     def tag_statistics(self):
         return {
-            'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in self.test_run.statistics.tags.tags.values()]
+            'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in self._test_run.statistics.tags.tags.values()]
         }
 
     def suite_statistics(self):
         return {
-            'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in self.test_run.statistics.suite.suites]
+            'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in self._test_run.statistics.suite.suites]
         }
 
     def _get_parsed_stat(self, stat):
@@ -182,7 +182,7 @@ class RobotOutputParser(object):
 
 class RobotDatabase(object):
     def __init__(self, db_file_path):
-        self.connection = connect(db_file_path)
+        self._connection = connect(db_file_path)
         self._init_schema()
 
     def _init_schema(self):
@@ -282,16 +282,16 @@ class RobotDatabase(object):
                     )''')
 
     def close(self):
-        self.connection.close()
+        self._connection.close()
 
     def commit(self):
-        self.connection.commit()
+        self._connection.commit()
 
     def dict_to_sql(self, dictionary):
         self._insert_all_elements('test_runs', dictionary)
 
     def _push(self, sql_statement, values=[]):
-        cursor = self.connection.execute(sql_statement, values)
+        cursor = self._connection.execute(sql_statement, values)
         return cursor.lastrowid
 
     def _insert_all_elements(self, db_table_name, elements, parent_reference=None):
