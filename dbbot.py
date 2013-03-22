@@ -9,11 +9,13 @@ from robot.result import ExecutionResult
 
 
 def main():
+    test_run_results = []
     try:
         config = ConfigurationParser()
-        output_xml_file = ExecutionResult(config.file_path)
-        output_parser = RobotOutputParser(output_xml_file)
-        test_run_results = output_parser.results_to_dict()
+        for output_file in config.file_paths:
+            parser = RobotOutputParser(output_file)
+            results_dictionary = parser.results_in_dict()
+            test_run_results.append(results_dictionary)
     except Exception, message:
         _output_error_and_exit('Error: %s\n\n' % message)
     db = RobotDatabase(config.db_file_path)
@@ -37,16 +39,16 @@ class ConfigurationParser(object):
         self._options = self._get_validated_options()
 
     @property
-    def file_path(self):
-        return self._options.file_path
+    def file_paths(self):
+        return self._options.file_paths
 
     @property
     def db_file_path(self):
         return self._options.db_file_path
 
     def _add_parser_options(self):
-        self._parser.add_option('--file', dest='file_path')
-        self._parser.add_option('--db', dest='db_file_path', default='results.db')
+        self._parser.add_option('-d', '--database', dest='db_file_path', default='results.db')
+        self._parser.add_option('-f', '--files', action="callback", callback=self._files_parser, dest='file_paths')
 
     def _get_validated_options(self):
         if len(sys.argv) < 2:
@@ -54,20 +56,32 @@ class ConfigurationParser(object):
         options, args = self._parser.parse_args()
         if args:
             self._exit_with_help()
-        if not exists(options.file_path):
-            raise Exception('File "%s" not exists.' % options.file_path)
+        for file_path in options.file_paths:
+            if not exists(file_path):
+                raise Exception('File "%s" not exists.' % file_path)
         return options
 
     def _exit_with_help(self):
         self._parser.print_help()
         exit(1)
 
+    def _files_parser(self, option, opt_str, value, parser):
+        value = []
+        for arg in parser.rargs:
+            if arg[:2] == "--" and len(arg) > 2:
+                break
+            if arg[:1] == "-" and len(arg) > 1:
+                break
+            value.append(arg)
+        del parser.rargs[:len(value)]
+        setattr(parser.values, option.dest, value)
+
 
 class RobotOutputParser(object):
     def __init__(self, output_file):
-        self._test_run = output_file
+        self._test_run = ExecutionResult(output_file)
 
-    def results_to_dict(self):
+    def results_in_dict(self):
         return {
             'source_file': self._test_run.source,
             'generator': self._test_run.generator,
@@ -213,7 +227,7 @@ class RobotDatabase(object):
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_run_id INTEGER,
                         suite_id INTEGER,
-                        xml_id TEXT UNIQUE NOT NULL,
+                        xml_id TEXT NOT NULL,
                         name TEXT NOT NULL,
                         source TEXT NOT NULL,
                         doc TEXT NOT NULL,
@@ -226,7 +240,7 @@ class RobotDatabase(object):
         self._push('''CREATE TABLE IF NOT EXISTS tests (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         suite_id INTEGER NOT NULL,
-                        xml_id TEXT UNIQUE NOT NULL,
+                        xml_id TEXT NOT NULL,
                         name TEXT NOT NULL,
                         timeout TEXT NOT NULL,
                         doc TEXT NOT NULL,
