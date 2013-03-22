@@ -6,7 +6,6 @@ import sqlite3
 from os.path import exists
 from datetime import datetime
 from robot.result import ExecutionResult
-from copy import deepcopy
 
 # -- for debugging purposes only
 import json
