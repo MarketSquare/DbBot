@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 import sys
-import optparse
-import sqlite3
+from sqlite3 import connect
 from os.path import exists
 from datetime import datetime
+from optparse import OptionParser
 from robot.result import ExecutionResult
 
 
@@ -32,7 +32,7 @@ def _output_error_and_exit(message=None):
 
 class ConfigurationParser(object):
     def __init__(self):
-        self.parser = optparse.OptionParser()
+        self.parser = OptionParser()
         self._add_parser_options()
         self.options = self._get_validated_options()
 
@@ -182,7 +182,7 @@ class RobotOutputParser(object):
 
 class RobotDatabase(object):
     def __init__(self, db_file_path):
-        self.connection = sqlite3.connect(db_file_path)
+        self.connection = connect(db_file_path)
         self._init_schema()
 
     def _init_schema(self):
