@@ -12,19 +12,18 @@ def main():
     try:
         config = ConfigurationParser()
         output_xml_file = ExecutionResult(config.file_path)
-        parser = RobotOutputParser(output_xml_file)
-        test_run = parser.parse_results()
+        output_parser = RobotOutputParser(output_xml_file)
+        test_run_results = output_parser.results_to_dict()
     except Exception, message:
         _output_error_and_exit('Error: %s\n\n' % message)
     db = RobotDatabase(config.db_file_path)
     try:
-        db.dict_to_sql(test_run)
+        db.dict_to_sql(test_run_results)
         db.commit()
     except Exception, message:
         _output_error_and_exit('Database error: %s\n\n' % message)
     finally:
         db.close()
-
 
 def _output_error_and_exit(message=None):
     sys.stderr.write(message)
@@ -69,7 +68,7 @@ class RobotOutputParser(object):
     def __init__(self, output_file):
         self.test_run = output_file
 
-    def parse_results(self):
+    def results_to_dict(self):
         return {
             'source_file': self.test_run.source,
             'generator': self.test_run.generator,
