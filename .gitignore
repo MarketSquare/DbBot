@@ -1,3 +1,5 @@
 *.idea
 *.db
+*.db-journal
 fixtures
+
