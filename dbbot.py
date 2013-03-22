@@ -240,6 +240,15 @@ class RobotDatabase(object):
                         FOREIGN KEY(parent_id) REFERENCES keywords(id)
                     )''')
 
+        self._execute('''CREATE TABLE IF NOT EXISTS errors (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        parent_id INTEGER,
+                        level TEXT,
+                        timestamp DATETIME,
+                        content TEXT,
+                        FOREIGN KEY(parent_id) REFERENCES test_runs(id)
+                    )''')
+
         self._execute('''CREATE TABLE IF NOT EXISTS tags (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         parent_id INTEGER,
