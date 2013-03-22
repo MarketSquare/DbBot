@@ -187,80 +187,89 @@ class RobotDatabase(object):
 
         self._execute('''CREATE TABLE IF NOT EXISTS statistics (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        test_run_id INTEGER NOT NULL,
                         name TEXT,
-                        FOREIGN KEY(parent_id) REFERENCES test_runs(id)
+                        FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS stats (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        statistic_id INTEGER NOT NULL,
                         name TEXT,
                         elapsed INTEGER,
                         failed INTEGER,
-                        passed INTEGER
+                        passed INTEGER,
+                        FOREIGN KEY(statistic_id) REFERENCES statistics(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS suites (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        test_run_id INTEGER,
+                        suite_id INTEGER,
                         name TEXT,
                         source TEXT,
                         doc TEXT,
                         start_time DATETIME,
-                        end_time DATETIME
+                        end_time DATETIME,
+                        FOREIGN KEY(test_run_id) REFERENCES test_runs(id),
+                        FOREIGN KEY(suite_id) REFERENCES suites(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS tests (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        suite_id INTEGER NOT NULL,
                         name TEXT,
                         timeout TEXT,
                         doc TEXT,
                         status TEXT,
-                        FOREIGN KEY(parent_id) REFERENCES suites(id)
+                        FOREIGN KEY(suite_id) REFERENCES suites(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS keywords (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        test_id INTEGER,
+                        keyword_id INTEGER,
+                        suite_id INTEGER,
                         name TEXT,
                         type TEXT,
                         timeout TEXT,
                         doc TEXT,
-                        status TEXT
+                        status TEXT,
+                        FOREIGN KEY(test_id) REFERENCES tests(id),
+                        FOREIGN KEY(keyword_id) REFERENCES keywords(id),
+                        FOREIGN KEY(suite_id) REFERENCES suites(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS messages (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        keyword_id INTEGER NOT NULL,
                         level TEXT,
                         timestamp DATETIME,
                         content TEXT,
-                        FOREIGN KEY(parent_id) REFERENCES keywords(id)
+                        FOREIGN KEY(keyword_id) REFERENCES keywords(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS errors (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        test_run_id INTEGER NOT NULL,
                         level TEXT,
                         timestamp DATETIME,
                         content TEXT,
-                        FOREIGN KEY(parent_id) REFERENCES test_runs(id)
+                        FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS tags (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        test_id INTEGER NOT NULL,
                         content TEXT,
-                        FOREIGN KEY(parent_id) REFERENCES tests(id)
+                        FOREIGN KEY(test_id) REFERENCES tests(id)
                     )''')
 
-        self._execute('''CREATE TABLE  IF NOT EXISTS arguments (
+        self._execute('''CREATE TABLE IF NOT EXISTS arguments (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
+                        keyword_id INTEGER NOT NULL,
                         content TEXT,
-                        FOREIGN KEY(parent_id) REFERENCES keywords(id)
+                        FOREIGN KEY(keyword_id) REFERENCES keywords(id)
                     )''')
 
     def _execute(self, statement, values=[]):
@@ -272,19 +281,20 @@ class RobotDatabase(object):
     def insert(self, dictionary):
         self._insert_table('test_runs', dictionary)
 
-    def _insert_table(self, db_table_name, items, parent_id=None):
+    def _insert_table(self, db_table_name, items, parent_reference=None):
         if type(items) is not list:
             items = [items]
-        [self._insert_row(db_table_name, item, parent_id) for item in items]
+        [self._insert_row(db_table_name, item, parent_reference) for item in items]
 
-    def _insert_row(self, db_table_name, object, parent_id=None):
-        if not parent_id is None:
-            object['parent_id'] = parent_id
+    def _insert_row(self, db_table_name, object, parent_reference=None):
+        if not parent_reference is None:
+            object[parent_reference[0]] = parent_reference[1]
         keys, values = self._get_parent_values(object)
         query = self._make_insert_query(db_table_name, keys)
         last_inserted_row_id = self._execute(query, values)
+        parent_reference = ("%s_id" % db_table_name[:-1], last_inserted_row_id)
         for key in list(set(object.keys()) - set(keys)):
-            self._insert_table(key, object[key], last_inserted_row_id)
+            self._insert_table(key, object[key], parent_reference)
 
     def _get_parent_values(self, object):
         keys = []
