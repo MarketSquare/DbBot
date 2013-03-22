@@ -13,9 +13,9 @@ def main():
     options = _get_validated_options(parser)
     output_xml_file = ExecutionResult(options.file_path)
     results_dictionary = parse_test_run(output_xml_file)
+    db = RobotDatabase(options.db_file_path)
     try:
-        db = RobotDatabase(options.db_file_path)
-        db.dict_to_inserts(results_dictionary)
+        db.dict_to_sql(results_dictionary)
         db.commit()
     except Exception, message:
         output_error_message(message)
@@ -268,7 +268,7 @@ class RobotDatabase(object):
     def commit(self):
         self.connection.commit()
 
-    def dict_to_inserts(self, dictionary):
+    def dict_to_sql(self, dictionary):
         self._insert_all_elements('test_runs', dictionary)
 
     def _push(self, sql_statement, values=[]):
