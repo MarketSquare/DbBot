@@ -38,26 +38,31 @@ def parse_test_run(results):
     }
 
 def parse_statistics(statistics):
+    return [
+        get_total_all_statistics(statistics),
+        get_total_critical_statistics(statistics),
+        get_tag_statistics(statistics),
+        get_suite_statistics(statistics)
+    ]
+
+def get_total_all_statistics(statistics):
     return {
-        'total_statistics': get_total_statistics(statistics),
-        'tag_statistics': get_tag_statistics(statistics),
-        'suite_statistics': get_suite_statistics(statistics)
+        'name': 'total', 'stats': _get_parsed_stat(statistics.total.all)
     }
 
-def get_total_statistics(statistics):
-    return [
-        { 'stats': _get_parsed_stat(statistics.total.all) },
-        { 'stats': _get_parsed_stat(statistics.total.critical) }
-    ]
+def get_total_critical_statistics(statistics):
+    return {
+        'name': 'critical', 'stats': _get_parsed_stat(statistics.total.critical)
+    }
 
 def get_tag_statistics(statistics):
     return {
-        'stats': [_get_parsed_stat(tag) for tag in statistics.tags.tags.values()]
+        'name': 'tag', 'stats': [_get_parsed_stat(tag) for tag in statistics.tags.tags.values()]
     }
 
 def get_suite_statistics(statistics):
     return {
-        'stats': [_get_parsed_stat(suite.stat) for suite in statistics.suite.suites]
+        'name': 'suite', 'stats': [_get_parsed_stat(suite.stat) for suite in statistics.suite.suites]
     }
 
 def _get_parsed_stat(stat):
@@ -180,34 +185,11 @@ class RobotDatabase(object):
                         generator TEXT
                     )''')
 
-        self._execute('''CREATE TABLE IF NOT EXISTS errors (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
-                        FOREIGN KEY(parent_id) REFERENCES test_runs(id)
-                    )''')
-
         self._execute('''CREATE TABLE IF NOT EXISTS statistics (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         parent_id INTEGER,
+                        name TEXT,
                         FOREIGN KEY(parent_id) REFERENCES test_runs(id)
-                    )''')
-
-        self._execute('''CREATE TABLE IF NOT EXISTS total_statistics (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
-                        FOREIGN KEY(parent_id) REFERENCES statistics(id)
-                    )''')
-
-        self._execute('''CREATE TABLE IF NOT EXISTS tag_statistics (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
-                        FOREIGN KEY(parent_id) REFERENCES statistics(id)
-                    )''')
-
-        self._execute('''CREATE TABLE IF NOT EXISTS suite_statistics (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        parent_id INTEGER,
-                        FOREIGN KEY(parent_id) REFERENCES statistics(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS stats (
