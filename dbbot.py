@@ -19,13 +19,13 @@ def main():
     options = _get_validated_options(parser)
     output_xml_file = ExecutionResult(options.file_path)
     results_dictionary = parse_test_run(output_xml_file)
-    writer = RobotDatabase(options)
+    db = RobotDatabase(options)
     try:
-        writer.insert(results_dictionary)
+        db.push(results_dictionary)
     except Exception, message:
         output_error_message(message)
     finally:
-        writer.close()
+        db.close()
 
 
 def parse_test_run(results):
@@ -117,13 +117,16 @@ def _get_parsed_keyword(keyword):
     }
 
 def parse_arguments(args):
-    return [_format_parsed_content(arg) for arg in args]
+    return [_get_parsed_content(arg) for arg in args]
 
 def parse_tags(tags):
-    return [_format_parsed_content(tag) for tag in tags]
+    return [_get_parsed_content(tag) for tag in tags]
 
-def _format_parsed_content(content):
+def _get_parsed_content(content):
     return { 'content': content }
+
+def parse_messages(messages):
+    return [_get_parsed_message(message) for message in messages]
 
 def _get_parsed_message(message):
     return {
@@ -131,9 +134,6 @@ def _get_parsed_message(message):
         'timestamp': _format_timestamp(message.timestamp),
         'content': message.message
     }
-
-def parse_messages(messages):
-    return [_get_parsed_message(message) for message in messages]
 
 def _format_timestamp(timestamp):
     return str(datetime.strptime(timestamp.split('.')[0], '%Y%m%d %H:%M:%S'))
@@ -166,17 +166,8 @@ def output_error_message(message):
 
 class RobotDatabase(object):
     def __init__(self, options):
-        self.sql_statements = {}
         self.connection = sqlite3.connect(options.db_file_path)
-        self._enable_foreign_keys()
         self._init_schema()
-
-    def close(self):
-        self.connection.close()
-
-    def _enable_foreign_keys(self):
-        self._execute('PRAGMA foreign_keys = on')
-        self.connection.commit()
 
     def _init_schema(self):
         self._execute('''CREATE TABLE IF NOT EXISTS test_runs (
@@ -272,33 +263,34 @@ class RobotDatabase(object):
                         FOREIGN KEY(keyword_id) REFERENCES keywords(id)
                     )''')
 
-    def _execute(self, statement, values=[]):
-        cursor = self.connection.cursor()
-        cursor.execute(statement, values)
+    def close(self):
         self.connection.commit()
+        self.connection.close()
+
+    def push(self, dictionary):
+        self._insert_all_elements('test_runs', dictionary)
+
+    def _execute(self, sql_statement, values=[]):
+        cursor = self.connection.execute(sql_statement, values)
         return cursor.lastrowid
 
-    def insert(self, dictionary):
-        self._insert_table('test_runs', dictionary)
+    def _insert_all_elements(self, db_table_name, elements, parent_reference=None):
+        if type(elements) is not list:
+            elements = [elements]
+        [self._insert_element_as_row(db_table_name, element, parent_reference) for element in elements]
 
-    def _insert_table(self, db_table_name, items, parent_reference=None):
-        if type(items) is not list:
-            items = [items]
-        [self._insert_row(db_table_name, item, parent_reference) for item in items]
-
-    def _insert_row(self, db_table_name, object, parent_reference=None):
+    def _insert_element_as_row(self, db_table_name, element, parent_reference=None):
         if not parent_reference is None:
-            object[parent_reference[0]] = parent_reference[1]
-        keys, values = self._get_parent_values(object)
+            element[parent_reference[0]] = parent_reference[1]
+        keys, values = self._get_parent_values(element)
         query = self._make_insert_query(db_table_name, keys)
         last_inserted_row_id = self._execute(query, values)
         parent_reference = ("%s_id" % db_table_name[:-1], last_inserted_row_id)
-        for key in list(set(object.keys()) - set(keys)):
-            self._insert_table(key, object[key], parent_reference)
+        for key in list(set(element.keys()) - set(keys)):
+            self._insert_all_elements(key, element[key], parent_reference)
 
     def _get_parent_values(self, object):
-        keys = []
-        values = []
+        keys, values = [], []
         for key, value in object.iteritems():
             if not isinstance(value, (list, dict)):
                 keys.append(key)
