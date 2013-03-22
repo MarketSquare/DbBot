@@ -53,7 +53,6 @@ class ConfigurationParser(object):
             self._exit_with_help()
         options, args = self.parser.parse_args()
         if args:
-            print args
             self._exit_with_help()
         if not exists(options.file_path):
             raise Exception('File "%s" not exists.' % options.file_path)
