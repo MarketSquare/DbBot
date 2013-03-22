@@ -172,24 +172,24 @@ class RobotDatabase(object):
     def _init_schema(self):
         self._execute('''CREATE TABLE IF NOT EXISTS test_runs (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        source_file TEXT,
-                        generator TEXT
+                        source_file TEXT NOT NULL,
+                        generator TEXT NOT NULL
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS statistics (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_run_id INTEGER NOT NULL,
-                        name TEXT,
+                        name TEXT NOT NULL,
                         FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS stats (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         statistic_id INTEGER NOT NULL,
-                        name TEXT,
-                        elapsed INTEGER,
-                        failed INTEGER,
-                        passed INTEGER,
+                        name TEXT NOT NULL,
+                        elapsed INTEGER NOT NULL,
+                        failed INTEGER NOT NULL,
+                        passed INTEGER NOT NULL,
                         FOREIGN KEY(statistic_id) REFERENCES statistics(id)
                     )''')
 
@@ -197,11 +197,11 @@ class RobotDatabase(object):
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_run_id INTEGER,
                         suite_id INTEGER,
-                        name TEXT,
-                        source TEXT,
-                        doc TEXT,
-                        start_time DATETIME,
-                        end_time DATETIME,
+                        name TEXT NOT NULL,
+                        source TEXT NOT NULL,
+                        doc TEXT NOT NULL,
+                        start_time DATETIME NOT NULL,
+                        end_time DATETIME NOT NULL,
                         FOREIGN KEY(test_run_id) REFERENCES test_runs(id),
                         FOREIGN KEY(suite_id) REFERENCES suites(id)
                     )''')
@@ -209,10 +209,10 @@ class RobotDatabase(object):
         self._execute('''CREATE TABLE IF NOT EXISTS tests (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         suite_id INTEGER NOT NULL,
-                        name TEXT,
-                        timeout TEXT,
-                        doc TEXT,
-                        status TEXT,
+                        name TEXT NOT NULL,
+                        timeout TEXT NOT NULL,
+                        doc TEXT NOT NULL,
+                        status TEXT NOT NULL,
                         FOREIGN KEY(suite_id) REFERENCES suites(id)
                     )''')
 
@@ -221,11 +221,11 @@ class RobotDatabase(object):
                         test_id INTEGER,
                         keyword_id INTEGER,
                         suite_id INTEGER,
-                        name TEXT,
-                        type TEXT,
-                        timeout TEXT,
-                        doc TEXT,
-                        status TEXT,
+                        name TEXT NOT NULL,
+                        type TEXT NOT NULL,
+                        timeout TEXT NOT NULL,
+                        doc TEXT NOT NULL,
+                        status TEXT NOT NULL,
                         FOREIGN KEY(test_id) REFERENCES tests(id),
                         FOREIGN KEY(keyword_id) REFERENCES keywords(id),
                         FOREIGN KEY(suite_id) REFERENCES suites(id)
@@ -234,32 +234,32 @@ class RobotDatabase(object):
         self._execute('''CREATE TABLE IF NOT EXISTS messages (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         keyword_id INTEGER NOT NULL,
-                        level TEXT,
-                        timestamp DATETIME,
-                        content TEXT,
+                        level TEXT NOT NULL,
+                        timestamp DATETIME NOT NULL,
+                        content TEXT NOT NULL,
                         FOREIGN KEY(keyword_id) REFERENCES keywords(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS errors (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_run_id INTEGER NOT NULL,
-                        level TEXT,
-                        timestamp DATETIME,
-                        content TEXT,
+                        level TEXT NOT NULL,
+                        timestamp DATETIME NOT NULL,
+                        content TEXT NOT NULL,
                         FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS tags (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_id INTEGER NOT NULL,
-                        content TEXT,
+                        content TEXT NOT NULL,
                         FOREIGN KEY(test_id) REFERENCES tests(id)
                     )''')
 
         self._execute('''CREATE TABLE IF NOT EXISTS arguments (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         keyword_id INTEGER NOT NULL,
-                        content TEXT,
+                        content TEXT NOT NULL,
                         FOREIGN KEY(keyword_id) REFERENCES keywords(id)
                     )''')
 
