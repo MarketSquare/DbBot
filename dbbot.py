@@ -7,11 +7,6 @@ from os.path import exists
 from datetime import datetime
 from robot.result import ExecutionResult
 
-# -- for debugging purposes only
-import json
-def pprint(payload):
-    print json.dumps(payload, sort_keys=True, indent=2)
-# ---
 
 def main():
     parser = _get_option_parser()
