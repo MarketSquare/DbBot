@@ -283,16 +283,16 @@ class RobotDatabase(object):
     def _insert_element_as_row(self, db_table_name, element, parent_reference=None):
         if not parent_reference is None:
             element[parent_reference[0]] = parent_reference[1]
-        keys, values = self._get_parent_values(element)
+        keys, values = self._get_simple_types(element)
         query = self._make_insert_query(db_table_name, keys)
         last_inserted_row_id = self._push(query, values)
         parent_reference = ("%s_id" % db_table_name[:-1], last_inserted_row_id)
         for key in list(set(element.keys()) - set(keys)):
             self._insert_all_elements(key, element[key], parent_reference)
 
-    def _get_parent_values(self, object):
+    def _get_simple_types(self, dictionary):
         keys, values = [], []
-        for key, value in object.iteritems():
+        for key, value in dictionary.iteritems():
             if not isinstance(value, (list, dict)):
                 keys.append(key)
                 values.append(value)
