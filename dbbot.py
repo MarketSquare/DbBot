@@ -78,6 +78,7 @@ def parse_suites(suite):
 
 def _get_parsed_suite(subsuite):
     return {
+        'xml_id': subsuite.id,
         'name': subsuite.name,
         'source': subsuite.source,
         'doc': subsuite.doc,
@@ -93,6 +94,7 @@ def parse_tests(tests):
 
 def _get_parsed_test(test):
     return {
+        'xml_id': test.id,
         'name': test.name,
         'timeout': test.timeout,
         'doc': test.doc,
@@ -197,6 +199,7 @@ class RobotDatabase(object):
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         test_run_id INTEGER,
                         suite_id INTEGER,
+                        xml_id TEXT UNIQUE NOT NULL,
                         name TEXT NOT NULL,
                         source TEXT NOT NULL,
                         doc TEXT NOT NULL,
@@ -209,6 +212,7 @@ class RobotDatabase(object):
         self._execute('''CREATE TABLE IF NOT EXISTS tests (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         suite_id INTEGER NOT NULL,
+                        xml_id TEXT UNIQUE NOT NULL,
                         name TEXT NOT NULL,
                         timeout TEXT NOT NULL,
                         doc TEXT NOT NULL,
