@@ -1,5 +1,8 @@
 *.idea
 *.pyc
+output.xml
+log.xml
+report.xml
 *.db
 *.db-journal
 fixtures
