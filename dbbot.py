@@ -47,15 +47,26 @@ class ConfigurationParser(object):
         return self._options.db_file_path
 
     def _add_parser_options(self):
+        def files_args_parser(option, opt_str, _, parser):
+            values = []
+            for arg in parser.rargs:
+                if arg[:2] == "--" and len(arg) > 2:
+                    break
+                if arg[:1] == "-" and len(arg) > 1:
+                    break
+                values.append(arg)
+            del parser.rargs[:len(values)]
+            setattr(parser.values, option.dest, values)
+
         self._parser.add_option('-d', '--database', dest='db_file_path', default='results.db')
-        self._parser.add_option('-f', '--files', action="callback", callback=self._files_args_parser, dest='file_paths')
+        self._parser.add_option('-f', '--files', action="callback", callback=files_args_parser, dest='file_paths')
 
     def _get_validated_options(self):
         if len(sys.argv) < 2:
             self._exit_with_help()
         options, args = self._parser.parse_args()
         if args:
-                self._exit_with_help()
+            self._exit_with_help()
         for file_path in options.file_paths:
             if not exists(file_path):
                 raise Exception('File "%s" not exists.' % file_path)
@@ -64,17 +75,6 @@ class ConfigurationParser(object):
     def _exit_with_help(self):
         self._parser.print_help()
         exit(1)
-
-    def _files_args_parser(self, option, opt_str, value, parser):
-        value = []
-        for arg in parser.rargs:
-            if arg[:2] == "--" and len(arg) > 2:
-                break
-            if arg[:1] == "-" and len(arg) > 1:
-                break
-            value.append(arg)
-        del parser.rargs[:len(value)]
-        setattr(parser.values, option.dest, value)
 
 
 class RobotOutputParser(object):
