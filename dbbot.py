@@ -20,7 +20,7 @@ def main():
         _output_error_and_exit('Error: %s\n\n' % message)
     db = RobotDatabase(config.db_file_path)
     try:
-        db.dict_to_sql(test_run_results)
+        db.dicts_to_sql(test_run_results)
         db.commit()
     except Exception, message:
         _output_error_and_exit('Database error: %s\n\n' % message)
@@ -48,14 +48,14 @@ class ConfigurationParser(object):
 
     def _add_parser_options(self):
         self._parser.add_option('-d', '--database', dest='db_file_path', default='results.db')
-        self._parser.add_option('-f', '--files', action="callback", callback=self._files_parser, dest='file_paths')
+        self._parser.add_option('-f', '--files', action="callback", callback=self._files_args_parser, dest='file_paths')
 
     def _get_validated_options(self):
         if len(sys.argv) < 2:
             self._exit_with_help()
         options, args = self._parser.parse_args()
         if args:
-            self._exit_with_help()
+                self._exit_with_help()
         for file_path in options.file_paths:
             if not exists(file_path):
                 raise Exception('File "%s" not exists.' % file_path)
@@ -65,7 +65,7 @@ class ConfigurationParser(object):
         self._parser.print_help()
         exit(1)
 
-    def _files_parser(self, option, opt_str, value, parser):
+    def _files_args_parser(self, option, opt_str, value, parser):
         value = []
         for arg in parser.rargs:
             if arg[:2] == "--" and len(arg) > 2:
@@ -301,8 +301,8 @@ class RobotDatabase(object):
     def commit(self):
         self._connection.commit()
 
-    def dict_to_sql(self, dictionary):
-        self._insert_all_elements('test_runs', dictionary)
+    def dicts_to_sql(self, dictionaries):
+        self._insert_all_elements('test_runs', dictionaries)
 
     def _push(self, sql_statement, values=[]):
         cursor = self._connection.execute(sql_statement, values)
