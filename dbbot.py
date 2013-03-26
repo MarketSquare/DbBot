@@ -32,8 +32,8 @@ class DbBot(object):
         return parser.results_in_dict()
 
     def _output_verbose(self, message, header):
-        if not self._config.be_verbose: return
-        sys.stdout.write("[%-8s]   %s\n" % (header, message))
+        if self._config.be_verbose:
+            sys.stdout.write(" %-8s |   %s\n" % (header, message))
 
 
 class ConfigurationParser(object):
@@ -133,25 +133,25 @@ class RobotOutputParser(object):
         ]
 
     def total_statistics(self):
-        self.verbose('`----> Parsing total statistics')
+        self.verbose('  `--> Parsing total statistics')
         return {
             'name': 'total', 'stats': self._get_parsed_stat(self._test_run.statistics.total.all)
         }
 
     def critical_statistics(self):
-        self.verbose('`----> Parsing critical statistics')
+        self.verbose('  `--> Parsing critical statistics')
         return {
             'name': 'critical', 'stats': self._get_parsed_stat(self._test_run.statistics.total.critical)
         }
 
     def tag_statistics(self):
-        self.verbose('`----> Parsing tag statistics')
+        self.verbose('  `--> Parsing tag statistics')
         return {
             'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in self._test_run.statistics.tags.tags.values()]
         }
 
     def suite_statistics(self):
-        self.verbose('`----> Parsing suite statistics')
+        self.verbose('  `--> Parsing suite statistics')
         return {
             'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in self._test_run.statistics.suite.suites]
         }
