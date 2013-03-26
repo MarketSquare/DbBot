@@ -8,28 +8,35 @@ from optparse import OptionParser
 from robot.result import ExecutionResult
 
 
-def main():
-    test_run_results = []
-    config = ConfigurationParser()
-    try:
-        for output_file in config.file_paths:
-            parser = RobotOutputParser(output_file, config.be_verbose)
-            results_dictionary = parser.results_in_dict()
-            test_run_results.append(results_dictionary)
-    except Exception, message:
-        _output_error_and_exit('Error: %s\n\n' % message)
-    db = RobotDatabase(config.db_file_path, config.be_verbose)
-    try:
-        db.dicts_to_sql(test_run_results)
-        db.commit()
-    except Exception, message:
-        _output_error_and_exit('Database error: %s\n\n' % message)
-    finally:
-        db.close()
+class DbBot(object):
+    def __init__(self):
+        self._config = ConfigurationParser()
+        self._db = RobotDatabase(self._config.db_file_path, self._output_verbose)
 
-def _output_error_and_exit(message=None):
-    sys.stderr.write(message)
-    exit(1)
+    def run(self):
+        try:
+            results_dict = self._parse_output_files()
+            self._db.dicts_to_sql(results_dict)
+            self._db.commit()
+        except Exception, message:
+            self._output_error_and_exit('Error: %s\n\n' % message)
+        finally:
+            self._db.close()
+
+    def _parse_output_files(self):
+        return [self._parse_output_xml(xml_file) for xml_file in self._config.file_paths]
+
+    def _parse_output_xml(self, xml_file):
+        parser = RobotOutputParser(xml_file, self._output_verbose)
+        return parser.results_in_dict()
+
+    def _output_error_and_exit(self, message=None):
+        sys.stderr.write(message)
+        exit(1)
+
+    def _output_verbose(self, message, header):
+        if not self._config.be_verbose: return
+        sys.stdout.write("[%-8s]   %s\n" % (header, message))
 
 
 class ConfigurationParser(object):
@@ -102,13 +109,12 @@ class ConfigurationParser(object):
 
 
 class RobotOutputParser(object):
-    def __init__(self, output_file, be_verbose=False):
+    def __init__(self, output_file, callback_verbose=None):
         self._test_run = ExecutionResult(output_file)
-        self._verbose = be_verbose
+        self.callback_verbose = callback_verbose
 
-    def verbose(self, message=None):
-        if not self._verbose: return
-        sys.stdout.write("[Parser]   %s\n" % message)
+    def verbose(self, message=''):
+        self.callback_verbose(message, 'Parser')
 
     def results_in_dict(self):
         self.verbose('- Parsing "%s"' % self._test_run.source)
@@ -232,21 +238,20 @@ class RobotOutputParser(object):
 
 
 class RobotDatabase(object):
-    def __init__(self, db_file_path, be_verbose=False):
-        self._verbose = be_verbose
+    def __init__(self, db_file_path, callback_verbose=None):
+        self.callback_verbose = callback_verbose
         self._connection = self._connect(db_file_path)
         self._init_schema()
 
-    def verbose(self, message=None):
-        if not self._verbose: return
-        sys.stdout.write('[Database] %s\n' % message)
+    def verbose(self, message=''):
+        self.callback_verbose(message, 'Database')
 
     def _connect(self, db_file_path):
         self.verbose('- Establishing database connection')
         return connect(db_file_path)
 
     def _init_schema(self):
-        self.verbose('`--> Initializing database schema')
+        self.verbose('- Initializing database schema')
         self._push('''CREATE TABLE IF NOT EXISTS test_runs (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         source_file TEXT NOT NULL,
@@ -343,15 +348,15 @@ class RobotDatabase(object):
                     )''')
 
     def close(self):
-        self.verbose('`--> Closing database connection')
+        self.verbose('- Closing database connection')
         self._connection.close()
 
     def commit(self):
-        self.verbose('`--> Commiting changes into database')
+        self.verbose('- Commiting changes into database')
         self._connection.commit()
 
     def dicts_to_sql(self, dictionaries):
-        self.verbose('`--> Mapping test run results to SQL')
+        self.verbose('- Mapping test run results to SQL')
         self._insert_all_elements('test_runs', dictionaries)
 
     def _push(self, sql_statement, values=[]):
@@ -388,4 +393,4 @@ class RobotDatabase(object):
 
 
 if __name__ == '__main__':
-    main()
+    DbBot().run()
