@@ -75,29 +75,29 @@ class ConfigurationParser(object):
         self._parser.add_option('-v', '--verbose',
             action='store_true',
             dest='verbose',
-            help='be verbose'
+            help='print information about execution '
         )
         self._parser.add_option('-d', '--dry-run',
             action='store_true',
             dest='dry_run',
-            help='don\'t save anything'
+            help='don\'t save anything into database'
         )
-        self._parser.add_option('-k', '--keywords',
+        self._parser.add_option('-k', '--also-keywords',
             action='store_true',
             default=False,
             dest='include_keywords',
-            help='parses also keywords'
+            help='include suites\' and tests\' keywords'
         )
-        self._parser.add_option('--database',
+        self._parser.add_option('-b', '--database',
             dest='db_file_path',
             default='results.db',
-            help='sqlite3 database file path',
+            help='path to the sqlite3 database to save to',
         )
         self._parser.add_option('-f', '--files',
             action='callback',
             callback=files_args_parser,
             dest='file_paths',
-            help='one or more output.xml files'
+            help='one or more output.xml files to save to db'
         )
 
     def _get_validated_options(self):
