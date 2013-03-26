@@ -11,11 +11,12 @@ from robot.result import ExecutionResult
 class DbBot(object):
     def __init__(self):
         self._config = ConfigurationParser()
+        self._parser = RobotOutputParser(self._config.include_keywords, self._output_verbose)
         self._db = RobotDatabase(self._config.db_file_path, self._output_verbose)
 
     def run(self):
         try:
-            results_dict = self._parse_output_files()
+            results_dict = self._results_to_dict()
             self._db.dicts_to_sql(results_dict)
             self._db.commit()
         except Exception, message:
@@ -24,12 +25,8 @@ class DbBot(object):
         finally:
             self._db.close()
 
-    def _parse_output_files(self):
-        return [self._parse_output_xml(xml_file) for xml_file in self._config.file_paths]
-
-    def _parse_output_xml(self, xml_file):
-        parser = RobotOutputParser(xml_file, self._config.include_keywords, self._output_verbose)
-        return parser.results_in_dict()
+    def _results_to_dict(self):
+        return [self._parser.xml_to_dict(xml_file) for xml_file in self._config.file_paths]
 
     def _output_verbose(self, message, header):
         if self._config.be_verbose:
@@ -116,55 +113,55 @@ class ConfigurationParser(object):
 
 
 class RobotOutputParser(object):
-    def __init__(self, output_file, include_keywords, callback_verbose=None):
-        self._test_run = ExecutionResult(output_file)
+    def __init__(self, include_keywords, callback_verbose=None):
         self._include_keywords = include_keywords
         self._callback_verbose = callback_verbose
 
     def verbose(self, message=''):
         self._callback_verbose(message, 'Parser')
 
-    def results_in_dict(self):
-        self.verbose('- Parsing "%s"' % self._test_run.source)
+    def xml_to_dict(self, xml_file):
+        self.verbose('- Parsing "%s"' % xml_file)
+        test_run = ExecutionResult(xml_file)
         return {
-            'source_file': self._test_run.source,
-            'generator': self._test_run.generator,
-            'statistics': self.parse_statistics(),
-            'errors': self._parse_messages(self._test_run.errors.messages),
-            'suites': self._parse_suites(self._test_run.suite)
+            'source_file': test_run.source,
+            'generator': test_run.generator,
+            'statistics': self.parse_statistics(test_run.statistics),
+            'errors': self._parse_messages(test_run.errors.messages),
+            'suites': self._parse_suites(test_run.suite)
         }
 
-    def parse_statistics(self):
+    def parse_statistics(self, statistics):
         self.verbose('`--> Parsing test run statistics')
         return [
-            self.total_statistics(),
-            self.critical_statistics(),
-            self.tag_statistics(),
-            self.suite_statistics()
+            self.total_statistics(statistics),
+            self.critical_statistics(statistics),
+            self.tag_statistics(statistics),
+            self.suite_statistics(statistics)
         ]
 
-    def total_statistics(self):
+    def total_statistics(self, statistics):
         self.verbose('  `--> Parsing total statistics')
         return {
-            'name': 'total', 'stats': self._get_parsed_stat(self._test_run.statistics.total.all)
+            'name': 'total', 'stats': self._get_parsed_stat(statistics.total.all)
         }
 
-    def critical_statistics(self):
+    def critical_statistics(self, statistics):
         self.verbose('  `--> Parsing critical statistics')
         return {
-            'name': 'critical', 'stats': self._get_parsed_stat(self._test_run.statistics.total.critical)
+            'name': 'critical', 'stats': self._get_parsed_stat(statistics.total.critical)
         }
 
-    def tag_statistics(self):
+    def tag_statistics(self, statistics):
         self.verbose('  `--> Parsing tag statistics')
         return {
-            'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in self._test_run.statistics.tags.tags.values()]
+            'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in statistics.tags.tags.values()]
         }
 
-    def suite_statistics(self):
+    def suite_statistics(self, statistics):
         self.verbose('  `--> Parsing suite statistics')
         return {
-            'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in self._test_run.statistics.suite.suites]
+            'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in statistics.suite.suites]
         }
 
     def _get_parsed_stat(self, stat):
