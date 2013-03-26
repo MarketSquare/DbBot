@@ -10,15 +10,15 @@ from robot.result import ExecutionResult
 
 def main():
     test_run_results = []
+    config = ConfigurationParser()
     try:
-        config = ConfigurationParser()
         for output_file in config.file_paths:
-            parser = RobotOutputParser(output_file)
+            parser = RobotOutputParser(output_file, config.be_verbose)
             results_dictionary = parser.results_in_dict()
             test_run_results.append(results_dictionary)
     except Exception, message:
         _output_error_and_exit('Error: %s\n\n' % message)
-    db = RobotDatabase(config.db_file_path)
+    db = RobotDatabase(config.db_file_path, config.be_verbose)
     try:
         db.dicts_to_sql(test_run_results)
         db.commit()
@@ -46,6 +46,10 @@ class ConfigurationParser(object):
     def db_file_path(self):
         return self._options.db_file_path
 
+    @property
+    def be_verbose(self):
+        return self._options.verbose
+
     def _add_parser_options(self):
         def files_args_parser(option, opt_str, _, parser):
             values = []
@@ -58,8 +62,26 @@ class ConfigurationParser(object):
             del parser.rargs[:len(values)]
             setattr(parser.values, option.dest, values)
 
-        self._parser.add_option('-d', '--database', dest='db_file_path', default='results.db')
-        self._parser.add_option('-f', '--files', action="callback", callback=files_args_parser, dest='file_paths')
+        self._parser.add_option('-v', '--verbose',
+            action='store_true',
+            dest='verbose',
+            help='be verbose'
+        )
+        self._parser.add_option('-d', '--dry-run',
+            action='store_true',
+            help='don\'t save anything'
+        )
+        self._parser.add_option('--database',
+            dest='db_file_path',
+            default='results.db',
+            help='sqlite3 database file path',
+        )
+        self._parser.add_option('-f', '--files',
+            action='callback',
+            callback=files_args_parser,
+            dest='file_paths',
+            help='one or more output.xml files'
+        )
 
     def _get_validated_options(self):
         if len(sys.argv) < 2:
@@ -78,10 +100,16 @@ class ConfigurationParser(object):
 
 
 class RobotOutputParser(object):
-    def __init__(self, output_file):
+    def __init__(self, output_file, be_verbose=False):
         self._test_run = ExecutionResult(output_file)
+        self._verbose = be_verbose
+
+    def verbose(self, message=None):
+        if not self._verbose: return
+        sys.stdout.write("[Parser]   %s\n" % message)
 
     def results_in_dict(self):
+        self.verbose('- Parsing "%s"' % self._test_run.source)
         return {
             'source_file': self._test_run.source,
             'generator': self._test_run.generator,
@@ -91,6 +119,7 @@ class RobotOutputParser(object):
         }
 
     def parse_statistics(self):
+        self.verbose('`--> Parsing test run statistics')
         return [
             self.total_statistics(),
             self.critical_statistics(),
@@ -99,21 +128,25 @@ class RobotOutputParser(object):
         ]
 
     def total_statistics(self):
+        self.verbose('`----> Parsing total statistics')
         return {
             'name': 'total', 'stats': self._get_parsed_stat(self._test_run.statistics.total.all)
         }
 
     def critical_statistics(self):
+        self.verbose('`----> Parsing critical statistics')
         return {
             'name': 'critical', 'stats': self._get_parsed_stat(self._test_run.statistics.total.critical)
         }
 
     def tag_statistics(self):
+        self.verbose('`----> Parsing tag statistics')
         return {
             'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in self._test_run.statistics.tags.tags.values()]
         }
 
     def suite_statistics(self):
+        self.verbose('`----> Parsing suite statistics')
         return {
             'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in self._test_run.statistics.suite.suites]
         }
@@ -130,6 +163,7 @@ class RobotOutputParser(object):
         return [self._get_parsed_suite(subsuite) for subsuite in suite.suites]
 
     def _get_parsed_suite(self, subsuite):
+        self.verbose('`--> Parsing suite: %s' % subsuite.name)
         return {
             'xml_id': subsuite.id,
             'name': subsuite.name,
@@ -146,6 +180,7 @@ class RobotOutputParser(object):
         return [self._get_parsed_test(test) for test in tests]
 
     def _get_parsed_test(self, test):
+        self.verbose('  `--> Parsing test: %s' % test.name)
         return {
             'xml_id': test.id,
             'name': test.name,
@@ -195,11 +230,21 @@ class RobotOutputParser(object):
 
 
 class RobotDatabase(object):
-    def __init__(self, db_file_path):
-        self._connection = connect(db_file_path)
+    def __init__(self, db_file_path, be_verbose=False):
+        self._verbose = be_verbose
+        self._connection = self._connect(db_file_path)
         self._init_schema()
 
+    def verbose(self, message=None):
+        if not self._verbose: return
+        sys.stdout.write('[Database] %s\n' % message)
+
+    def _connect(self, db_file_path):
+        self.verbose('- Establishing database connection')
+        return connect(db_file_path)
+
     def _init_schema(self):
+        self.verbose('`--> Initializing database schema')
         self._push('''CREATE TABLE IF NOT EXISTS test_runs (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         source_file TEXT NOT NULL,
@@ -296,12 +341,15 @@ class RobotDatabase(object):
                     )''')
 
     def close(self):
+        self.verbose('`--> Closing database connection')
         self._connection.close()
 
     def commit(self):
+        self.verbose('`--> Commiting changes into database')
         self._connection.commit()
 
     def dicts_to_sql(self, dictionaries):
+        self.verbose('`--> Mapping test run results to SQL')
         self._insert_all_elements('test_runs', dictionaries)
 
     def _push(self, sql_statement, values=[]):
