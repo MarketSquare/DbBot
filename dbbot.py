@@ -28,7 +28,7 @@ class DbBot(object):
         return [self._parse_output_xml(xml_file) for xml_file in self._config.file_paths]
 
     def _parse_output_xml(self, xml_file):
-        parser = RobotOutputParser(xml_file, self._output_verbose)
+        parser = RobotOutputParser(xml_file, self._config.include_keywords, self._output_verbose)
         return parser.results_in_dict()
 
     def _output_verbose(self, message, header):
@@ -54,6 +54,10 @@ class ConfigurationParser(object):
     def be_verbose(self):
         return self._options.verbose
 
+    @property
+    def include_keywords(self):
+        return self._options.include_keywords
+
     def _add_parser_options(self):
         def files_args_parser(option, opt_str, _, parser):
             values = []
@@ -74,6 +78,12 @@ class ConfigurationParser(object):
         self._parser.add_option('-d', '--dry-run',
             action='store_true',
             help='don\'t save anything'
+        )
+        self._parser.add_option('-k', '--keywords',
+            action='store_true',
+            default=False,
+            dest='include_keywords',
+            help='parses also keywords'
         )
         self._parser.add_option('--database',
             dest='db_file_path',
@@ -106,12 +116,13 @@ class ConfigurationParser(object):
 
 
 class RobotOutputParser(object):
-    def __init__(self, output_file, callback_verbose=None):
+    def __init__(self, output_file, include_keywords, callback_verbose=None):
         self._test_run = ExecutionResult(output_file)
-        self.callback_verbose = callback_verbose
+        self._include_keywords = include_keywords
+        self._callback_verbose = callback_verbose
 
     def verbose(self, message=''):
-        self.callback_verbose(message, 'Parser')
+        self._callback_verbose(message, 'Parser')
 
     def results_in_dict(self):
         self.verbose('- Parsing "%s"' % self._test_run.source)
@@ -176,9 +187,9 @@ class RobotOutputParser(object):
             'doc': subsuite.doc,
             'start_time': self._format_timestamp(subsuite.starttime),
             'end_time': self._format_timestamp(subsuite.endtime),
-            'keywords': self._parse_keywords(subsuite.keywords),
             'tests': self._parse_tests(subsuite.tests),
-            'suites': self._parse_suites(subsuite)
+            'suites': self._parse_suites(subsuite),
+            'keywords': self._parse_keywords(subsuite.keywords)
         }
 
     def _parse_tests(self, tests):
@@ -197,6 +208,7 @@ class RobotOutputParser(object):
         }
 
     def _parse_keywords(self, keywords):
+        if not self._include_keywords: return []
         return [self._get_parsed_keyword(keyword) for keyword in keywords]
 
     def _get_parsed_keyword(self, keyword):
