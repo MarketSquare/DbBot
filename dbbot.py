@@ -12,7 +12,8 @@ class DbBot(object):
     def __init__(self):
         self._config = ConfigurationParser()
         self._parser = RobotOutputParser(self._config.include_keywords, self._output_verbose)
-        self._db = RobotDatabase(self._config.db_file_path, self._output_verbose)
+        database = ":memory:" if self._config.dry_run else self._config.db_file_path
+        self._db = RobotDatabase(database, self._output_verbose)
 
     def run(self):
         try:
@@ -52,6 +53,10 @@ class ConfigurationParser(object):
         return self._options.verbose
 
     @property
+    def dry_run(self):
+        return self._options.dry_run
+
+    @property
     def include_keywords(self):
         return self._options.include_keywords
 
@@ -74,6 +79,7 @@ class ConfigurationParser(object):
         )
         self._parser.add_option('-d', '--dry-run',
             action='store_true',
+            dest='dry_run',
             help='don\'t save anything'
         )
         self._parser.add_option('-k', '--keywords',
@@ -245,12 +251,12 @@ class RobotOutputParser(object):
 
 class RobotDatabase(object):
     def __init__(self, db_file_path, callback_verbose=None):
-        self.callback_verbose = callback_verbose
+        self._callback_verbose = callback_verbose
         self._connection = self._connect(db_file_path)
         self._init_schema()
 
     def verbose(self, message=''):
-        self.callback_verbose(message, 'Database')
+        self._callback_verbose(message, 'Database')
 
     def _connect(self, db_file_path):
         self.verbose('- Establishing database connection')
@@ -358,7 +364,7 @@ class RobotDatabase(object):
         self._connection.close()
 
     def commit(self):
-        self.verbose('- Commiting changes into database')
+        self.verbose('- Committing changes into database')
         self._connection.commit()
 
     def dicts_to_sql(self, dictionaries):
