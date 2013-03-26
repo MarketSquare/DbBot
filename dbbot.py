@@ -89,9 +89,11 @@ class ConfigurationParser(object):
         options, args = self._parser.parse_args()
         if args:
             self._exit_with_help()
+        if options.file_paths is None or len(options.file_paths) < 1:
+            self._parser.error('at least one input file is required')
         for file_path in options.file_paths:
             if not exists(file_path):
-                raise Exception('File "%s" not exists.' % file_path)
+                self._parser.error('file "%s" not exists' % file_path)
         return options
 
     def _exit_with_help(self):
