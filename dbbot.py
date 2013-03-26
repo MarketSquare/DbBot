@@ -19,7 +19,8 @@ class DbBot(object):
             self._db.dicts_to_sql(results_dict)
             self._db.commit()
         except Exception, message:
-            self._output_error_and_exit('Error: %s\n\n' % message)
+            sys.stderr.write('Error: %s\n\n' % message)
+            exit(1)
         finally:
             self._db.close()
 
@@ -29,10 +30,6 @@ class DbBot(object):
     def _parse_output_xml(self, xml_file):
         parser = RobotOutputParser(xml_file, self._output_verbose)
         return parser.results_in_dict()
-
-    def _output_error_and_exit(self, message=None):
-        sys.stderr.write(message)
-        exit(1)
 
     def _output_verbose(self, message, header):
         if not self._config.be_verbose: return
