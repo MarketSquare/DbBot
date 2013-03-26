@@ -33,7 +33,7 @@ class DbBot(object):
 
     def _output_verbose(self, message, header):
         if self._config.be_verbose:
-            sys.stdout.write(" %-8s |   %s\n" % (header, message))
+            sys.stdout.write(' %-8s |   %s\n' % (header, message))
 
 
 class ConfigurationParser(object):
@@ -62,9 +62,9 @@ class ConfigurationParser(object):
         def files_args_parser(option, opt_str, _, parser):
             values = []
             for arg in parser.rargs:
-                if arg[:2] == "--" and len(arg) > 2:
+                if arg[:2] == '--' and len(arg) > 2:
                     break
-                if arg[:1] == "-" and len(arg) > 1:
+                if arg[:1] == '-' and len(arg) > 1:
                     break
                 values.append(arg)
             del parser.rargs[:len(values)]
@@ -383,7 +383,7 @@ class RobotDatabase(object):
         keys, values = self._get_simple_types(element)
         query = self._make_insert_query(db_table_name, keys)
         last_inserted_row_id = self._push(query, values)
-        parent_reference = ("%s_id" % db_table_name[:-1], last_inserted_row_id)
+        parent_reference = ('%s_id' % db_table_name[:-1], last_inserted_row_id)
         for key in list(set(element.keys()) - set(keys)):
             self._insert_all_elements(key, element[key], parent_reference)
 
@@ -396,7 +396,7 @@ class RobotDatabase(object):
         return keys, values
 
     def _make_insert_query(self, db_table_name, keys):
-        column_names = ",".join(keys)
+        column_names = ','.join(keys)
         value_placeholders = ','.join(['?'] * len(keys))
         return 'INSERT INTO %s(%s) VALUES (%s)' % (db_table_name, column_names, value_placeholders)
 
