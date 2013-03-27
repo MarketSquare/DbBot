@@ -8,6 +8,8 @@ from optparse import OptionParser
 from robot.result import ExecutionResult
 
 
+DEFAULT_DB_NAME = "results.db"
+
 class DbBot(object):
     def __init__(self):
         self._config = ConfigurationParser()
@@ -89,7 +91,7 @@ class ConfigurationParser(object):
         )
         self._parser.add_option('-b', '--database',
             dest='db_file_path',
-            default='results.db',
+            default=DEFAULT_DB_NAME,
             help='path to the sqlite3 database to save to',
         )
         self._parser.add_option('-f', '--files',
