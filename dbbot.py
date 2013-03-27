@@ -19,8 +19,8 @@ class DbBot(object):
 
     def run(self):
         try:
-            results_dict = self._results_to_dict()
-            self._db.dicts_to_sql(results_dict)
+            all_test_run_results = self._results_to_dict()
+            self._db.dicts_to_sql(all_test_run_results)
             self._db.commit()
         except Exception, message:
             sys.stderr.write('Error: %s\n\n' % message)
@@ -259,6 +259,18 @@ class RobotDatabase(object):
     def verbose(self, message=''):
         self._callback_verbose(message, 'Database')
 
+    def close(self):
+        self.verbose('- Closing database connection')
+        self._connection.close()
+
+    def commit(self):
+        self.verbose('- Committing changes into database')
+        self._connection.commit()
+
+    def dicts_to_sql(self, dictionaries):
+        self.verbose('- Mapping test run results to SQL')
+        self._insert_all_elements('test_runs', dictionaries)
+
     def _connect(self, db_file_path):
         self.verbose('- Establishing database connection')
         return connect(db_file_path)
@@ -359,18 +371,6 @@ class RobotDatabase(object):
                         content TEXT NOT NULL,
                         FOREIGN KEY(keyword_id) REFERENCES keywords(id)
                     )''')
-
-    def close(self):
-        self.verbose('- Closing database connection')
-        self._connection.close()
-
-    def commit(self):
-        self.verbose('- Committing changes into database')
-        self._connection.commit()
-
-    def dicts_to_sql(self, dictionaries):
-        self.verbose('- Mapping test run results to SQL')
-        self._insert_all_elements('test_runs', dictionaries)
 
     def _push(self, sql_statement, values=[]):
         cursor = self._connection.execute(sql_statement, values)
