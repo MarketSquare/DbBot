@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from sqlite3 import connect
+import sqlite3
 from os.path import exists
 from datetime import datetime
 from optparse import OptionParser
@@ -212,8 +212,10 @@ class RobotOutputParser(object):
         }
 
     def _parse_keywords(self, keywords):
-        if not self._include_keywords: return []
-        return [self._get_parsed_keyword(keyword) for keyword in keywords]
+        if self._include_keywords:
+            return [self._get_parsed_keyword(keyword) for keyword in keywords]
+        else:
+            return []
 
     def _get_parsed_keyword(self, keyword):
         return {
@@ -253,8 +255,13 @@ class RobotOutputParser(object):
 class RobotDatabase(object):
     def __init__(self, db_file_path, callback_verbose=None):
         self._callback_verbose = callback_verbose
+
+        db_is_new = not exists(db_file_path)
         self._connection = self._connect(db_file_path)
-        self._init_schema()
+        self._set_db_settings()
+
+        if db_is_new:
+            self._init_schema()
 
     def verbose(self, message=''):
         self._callback_verbose(message, 'Database')
@@ -273,104 +280,112 @@ class RobotDatabase(object):
 
     def _connect(self, db_file_path):
         self.verbose('- Establishing database connection')
-        return connect(db_file_path)
+        return sqlite3.connect(db_file_path)
+
+    def _set_db_settings(self):
+        self._push('PRAGMA main.page_size=4096')
+        self._push('PRAGMA main.cache_size=10000')
+        self._push('PRAGMA main.synchronous=NORMAL')
+        self._push('PRAGMA main.journal_mode=WAL')
 
     def _init_schema(self):
         self.verbose('- Initializing database schema')
-        self._push('''CREATE TABLE IF NOT EXISTS test_runs (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        self._push('''CREATE TABLE test_runs (
+                        id INTEGER PRIMARY KEY,
                         source_file TEXT NOT NULL,
                         generator TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS statistics (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_run_id INTEGER NOT NULL,
-                        name TEXT NOT NULL,
-                        FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
+        self._push('''CREATE TABLE statistics (
+                        id INTEGER PRIMARY KEY,
+                        test_run_id INTEGER NOT NULL REFERENCES test_runs,
+                        name TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS stats (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        statistic_id INTEGER NOT NULL,
+        self._push('''CREATE TABLE stats (
+                        id INTEGER PRIMARY KEY,
+                        statistic_id INTEGER NOT NULL REFERENCES stats,
                         name TEXT NOT NULL,
                         elapsed INTEGER NOT NULL,
                         failed INTEGER NOT NULL,
-                        passed INTEGER NOT NULL,
-                        FOREIGN KEY(statistic_id) REFERENCES statistics(id)
+                        passed INTEGER NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS suites (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_run_id INTEGER,
-                        suite_id INTEGER,
+        self._push('''CREATE TABLE suites (
+                        id INTEGER PRIMARY KEY,
+                        test_run_id INTEGER REFERENCES test_runs,
+                        suite_id INTEGER REFERENCES suites,
                         xml_id TEXT NOT NULL,
                         name TEXT NOT NULL,
                         source TEXT NOT NULL,
                         doc TEXT NOT NULL,
                         start_time DATETIME NOT NULL,
-                        end_time DATETIME NOT NULL,
-                        FOREIGN KEY(test_run_id) REFERENCES test_runs(id),
-                        FOREIGN KEY(suite_id) REFERENCES suites(id)
+                        end_time DATETIME NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS tests (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        suite_id INTEGER NOT NULL,
+        self._push('''CREATE TABLE tests (
+                        id INTEGER PRIMARY KEY,
+                        suite_id INTEGER NOT NULL REFERENCES suites,
                         xml_id TEXT NOT NULL,
                         name TEXT NOT NULL,
                         timeout TEXT NOT NULL,
                         doc TEXT NOT NULL,
-                        status TEXT NOT NULL,
-                        FOREIGN KEY(suite_id) REFERENCES suites(id)
+                        status TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS keywords (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_id INTEGER,
-                        keyword_id INTEGER,
-                        suite_id INTEGER,
+        self._push('''CREATE TABLE keywords (
+                        id INTEGER PRIMARY KEY,
+                        test_id INTEGER REFERENCES tests,
+                        keyword_id INTEGER REFERENCES keywords,
+                        suite_id INTEGER REFERENCES suites,
                         name TEXT NOT NULL,
                         type TEXT NOT NULL,
                         timeout TEXT NOT NULL,
                         doc TEXT NOT NULL,
-                        status TEXT NOT NULL,
-                        FOREIGN KEY(test_id) REFERENCES tests(id),
-                        FOREIGN KEY(keyword_id) REFERENCES keywords(id),
-                        FOREIGN KEY(suite_id) REFERENCES suites(id)
+                        status TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS messages (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        keyword_id INTEGER NOT NULL,
+        self._push('''CREATE TABLE messages (
+                        id INTEGER PRIMARY KEY,
+                        keyword_id INTEGER NOT NULL REFERENCES keywords,
                         level TEXT NOT NULL,
                         timestamp DATETIME NOT NULL,
-                        content TEXT NOT NULL,
-                        FOREIGN KEY(keyword_id) REFERENCES keywords(id)
+                        content TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS errors (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_run_id INTEGER NOT NULL,
+        self._push('''CREATE TABLE errors (
+                        id INTEGER PRIMARY KEY,
+                        test_run_id INTEGER NOT NULL REFERENCES test_runs,
                         level TEXT NOT NULL,
                         timestamp DATETIME NOT NULL,
-                        content TEXT NOT NULL,
-                        FOREIGN KEY(test_run_id) REFERENCES test_runs(id)
+                        content TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS tags (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        test_id INTEGER NOT NULL,
-                        content TEXT NOT NULL,
-                        FOREIGN KEY(test_id) REFERENCES tests(id)
+        self._push('''CREATE TABLE tags (
+                        id INTEGER PRIMARY KEY,
+                        test_id INTEGER NOT NULL REFERENCES tests,
+                        content TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE IF NOT EXISTS arguments (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        keyword_id INTEGER NOT NULL,
-                        content TEXT NOT NULL,
-                        FOREIGN KEY(keyword_id) REFERENCES keywords(id)
+        self._push('''CREATE TABLE arguments (
+                        id INTEGER PRIMARY KEY,
+                        keyword_id INTEGER NOT NULL REFERENCES keywords,
+                        content TEXT NOT NULL
                     )''')
+
+        self._push('''CREATE INDEX test_run_index ON statistics(test_run_id)''')
+        self._push('''CREATE INDEX statistics_index ON stats(statistic_id)''')
+        self._push('''CREATE INDEX suite_test_run_index ON suites(test_run_id)''')
+        self._push('''CREATE INDEX suite_index ON suites(suite_id)''')
+        self._push('''CREATE INDEX test_suite_index ON tests(suite_id)''')
+        self._push('''CREATE INDEX keyword_test_index ON keywords(test_id)''')
+        self._push('''CREATE INDEX keyword_suite_index ON keywords(suite_id)''')
+        self._push('''CREATE INDEX keyword_keyword_index ON keywords(keyword_id)''')
+        self._push('''CREATE INDEX message_keyword_index ON messages(keyword_id)''')
+        self._push('''CREATE INDEX error_test_run_index ON errors(test_run_id)''')
+        self._push('''CREATE INDEX tag_test_index ON tags(test_id)''')
+        self._push('''CREATE INDEX argument_keyword_index ON arguments(keyword_id)''')
+
 
     def _push(self, sql_statement, values=[]):
         cursor = self._connection.execute(sql_statement, values)
