@@ -84,7 +84,6 @@ class ConfigurationParser(object):
         )
         self._parser.add_option('-k', '--also-keywords',
             action='store_true',
-            default=False,
             dest='include_keywords',
             help='include suites\' and tests\' keywords'
         )
