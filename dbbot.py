@@ -19,7 +19,8 @@ class DbBot(object):
 
     def run(self):
         try:
-            [self._parser.xml_to_dict(xml_file) for xml_file in self._config.file_paths]
+            for xml_file in self._config.file_paths:
+                self._parser.xml_to_db(xml_file)
             self._db.commit()
         except Exception, message:
             sys.stderr.write('Error: %s\n\n' % message)
@@ -124,16 +125,24 @@ class RobotOutputParser(object):
     def verbose(self, message=''):
         self._callback_verbose(message, 'Parser')
 
-    def xml_to_dict(self, xml_file):
+    def xml_to_db(self, xml_file):
         self.verbose('- Parsing "%s"' % xml_file)
         test_run = ExecutionResult(xml_file)
-        test_run_id = self._db._push('''
+        test_run_id = self._db.push('''
             INSERT INTO test_runs (source_file, generator) VALUES (?,?)''',
             (test_run.source, test_run.generator)
         )
+        self._parse_errors(test_run.errors.messages, test_run_id)
         self._parse_statistics(test_run.statistics, test_run_id)
-        self._parse_messages(test_run.errors.messages, test_run_id)
         self._parse_suites(test_run.suite, test_run_id)
+
+    def _parse_errors(self, errors, test_run_id):
+        self._db.push_many('''
+            INSERT INTO errors (test_run_id, level, timestamp, content)
+            VALUES (?,?,?,?)''',
+            [(test_run_id, error.level, self._format_timestamp(error.timestamp),
+            error.message) for error in errors]
+        )
 
     def _parse_statistics(self, statistics, test_run_id):
         self.verbose('`--> Parsing test run statistics')
@@ -144,7 +153,7 @@ class RobotOutputParser(object):
 
     def _total_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing total statistics')
-        statistics_id = self._db._push('''
+        statistics_id = self._db.push('''
             INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
             (test_run_id, 'total')
         )
@@ -152,7 +161,7 @@ class RobotOutputParser(object):
 
     def _critical_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing critical statistics')
-        statistics_id = self._db._push('''
+        statistics_id = self._db.push('''
             INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
             (test_run_id, 'critical')
         )
@@ -160,7 +169,7 @@ class RobotOutputParser(object):
 
     def _tag_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing tag statistics')
-        statistics_id = self._db._push('''
+        statistics_id = self._db.push('''
             INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
             (test_run_id, 'tag')
         )
@@ -168,14 +177,14 @@ class RobotOutputParser(object):
 
     def _suite_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing suite statistics')
-        statistics_id = self._db._push('''
+        statistics_id = self._db.push('''
             INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
             (test_run_id, 'suite')
         )
         [self._parse_stats(suite.stat, statistics_id) for suite in statistics.suite.suites]
 
     def _parse_stats(self, stat, statistics_id):
-        self._db._push('''
+        self._db.push('''
             INSERT INTO stats (statistics_id, name, elapsed, failed, passed)
             VALUES (?,?,?,?,?)''',
             (statistics_id, stat.name, stat.elapsed, stat.failed, stat.passed)
@@ -186,7 +195,7 @@ class RobotOutputParser(object):
 
     def _parse_suite(self, suite, test_run_id, suite_id):
         self.verbose('`--> Parsing suite: %s' % suite.name)
-        suite_id = self._db._push('''
+        suite_id = self._db.push('''
             INSERT INTO suites (test_run_id, suite_id, xml_id, name, source,
             doc, start_time, end_time) VALUES (?,?,?,?,?,?,?,?)''',
             (test_run_id, suite_id, suite.id, suite.name, suite.source,
@@ -195,27 +204,33 @@ class RobotOutputParser(object):
         )
         self._parse_suites(suite, None, suite_id)
         self._parse_tests(suite.tests, suite_id)
-        self._parse_keywords(suite.keywords, suite_id, None, None)
+        self._parse_keywords(suite.keywords, suite_id, None)
 
     def _parse_tests(self, tests, suite_id):
         [self._parse_test(test, suite_id) for test in tests]
 
     def _parse_test(self, test, suite_id):
         self.verbose('  `--> Parsing test: %s' % test.name)
-        test_id = self._db._push('''
+        test_id = self._db.push('''
             INSERT INTO tests (suite_id, xml_id, name, timeout, doc, status)
             VALUES (?,?,?,?,?,?)''',
             (suite_id, test.id, test.name, test.timeout, test.doc, test.status)
         )
         self._parse_tags(test.tags, test_id)
-        self._parse_keywords(test.keywords, None, test_id, None)
+        self._parse_keywords(test.keywords, None, test_id)
 
-    def _parse_keywords(self, keywords, suite_id, test_id, keyword_id):
+    def _parse_tags(self, tags, test_id):
+        self._db.push_many('''
+            INSERT INTO tags (test_id, content) VALUES (?,?)''',
+            [(test_id, tag) for tag in tags]
+        )
+
+    def _parse_keywords(self, keywords, suite_id, test_id, keyword_id=None):
         if self._include_keywords:
             [self._parse_keyword(keyword, suite_id, test_id, keyword_id) for keyword in keywords]
 
     def _parse_keyword(self, keyword, suite_id, test_id, keyword_id):
-        keyword_id = self._db._push('''
+        keyword_id = self._db.push('''
             INSERT INTO keywords (suite_id, test_id, keyword_id, name, type,
             timeout, doc, status) VALUES (?,?,?,?,?,?,?,?)''',
             (suite_id, test_id, keyword_id, keyword.name, keyword.type,
@@ -225,32 +240,18 @@ class RobotOutputParser(object):
         self._parse_arguments(keyword.args, keyword_id)
         self._parse_keywords(keyword.keywords, None, None, keyword_id)
 
-    def _parse_tags(self, tags, test_id):
-        self._db._push_many('''
-            INSERT INTO tags (test_id, content) VALUES (?,?)''',
-            [(test_id, tag) for tag in tags]
-        )
-
-    def _parse_arguments(self, args, keyword_id):
-        self._db._push_many('''
-            INSERT INTO arguments (keyword_id, content) VALUES (?,?)''',
-            [(keyword_id, arg) for arg in args]
-        )
-
-    def _parse_errors(self, error, test_run_id):
-        self._db._push_many('''
-            INSERT INTO messages (test_run_id, level, timestamp, content)
-            VALUES (?,?,?,?)''',
-            [(test_run_id, error.level, self._format_timestamp(error.timestamp),
-            error.message) for error in errors]
-        )
-
     def _parse_messages(self, messages, keyword_id):
-        self._db._push_many('''
+        self._db.push_many('''
             INSERT INTO messages (keyword_id, level, timestamp, content)
             VALUES (?,?,?,?)''',
             [(keyword_id, message.level, self._format_timestamp(message.timestamp),
             message.message) for message in messages]
+        )
+
+    def _parse_arguments(self, args, keyword_id):
+        self._db.push_many('''
+            INSERT INTO arguments (keyword_id, content) VALUES (?,?)''',
+            [(keyword_id, arg) for arg in args]
         )
 
     def _format_timestamp(self, timestamp):
@@ -279,31 +280,38 @@ class RobotDatabase(object):
         self.verbose('- Committing changes into database')
         self._connection.commit()
 
+    def push(self, sql_statement, values=()):
+        cursor = self._connection.execute(sql_statement, values)
+        return cursor.lastrowid
+
+    def push_many(self, sql_statement, values=[]):
+        self._connection.executemany(sql_statement, values)
+
     def _connect(self, db_file_path):
         self.verbose('- Establishing database connection')
         return sqlite3.connect(db_file_path)
 
     def _set_db_settings(self):
-        self._push('PRAGMA main.page_size=4096')
-        self._push('PRAGMA main.cache_size=10000')
-        self._push('PRAGMA main.synchronous=NORMAL')
-        self._push('PRAGMA main.journal_mode=WAL')
+        self.push('PRAGMA main.page_size=4096')
+        self.push('PRAGMA main.cache_size=10000')
+        self.push('PRAGMA main.synchronous=NORMAL')
+        self.push('PRAGMA main.journal_mode=WAL')
 
     def _init_schema(self):
         self.verbose('- Initializing database schema')
-        self._push('''CREATE TABLE test_runs (
+        self.push('''CREATE TABLE test_runs (
                         id INTEGER PRIMARY KEY,
                         source_file TEXT NOT NULL,
                         generator TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE statistics (
+        self.push('''CREATE TABLE statistics (
                         id INTEGER PRIMARY KEY,
                         test_run_id INTEGER NOT NULL REFERENCES test_runs,
                         name TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE stats (
+        self.push('''CREATE TABLE stats (
                         id INTEGER PRIMARY KEY,
                         statistics_id INTEGER NOT NULL REFERENCES statistics,
                         name TEXT NOT NULL,
@@ -312,7 +320,7 @@ class RobotDatabase(object):
                         passed INTEGER NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE suites (
+        self.push('''CREATE TABLE suites (
                         id INTEGER PRIMARY KEY,
                         test_run_id INTEGER REFERENCES test_runs,
                         suite_id INTEGER REFERENCES suites,
@@ -324,7 +332,7 @@ class RobotDatabase(object):
                         end_time DATETIME NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE tests (
+        self.push('''CREATE TABLE tests (
                         id INTEGER PRIMARY KEY,
                         suite_id INTEGER NOT NULL REFERENCES suites,
                         xml_id TEXT NOT NULL,
@@ -334,7 +342,7 @@ class RobotDatabase(object):
                         status TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE keywords (
+        self.push('''CREATE TABLE keywords (
                         id INTEGER PRIMARY KEY,
                         test_id INTEGER REFERENCES tests,
                         keyword_id INTEGER REFERENCES keywords,
@@ -346,7 +354,7 @@ class RobotDatabase(object):
                         status TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE messages (
+        self.push('''CREATE TABLE messages (
                         id INTEGER PRIMARY KEY,
                         keyword_id INTEGER NOT NULL REFERENCES keywords,
                         level TEXT NOT NULL,
@@ -354,7 +362,7 @@ class RobotDatabase(object):
                         content TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE errors (
+        self.push('''CREATE TABLE errors (
                         id INTEGER PRIMARY KEY,
                         test_run_id INTEGER NOT NULL REFERENCES test_runs,
                         level TEXT NOT NULL,
@@ -362,37 +370,17 @@ class RobotDatabase(object):
                         content TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE tags (
+        self.push('''CREATE TABLE tags (
                         id INTEGER PRIMARY KEY,
                         test_id INTEGER NOT NULL REFERENCES tests,
                         content TEXT NOT NULL
                     )''')
 
-        self._push('''CREATE TABLE arguments (
+        self.push('''CREATE TABLE arguments (
                         id INTEGER PRIMARY KEY,
                         keyword_id INTEGER NOT NULL REFERENCES keywords,
                         content TEXT NOT NULL
                     )''')
-
-        self._push('''CREATE INDEX test_run_index ON statistics(test_run_id)''')
-        self._push('''CREATE INDEX statistics_index ON stats(statistics_id)''')
-        self._push('''CREATE INDEX suite_test_run_index ON suites(test_run_id)''')
-        self._push('''CREATE INDEX suite_index ON suites(suite_id)''')
-        self._push('''CREATE INDEX test_suite_index ON tests(suite_id)''')
-        self._push('''CREATE INDEX keyword_test_index ON keywords(test_id)''')
-        self._push('''CREATE INDEX keyword_suite_index ON keywords(suite_id)''')
-        self._push('''CREATE INDEX keyword_keyword_index ON keywords(keyword_id)''')
-        self._push('''CREATE INDEX message_keyword_index ON messages(keyword_id)''')
-        self._push('''CREATE INDEX error_test_run_index ON errors(test_run_id)''')
-        self._push('''CREATE INDEX tag_test_index ON tags(test_id)''')
-        self._push('''CREATE INDEX argument_keyword_index ON arguments(keyword_id)''')
-
-    def _push(self, sql_statement, values=()):
-        cursor = self._connection.execute(sql_statement, values)
-        return cursor.lastrowid
-
-    def _push_many(self, sql_statement, values=[]):
-        self._connection.executemany(sql_statement, values)
 
 if __name__ == '__main__':
     DbBot().run()
