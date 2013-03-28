@@ -304,7 +304,7 @@ class RobotDatabase(object):
 
         self._push('''CREATE TABLE stats (
                         id INTEGER PRIMARY KEY,
-                        statistic_id INTEGER NOT NULL REFERENCES stats,
+                        statistic_id INTEGER NOT NULL REFERENCES statistics,
                         name TEXT NOT NULL,
                         elapsed INTEGER NOT NULL,
                         failed INTEGER NOT NULL,
