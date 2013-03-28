@@ -19,16 +19,13 @@ class DbBot(object):
 
     def run(self):
         try:
-            all_test_run_results = self._results_to_dict()
+            [self._parser.xml_to_dict(xml_file) for xml_file in self._config.file_paths]
             self._db.commit()
         except Exception, message:
             sys.stderr.write('Error: %s\n\n' % message)
             exit(1)
         finally:
             self._db.close()
-
-    def _results_to_dict(self):
-        return [self._parser.xml_to_dict(xml_file) for xml_file in self._config.file_paths]
 
     def _output_verbose(self, message, header):
         if self._config.be_verbose:
@@ -132,7 +129,7 @@ class RobotOutputParser(object):
         test_run = ExecutionResult(xml_file)
         test_run_id = self._db._push('''
             INSERT INTO test_runs (source_file, generator) VALUES (?,?)''',
-            [test_run.source, test_run.generator]
+            (test_run.source, test_run.generator)
         )
         self._parse_statistics(test_run.statistics, test_run_id)
         self._parse_messages(test_run.errors.messages, test_run_id)
@@ -149,7 +146,7 @@ class RobotOutputParser(object):
         self.verbose('  `--> Parsing total statistics')
         statistics_id = self._db._push('''
             INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
-            [test_run_id, 'total']
+            (test_run_id, 'total')
         )
         self._parse_stats(statistics.total.all, statistics_id)
 
@@ -157,7 +154,7 @@ class RobotOutputParser(object):
         self.verbose('  `--> Parsing critical statistics')
         statistics_id = self._db._push('''
             INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
-            [test_run_id, 'critical']
+            (test_run_id, 'critical')
         )
         self._parse_stats(statistics.total.critical, statistics_id)
 
@@ -165,7 +162,7 @@ class RobotOutputParser(object):
         self.verbose('  `--> Parsing tag statistics')
         statistics_id = self._db._push('''
             INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
-            [test_run_id, 'tag']
+            (test_run_id, 'tag')
         )
         [self._parse_stats(tag, statistics_id) for tag in statistics.tags.tags.values()]
 
@@ -173,7 +170,7 @@ class RobotOutputParser(object):
         self.verbose('  `--> Parsing suite statistics')
         statistics_id = self._db._push('''
             INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
-            [test_run_id, 'suite']
+            (test_run_id, 'suite')
         )
         [self._parse_stats(suite.stat, statistics_id) for suite in statistics.suite.suites]
 
@@ -181,7 +178,7 @@ class RobotOutputParser(object):
         self._db._push('''
             INSERT INTO stats (statistics_id, name, elapsed, failed, passed)
             VALUES (?,?,?,?,?)''',
-            [statistics_id, stat.name, stat.elapsed, stat.failed, stat.passed]
+            (statistics_id, stat.name, stat.elapsed, stat.failed, stat.passed)
         )
 
     def _parse_suites(self, suite, test_run_id, suite_id=None):
@@ -192,8 +189,9 @@ class RobotOutputParser(object):
         suite_id = self._db._push('''
             INSERT INTO suites (test_run_id, suite_id, xml_id, name, source,
             doc, start_time, end_time) VALUES (?,?,?,?,?,?,?,?)''',
-            [test_run_id, suite_id, suite.id, suite.name, suite.source, suite.doc,
-            self._format_timestamp(suite.starttime), self._format_timestamp(suite.endtime)]
+            (test_run_id, suite_id, suite.id, suite.name, suite.source,
+            suite.doc, self._format_timestamp(suite.starttime),
+            self._format_timestamp(suite.endtime))
         )
         self._parse_suites(suite, None, suite_id)
         self._parse_tests(suite.tests, suite_id)
@@ -207,7 +205,7 @@ class RobotOutputParser(object):
         test_id = self._db._push('''
             INSERT INTO tests (suite_id, xml_id, name, timeout, doc, status)
             VALUES (?,?,?,?,?,?)''',
-            [suite_id, test.id, test.name, test.timeout, test.doc, test.status]
+            (suite_id, test.id, test.name, test.timeout, test.doc, test.status)
         )
         self._parse_tags(test.tags, test_id)
         self._parse_keywords(test.keywords, None, test_id, None)
@@ -220,51 +218,39 @@ class RobotOutputParser(object):
         keyword_id = self._db._push('''
             INSERT INTO keywords (suite_id, test_id, keyword_id, name, type,
             timeout, doc, status) VALUES (?,?,?,?,?,?,?,?)''',
-            [suite_id, test_id, keyword_id, keyword.name, keyword.type,
-            keyword.timeout, keyword.doc, keyword.status]
+            (suite_id, test_id, keyword_id, keyword.name, keyword.type,
+            keyword.timeout, keyword.doc, keyword.status)
         )
         self._parse_messages(keyword.messages, keyword_id)
         self._parse_arguments(keyword.args, keyword_id)
         self._parse_keywords(keyword.keywords, None, None, keyword_id)
 
     def _parse_tags(self, tags, test_id):
-        [self._parse_tag(tag, test_id) for tag in tags]
-
-    def _parse_tag(self, tag, test_id):
-        self._db._push('''
+        self._db._push_many('''
             INSERT INTO tags (test_id, content) VALUES (?,?)''',
-            [test_id, tag]
+            [(test_id, tag) for tag in tags]
         )
 
     def _parse_arguments(self, args, keyword_id):
-        [self._parse_argument(arg, keyword_id) for arg in args]
-
-    def _parse_argument(self, argument, keyword_id):
-        self._db._push('''
+        self._db._push_many('''
             INSERT INTO arguments (keyword_id, content) VALUES (?,?)''',
-            [keyword_id, argument]
+            [(keyword_id, arg) for arg in args]
         )
 
-    def _parse_errors(self, errors, test_run_id):
-        [self._parse_error(error, test_run_id) for error in errors]
-
-    def _parse_error(self, error, test_run_id):
-        self._db._push('''
+    def _parse_errors(self, error, test_run_id):
+        self._db._push_many('''
             INSERT INTO messages (test_run_id, level, timestamp, content)
             VALUES (?,?,?,?)''',
-            [test_run_id, error.level, self._format_timestamp(error.timestamp),
-            error.message]
+            [(test_run_id, error.level, self._format_timestamp(error.timestamp),
+            error.message) for error in errors]
         )
 
     def _parse_messages(self, messages, keyword_id):
-        [self._parse_message(message, keyword_id) for message in messages]
-
-    def _parse_message(self, error, keyword_id):
-        self._db._push('''
+        self._db._push_many('''
             INSERT INTO messages (keyword_id, level, timestamp, content)
             VALUES (?,?,?,?)''',
-            [keyword_id, error.level, self._format_timestamp(error.timestamp),
-            error.message]
+            [(keyword_id, message.level, self._format_timestamp(message.timestamp),
+            message.message) for message in messages]
         )
 
     def _format_timestamp(self, timestamp):
@@ -401,10 +387,12 @@ class RobotDatabase(object):
         self._push('''CREATE INDEX tag_test_index ON tags(test_id)''')
         self._push('''CREATE INDEX argument_keyword_index ON arguments(keyword_id)''')
 
-
-    def _push(self, sql_statement, values=[]):
+    def _push(self, sql_statement, values=()):
         cursor = self._connection.execute(sql_statement, values)
         return cursor.lastrowid
+
+    def _push_many(self, sql_statement, values=[]):
+        self._connection.executemany(sql_statement, values)
 
 if __name__ == '__main__':
     DbBot().run()
