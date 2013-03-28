@@ -13,14 +13,13 @@ DEFAULT_DB_NAME = "results.db"
 class DbBot(object):
     def __init__(self):
         self._config = ConfigurationParser()
-        self._parser = RobotOutputParser(self._config.include_keywords, self._output_verbose)
         database = ":memory:" if self._config.dry_run else self._config.db_file_path
         self._db = RobotDatabase(database, self._output_verbose)
+        self._parser = RobotOutputParser(self._config.include_keywords, self._db, self._output_verbose)
 
     def run(self):
         try:
             all_test_run_results = self._results_to_dict()
-            self._db.dicts_to_sql(all_test_run_results)
             self._db.commit()
         except Exception, message:
             sys.stderr.write('Error: %s\n\n' % message)
@@ -120,9 +119,10 @@ class ConfigurationParser(object):
 
 
 class RobotOutputParser(object):
-    def __init__(self, include_keywords, callback_verbose=None):
+    def __init__(self, include_keywords, db, callback_verbose=None):
         self._include_keywords = include_keywords
         self._callback_verbose = callback_verbose
+        self._db = db
 
     def verbose(self, message=''):
         self._callback_verbose(message, 'Parser')
@@ -130,123 +130,142 @@ class RobotOutputParser(object):
     def xml_to_dict(self, xml_file):
         self.verbose('- Parsing "%s"' % xml_file)
         test_run = ExecutionResult(xml_file)
-        return {
-            'source_file': test_run.source,
-            'generator': test_run.generator,
-            'statistics': self.parse_statistics(test_run.statistics),
-            'errors': self._parse_messages(test_run.errors.messages),
-            'suites': self._parse_suites(test_run.suite)
-        }
+        test_run_id = self._db._push('''
+            INSERT INTO test_runs (source_file, generator) VALUES (?,?)''',
+            [test_run.source, test_run.generator]
+        )
+        self._parse_statistics(test_run.statistics, test_run_id)
+        self._parse_messages(test_run.errors.messages, test_run_id)
+        self._parse_suites(test_run.suite, test_run_id)
 
-    def parse_statistics(self, statistics):
+    def _parse_statistics(self, statistics, test_run_id):
         self.verbose('`--> Parsing test run statistics')
-        return [
-            self.total_statistics(statistics),
-            self.critical_statistics(statistics),
-            self.tag_statistics(statistics),
-            self.suite_statistics(statistics)
-        ]
+        self._total_statistics(statistics, test_run_id)
+        self._critical_statistics(statistics, test_run_id)
+        self._tag_statistics(statistics, test_run_id)
+        self._suite_statistics(statistics, test_run_id)
 
-    def total_statistics(self, statistics):
+    def _total_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing total statistics')
-        return {
-            'name': 'total', 'stats': self._get_parsed_stat(statistics.total.all)
-        }
+        statistics_id = self._db._push('''
+            INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
+            [test_run_id, 'total']
+        )
+        self._parse_stats(statistics.total.all, statistics_id)
 
-    def critical_statistics(self, statistics):
+    def _critical_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing critical statistics')
-        return {
-            'name': 'critical', 'stats': self._get_parsed_stat(statistics.total.critical)
-        }
+        statistics_id = self._db._push('''
+            INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
+            [test_run_id, 'critical']
+        )
+        self._parse_stats(statistics.total.critical, statistics_id)
 
-    def tag_statistics(self, statistics):
+    def _tag_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing tag statistics')
-        return {
-            'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in statistics.tags.tags.values()]
-        }
+        statistics_id = self._db._push('''
+            INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
+            [test_run_id, 'tag']
+        )
+        [self._parse_stats(tag, statistics_id) for tag in statistics.tags.tags.values()]
 
-    def suite_statistics(self, statistics):
+    def _suite_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing suite statistics')
-        return {
-            'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in statistics.suite.suites]
-        }
+        statistics_id = self._db._push('''
+            INSERT INTO statistics (test_run_id, name) VALUES (?,?)''',
+            [test_run_id, 'suite']
+        )
+        [self._parse_stats(suite.stat, statistics_id) for suite in statistics.suite.suites]
 
-    def _get_parsed_stat(self, stat):
-        return {
-            'name': stat.name,
-            'elapsed': stat.elapsed,
-            'failed': stat.failed,
-            'passed': stat.passed
-        }
+    def _parse_stats(self, stat, statistics_id):
+        self._db._push('''
+            INSERT INTO stats (statistics_id, name, elapsed, failed, passed)
+            VALUES (?,?,?,?,?)''',
+            [statistics_id, stat.name, stat.elapsed, stat.failed, stat.passed]
+        )
 
-    def _parse_suites(self, suite):
-        return [self._get_parsed_suite(subsuite) for subsuite in suite.suites]
+    def _parse_suites(self, suite, test_run_id, suite_id=None):
+        [self._parse_suite(subsuite, test_run_id, suite_id) for subsuite in suite.suites]
 
-    def _get_parsed_suite(self, subsuite):
-        self.verbose('`--> Parsing suite: %s' % subsuite.name)
-        return {
-            'xml_id': subsuite.id,
-            'name': subsuite.name,
-            'source': subsuite.source,
-            'doc': subsuite.doc,
-            'start_time': self._format_timestamp(subsuite.starttime),
-            'end_time': self._format_timestamp(subsuite.endtime),
-            'tests': self._parse_tests(subsuite.tests),
-            'suites': self._parse_suites(subsuite),
-            'keywords': self._parse_keywords(subsuite.keywords)
-        }
+    def _parse_suite(self, suite, test_run_id, suite_id):
+        self.verbose('`--> Parsing suite: %s' % suite.name)
+        suite_id = self._db._push('''
+            INSERT INTO suites (test_run_id, suite_id, xml_id, name, source,
+            doc, start_time, end_time) VALUES (?,?,?,?,?,?,?,?)''',
+            [test_run_id, suite_id, suite.id, suite.name, suite.source, suite.doc,
+            self._format_timestamp(suite.starttime), self._format_timestamp(suite.endtime)]
+        )
+        self._parse_suites(suite, None, suite_id)
+        self._parse_tests(suite.tests, suite_id)
+        self._parse_keywords(suite.keywords, suite_id, None, None)
 
-    def _parse_tests(self, tests):
-        return [self._get_parsed_test(test) for test in tests]
+    def _parse_tests(self, tests, suite_id):
+        [self._parse_test(test, suite_id) for test in tests]
 
-    def _get_parsed_test(self, test):
+    def _parse_test(self, test, suite_id):
         self.verbose('  `--> Parsing test: %s' % test.name)
-        return {
-            'xml_id': test.id,
-            'name': test.name,
-            'timeout': test.timeout,
-            'doc': test.doc,
-            'status': test.status,
-            'tags': self._parse_tags(test.tags),
-            'keywords': self._parse_keywords(test.keywords)
-        }
+        test_id = self._db._push('''
+            INSERT INTO tests (suite_id, xml_id, name, timeout, doc, status)
+            VALUES (?,?,?,?,?,?)''',
+            [suite_id, test.id, test.name, test.timeout, test.doc, test.status]
+        )
+        self._parse_tags(test.tags, test_id)
+        self._parse_keywords(test.keywords, None, test_id, None)
 
-    def _parse_keywords(self, keywords):
+    def _parse_keywords(self, keywords, suite_id, test_id, keyword_id):
         if self._include_keywords:
-            return [self._get_parsed_keyword(keyword) for keyword in keywords]
-        else:
-            return []
+            [self._parse_keyword(keyword, suite_id, test_id, keyword_id) for keyword in keywords]
 
-    def _get_parsed_keyword(self, keyword):
-        return {
-            'name': keyword.name,
-            'type': keyword.type,
-            'timeout': keyword.timeout,
-            'doc': keyword.doc,
-            'status': keyword.status,
-            'messages': self._parse_messages(keyword.messages),
-            'arguments': self._parse_arguments(keyword.args),
-            'keywords': self._parse_keywords(keyword.keywords)
-        }
+    def _parse_keyword(self, keyword, suite_id, test_id, keyword_id):
+        keyword_id = self._db._push('''
+            INSERT INTO keywords (suite_id, test_id, keyword_id, name, type,
+            timeout, doc, status) VALUES (?,?,?,?,?,?,?,?)''',
+            [suite_id, test_id, keyword_id, keyword.name, keyword.type,
+            keyword.timeout, keyword.doc, keyword.status]
+        )
+        self._parse_messages(keyword.messages, keyword_id)
+        self._parse_arguments(keyword.args, keyword_id)
+        self._parse_keywords(keyword.keywords, None, None, keyword_id)
 
-    def _parse_arguments(self, args):
-        return [self._get_parsed_content(arg) for arg in args]
+    def _parse_tags(self, tags, test_id):
+        [self._parse_tag(tag, test_id) for tag in tags]
 
-    def _parse_tags(self, tags):
-        return [self._get_parsed_content(tag) for tag in tags]
+    def _parse_tag(self, tag, test_id):
+        self._db._push('''
+            INSERT INTO tags (test_id, content) VALUES (?,?)''',
+            [test_id, tag]
+        )
 
-    def _get_parsed_content(self, content):
-        return { 'content': content }
+    def _parse_arguments(self, args, keyword_id):
+        [self._parse_argument(arg, keyword_id) for arg in args]
 
-    def _parse_messages(self, messages):
-        return [self._get_parsed_message(message) for message in messages]
+    def _parse_argument(self, argument, keyword_id):
+        self._db._push('''
+            INSERT INTO arguments (keyword_id, content) VALUES (?,?)''',
+            [keyword_id, argument]
+        )
 
-    def _get_parsed_message(self, message):
-        return {
-            'level': message.level,
-            'timestamp': self._format_timestamp(message.timestamp),
-            'content': message.message
-        }
+    def _parse_errors(self, errors, test_run_id):
+        [self._parse_error(error, test_run_id) for error in errors]
+
+    def _parse_error(self, error, test_run_id):
+        self._db._push('''
+            INSERT INTO messages (test_run_id, level, timestamp, content)
+            VALUES (?,?,?,?)''',
+            [test_run_id, error.level, self._format_timestamp(error.timestamp),
+            error.message]
+        )
+
+    def _parse_messages(self, messages, keyword_id):
+        [self._parse_message(message, keyword_id) for message in messages]
+
+    def _parse_message(self, error, keyword_id):
+        self._db._push('''
+            INSERT INTO messages (keyword_id, level, timestamp, content)
+            VALUES (?,?,?,?)''',
+            [keyword_id, error.level, self._format_timestamp(error.timestamp),
+            error.message]
+        )
 
     def _format_timestamp(self, timestamp):
         return str(datetime.strptime(timestamp.split('.')[0], '%Y%m%d %H:%M:%S'))
@@ -274,10 +293,6 @@ class RobotDatabase(object):
         self.verbose('- Committing changes into database')
         self._connection.commit()
 
-    def dicts_to_sql(self, dictionaries):
-        self.verbose('- Mapping test run results to SQL')
-        self._insert_all_elements('test_runs', dictionaries)
-
     def _connect(self, db_file_path):
         self.verbose('- Establishing database connection')
         return sqlite3.connect(db_file_path)
@@ -304,7 +319,7 @@ class RobotDatabase(object):
 
         self._push('''CREATE TABLE stats (
                         id INTEGER PRIMARY KEY,
-                        statistic_id INTEGER NOT NULL REFERENCES statistics,
+                        statistics_id INTEGER NOT NULL REFERENCES statistics,
                         name TEXT NOT NULL,
                         elapsed INTEGER NOT NULL,
                         failed INTEGER NOT NULL,
@@ -374,7 +389,7 @@ class RobotDatabase(object):
                     )''')
 
         self._push('''CREATE INDEX test_run_index ON statistics(test_run_id)''')
-        self._push('''CREATE INDEX statistics_index ON stats(statistic_id)''')
+        self._push('''CREATE INDEX statistics_index ON stats(statistics_id)''')
         self._push('''CREATE INDEX suite_test_run_index ON suites(test_run_id)''')
         self._push('''CREATE INDEX suite_index ON suites(suite_id)''')
         self._push('''CREATE INDEX test_suite_index ON tests(suite_id)''')
@@ -390,35 +405,6 @@ class RobotDatabase(object):
     def _push(self, sql_statement, values=[]):
         cursor = self._connection.execute(sql_statement, values)
         return cursor.lastrowid
-
-    def _insert_all_elements(self, db_table_name, elements, parent_reference=None):
-        if type(elements) is not list:
-            elements = [elements]
-        [self._insert_element_as_row(db_table_name, element, parent_reference) for element in elements]
-
-    def _insert_element_as_row(self, db_table_name, element, parent_reference=None):
-        if not parent_reference is None:
-            element[parent_reference[0]] = parent_reference[1]
-        keys, values = self._get_simple_types(element)
-        query = self._make_insert_query(db_table_name, keys)
-        last_inserted_row_id = self._push(query, values)
-        parent_reference = ('%s_id' % db_table_name[:-1], last_inserted_row_id)
-        for key in list(set(element.keys()) - set(keys)):
-            self._insert_all_elements(key, element[key], parent_reference)
-
-    def _get_simple_types(self, dictionary):
-        keys, values = [], []
-        for key, value in dictionary.iteritems():
-            if not isinstance(value, (list, dict)):
-                keys.append(key)
-                values.append(value)
-        return keys, values
-
-    def _make_insert_query(self, db_table_name, keys):
-        column_names = ','.join(keys)
-        value_placeholders = ','.join(['?'] * len(keys))
-        return 'INSERT INTO %s(%s) VALUES (%s)' % (db_table_name, column_names, value_placeholders)
-
 
 if __name__ == '__main__':
     DbBot().run()
