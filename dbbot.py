@@ -132,7 +132,7 @@ class RobotOutputParser(object):
     def xml_to_db(self, xml_file):
         self.verbose('- Parsing %s' % xml_file)
         test_run = ExecutionResult(xml_file)
-        test_run_id = self._db.insert_row('test_runs', {
+        test_run_id = self._db.insert('test_runs', {
             'source_file': test_run.source,
             'generator': test_run.generator,
             'started_at': self._format_robot_timestamp(test_run.suite.starttime),
@@ -141,10 +141,10 @@ class RobotOutputParser(object):
         })
         self._parse_errors(test_run.errors.messages, test_run_id)
         self._parse_statistics(test_run.statistics, test_run_id)
-        self._parse_suites(test_run.suite)
+        self._parse_suites(test_run.suite, test_run_id)
 
     def _parse_errors(self, errors, test_run_id):
-        self._db.insert_many('errors', ('test_run_id', 'level', 'timestamp', 'content'),
+        self._db.insert_many_or_ignore('errors', ('test_run_id', 'level', 'timestamp', 'content'),
             [(test_run_id, error.level, self._format_robot_timestamp(error.timestamp), error.message)
             for error in errors]
         )
@@ -158,7 +158,7 @@ class RobotOutputParser(object):
 
     def _total_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing total statistics')
-        statistics_id = self._db.insert_row('statistics', {
+        statistics_id = self._db.insert('statistics', {
             'test_run_id': test_run_id,
             'name': 'total'
         })
@@ -166,7 +166,7 @@ class RobotOutputParser(object):
 
     def _critical_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing critical statistics')
-        statistics_id = self._db.insert_row('statistics', {
+        statistics_id = self._db.insert('statistics', {
             'test_run_id': test_run_id,
             'name': 'critical'
         })
@@ -174,7 +174,7 @@ class RobotOutputParser(object):
 
     def _tag_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing tag statistics')
-        statistics_id = self._db.insert_row('statistics', {
+        statistics_id = self._db.insert('statistics', {
             'test_run_id': test_run_id,
             'name': 'tag'
         })
@@ -182,14 +182,14 @@ class RobotOutputParser(object):
 
     def _suite_statistics(self, statistics, test_run_id):
         self.verbose('  `--> Parsing suite statistics')
-        statistics_id = self._db.insert_row('statistics', {
+        statistics_id = self._db.insert('statistics', {
             'test_run_id': test_run_id,
             'name': 'suite'
         })
         [self._parse_stats(suite.stat, statistics_id) for suite in statistics.suite.suites]
 
     def _parse_stats(self, stat, statistics_id):
-        self._db.insert_row('stats', {
+        self._db.insert_or_ignore('stats', {
             'statistics_id': statistics_id,
             'name': stat.name,
             'elapsed': stat.elapsed,
@@ -197,13 +197,13 @@ class RobotOutputParser(object):
             'passed': stat.passed
         })
 
-    def _parse_suites(self, suite, parent_suite_id=None):
-        [self._parse_suite(subsuite, parent_suite_id) for subsuite in suite.suites]
+    def _parse_suites(self, suite, test_run_id, parent_suite_id=None):
+        [self._parse_suite(subsuite, test_run_id, parent_suite_id) for subsuite in suite.suites]
 
-    def _parse_suite(self, suite, parent_suite_id):
+    def _parse_suite(self, suite, test_run_id, parent_suite_id):
         self.verbose('`--> Parsing suite: %s' % suite.name)
         try:
-            suite_id = self._db.insert_row('suites', {
+            suite_id = self._db.insert('suites', {
                 'suite_id': parent_suite_id,
                 'xml_id': suite.id,
                 'name': suite.name,
@@ -215,17 +215,17 @@ class RobotOutputParser(object):
                 'name': suite.name,
                 'source': suite.source
             })
-        self._parse_suites(suite, suite_id)
-        self._parse_tests(suite.tests, suite_id)
-        self._parse_keywords(suite.keywords, suite_id, None)
+        self._parse_suites(suite, test_run_id, suite_id)
+        self._parse_tests(suite.tests, test_run_id, suite_id)
+        self._parse_keywords(suite.keywords, test_run_id, suite_id, None)
 
-    def _parse_tests(self, tests, suite_id):
-        [self._parse_test(test, suite_id) for test in tests]
+    def _parse_tests(self, tests, test_run_id, suite_id):
+        [self._parse_test(test, test_run_id, suite_id) for test in tests]
 
-    def _parse_test(self, test, suite_id):
+    def _parse_test(self, test, test_run_id, suite_id):
         self.verbose('  `--> Parsing test: %s' % test.name)
         try:
-            test_id = self._db.insert_row('tests', {
+            test_id = self._db.insert('tests', {
                 'suite_id': suite_id,
                 'xml_id': test.id,
                 'name': test.name,
@@ -237,22 +237,30 @@ class RobotOutputParser(object):
                 'suite_id': suite_id,
                 'name': test.name
             })
+        self._parse_test_status(test_run_id, test_id, test.status)
         self._parse_tags(test.tags, test_id)
-        self._parse_keywords(test.keywords, None, test_id)
+        self._parse_keywords(test.keywords, test_run_id, None, test_id)
+
+    def _parse_test_status(self, test_run_id, test_id, status):
+            self._db.insert_or_ignore('test_status', {
+                'test_run_id': test_run_id,
+                'test_id': test_id,
+                'status': status
+            })
 
     def _parse_tags(self, tags, test_id):
-        self._db.insert_many('tags', ('test_id', 'content'),
+        self._db.insert_many_or_ignore('tags', ('test_id', 'content'),
             [(test_id, tag) for tag in tags]
         )
 
-    def _parse_keywords(self, keywords, suite_id, test_id, keyword_id=None):
+    def _parse_keywords(self, keywords, test_run_id, suite_id, test_id, keyword_id=None):
         if self._include_keywords:
-            [self._parse_keyword(keyword, suite_id, test_id, keyword_id)
+            [self._parse_keyword(keyword, test_run_id, suite_id, test_id, keyword_id)
             for keyword in keywords]
 
-    def _parse_keyword(self, keyword, suite_id, test_id, keyword_id):
+    def _parse_keyword(self, keyword, test_run_id, suite_id, test_id, keyword_id):
         try:
-            keyword_id = self._db.insert_row('keywords', {
+            keyword_id = self._db.insert('keywords', {
                 'suite_id': suite_id,
                 'test_id': test_id,
                 'keyword_id': keyword_id,
@@ -266,18 +274,26 @@ class RobotOutputParser(object):
                 'name': keyword.name,
                 'type': keyword.type
             })
+        self._parse_keyword_status(test_run_id, keyword_id, keyword.status)
         self._parse_messages(keyword.messages, keyword_id)
         self._parse_arguments(keyword.args, keyword_id)
-        self._parse_keywords(keyword.keywords, None, None, keyword_id)
+        self._parse_keywords(keyword.keywords, test_run_id, None, None, keyword_id)
+
+    def _parse_keyword_status(self, test_run_id, keyword_id, status):
+            self._db.insert_or_ignore('keyword_status', {
+                'test_run_id': test_run_id,
+                'keyword_id': keyword_id,
+                'status': status
+            })
 
     def _parse_messages(self, messages, keyword_id):
-        self._db.insert_many('messages', ('keyword_id', 'level', 'timestamp', 'content'),
+        self._db.insert_many_or_ignore('messages', ('keyword_id', 'level', 'timestamp', 'content'),
             [(keyword_id, message.level, self._format_robot_timestamp(message.timestamp),
             message.message) for message in messages]
         )
 
     def _parse_arguments(self, args, keyword_id):
-        self._db.insert_many('arguments', ('keyword_id', 'content'),
+        self._db.insert_many_or_ignore('arguments', ('keyword_id', 'content'),
             [(keyword_id, arg) for arg in args]
         )
 
@@ -310,7 +326,7 @@ class RobotDatabase(object):
         sql_statement += ' AND '.join('%s=?' % key for key in criteria.keys())
         return self._connection.execute(sql_statement, criteria.values()).fetchone()[0]
 
-    def insert_row(self, table_name, criteria):
+    def insert(self, table_name, criteria):
         column_names = ','.join(criteria.keys())
         placeholders = ','.join('?' * len(criteria))
         sql_statement = 'INSERT OR ABORT INTO %s (%s) VALUES (%s)' % (
@@ -319,7 +335,15 @@ class RobotDatabase(object):
         cursor = self._connection.execute(sql_statement, criteria.values())
         return cursor.lastrowid
 
-    def insert_many(self, table_name, columns, values):
+    def insert_or_ignore(self, table_name, criteria):
+        column_names = ','.join(criteria.keys())
+        placeholders = ','.join('?' * len(criteria))
+        sql_statement = 'INSERT OR IGNORE INTO %s (%s) VALUES (%s)' % (
+            table_name, column_names, placeholders
+        )
+        self._connection.execute(sql_statement, criteria.values())
+
+    def insert_many_or_ignore(self, table_name, columns, values):
         column_names = ','.join(columns)
         placeholders = ','.join('?' * len(columns))
         sql_statement = 'INSERT OR IGNORE INTO %s (%s) VALUES (%s)' % (
@@ -354,14 +378,14 @@ class RobotDatabase(object):
         self._create_table('statistics', {
             'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
             'name': 'TEXT NOT NULL'
-        })
+        }, ('test_run_id', 'name'))
         self._create_table('stats', {
             'statistics_id': 'INTEGER NOT NULL REFERENCES statistics',
             'name': 'TEXT NOT NULL',
             'elapsed': 'INTEGER NOT NULL',
             'failed': 'INTEGER NOT NULL',
             'passed': 'INTEGER NOT NULL'
-        })
+        }, ('statistics_id', 'name'))
         self._create_table('suites', {
             'test_run_id': 'INTEGER REFERENCES test_runs',
             'suite_id': 'INTEGER REFERENCES suites',
@@ -370,6 +394,11 @@ class RobotDatabase(object):
             'source': 'TEXT NOT NULL',
             'doc': 'TEXT NOT NULL'
         }, ('name', 'source'))
+        self._create_table('test_status', {
+            'test_run_id': 'INTEGER REFERENCES test_runs',
+            'test_id': 'INTEGER REFERENCES tests',
+            'status': 'TEXT NOT NULL'
+        }, ('test_run_id', 'test_id'))
         self._create_table('tests', {
             'suite_id': 'INTEGER NOT NULL REFERENCES suites',
             'xml_id': 'TEXT NOT NULL',
@@ -386,6 +415,11 @@ class RobotDatabase(object):
             'timeout': 'TEXT NOT NULL',
             'doc': 'TEXT NOT NULL'
         }, ('name', 'type'))
+        self._create_table('keyword_status', {
+            'test_run_id': 'INTEGER REFERENCES test_runs',
+            'keyword_id': 'INTEGER REFERENCES keyword',
+            'status': 'TEXT NOT NULL'
+        }, ('test_run_id', 'keyword_id'))
         self._create_table('messages', {
             'keyword_id': 'INTEGER NOT NULL REFERENCES keywords',
             'level': 'TEXT NOT NULL',
