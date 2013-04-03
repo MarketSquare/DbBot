@@ -215,9 +215,17 @@ class RobotOutputParser(object):
                 'name': suite.name,
                 'source': suite.source
             })
+        self._parse_suite_status(test_run_id, suite_id, suite.status)
         self._parse_suites(suite, test_run_id, suite_id)
         self._parse_tests(suite.tests, test_run_id, suite_id)
         self._parse_keywords(suite.keywords, test_run_id, suite_id, None)
+
+    def _parse_suite_status(self, test_run_id, suite_id, status):
+        self._db.insert_or_ignore('suite_status', {
+            'test_run_id': test_run_id,
+            'suite_id': suite_id,
+            'status': status
+        })
 
     def _parse_tests(self, tests, test_run_id, suite_id):
         [self._parse_test(test, test_run_id, suite_id) for test in tests]
@@ -389,6 +397,11 @@ class RobotDatabase(object):
             'source': 'TEXT NOT NULL',
             'doc': 'TEXT NOT NULL'
         }, ('name', 'source'))
+        self._create_table('suite_status', {
+            'test_run_id': 'INTEGER REFERENCES test_runs',
+            'suite_id': 'INTEGER REFERENCES suites',
+            'status': 'TEXT NOT NULL',
+        }, ('test_run_id', 'suite_id'))
         self._create_table('test_status', {
             'test_run_id': 'INTEGER REFERENCES test_runs',
             'test_id': 'INTEGER REFERENCES tests',
