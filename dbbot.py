@@ -327,42 +327,37 @@ class RobotDatabase(object):
         return self._connection.execute(sql_statement, criteria.values()).fetchone()[0]
 
     def insert(self, table_name, criteria):
-        column_names = ','.join(criteria.keys())
-        placeholders = ','.join('?' * len(criteria))
-        sql_statement = 'INSERT OR ABORT INTO %s (%s) VALUES (%s)' % (
-            table_name, column_names, placeholders
-        )
+        sql_statement = self._format_insert_statement(table_name, criteria.keys())
         cursor = self._connection.execute(sql_statement, criteria.values())
         return cursor.lastrowid
 
     def insert_or_ignore(self, table_name, criteria):
-        column_names = ','.join(criteria.keys())
-        placeholders = ','.join('?' * len(criteria))
-        sql_statement = 'INSERT OR IGNORE INTO %s (%s) VALUES (%s)' % (
-            table_name, column_names, placeholders
-        )
+        sql_statement = self._format_insert_statement(table_name, criteria.keys(), 'IGNORE')
         self._connection.execute(sql_statement, criteria.values())
 
-    def insert_many_or_ignore(self, table_name, columns, values):
-        column_names = ','.join(columns)
-        placeholders = ','.join('?' * len(columns))
-        sql_statement = 'INSERT OR IGNORE INTO %s (%s) VALUES (%s)' % (
-            table_name, column_names, placeholders
-        )
+    def insert_many_or_ignore(self, table_name, column_names, values):
+        sql_statement = self._format_insert_statement(table_name, column_names, 'IGNORE')
         self._connection.executemany(sql_statement, values)
+
+    def _format_insert_statement(self, table_name, column_names, on_conflict='ABORT'):
+        return 'INSERT OR %s INTO %s (%s) VALUES (%s)' % (
+            on_conflict,
+            table_name,
+            ','.join(column_names),
+            ','.join('?' * len(column_names))
+        )
 
     def _connect(self, db_file_path):
         self.verbose('- Establishing database connection')
         return sqlite3.connect(db_file_path)
 
     def _configure(self):
-        self._set('page_size', 4096)
-        self._set('cache_size', 10000)
-        self._set('synchronous', 'NORMAL')
-        self._set('journal_mode', 'WAL')
+        self._set_pragma('page_size', 4096)
+        self._set_pragma('cache_size', 10000)
+        self._set_pragma('synchronous', 'NORMAL')
+        self._set_pragma('journal_mode', 'WAL')
 
-    def _set(self, name, value):
-        self.verbose('- Configuring database')
+    def _set_pragma(self, name, value):
         sql_statement = 'PRAGMA %s=%s' % (name, value)
         self._connection.execute(sql_statement)
 
