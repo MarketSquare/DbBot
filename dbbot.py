@@ -134,7 +134,10 @@ class RobotOutputParser(object):
         test_run = ExecutionResult(xml_file)
         test_run_id = self._db.insert_row('test_runs', {
             'source_file': test_run.source,
-            'generator': test_run.generator
+            'generator': test_run.generator,
+            'started_at': self._format_robot_timestamp(test_run.suite.starttime),
+            'finished_at': self._format_robot_timestamp(test_run.suite.endtime),
+            'imported_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
         })
         self._parse_errors(test_run.errors.messages, test_run_id)
         self._parse_statistics(test_run.statistics, test_run_id)
@@ -142,7 +145,7 @@ class RobotOutputParser(object):
 
     def _parse_errors(self, errors, test_run_id):
         self._db.insert_many('errors', ('test_run_id', 'level', 'timestamp', 'content'),
-            [(test_run_id, error.level, self._format_timestamp(error.timestamp), error.message)
+            [(test_run_id, error.level, self._format_robot_timestamp(error.timestamp), error.message)
             for error in errors]
         )
 
@@ -269,7 +272,7 @@ class RobotOutputParser(object):
 
     def _parse_messages(self, messages, keyword_id):
         self._db.insert_many('messages', ('keyword_id', 'level', 'timestamp', 'content'),
-            [(keyword_id, message.level, self._format_timestamp(message.timestamp),
+            [(keyword_id, message.level, self._format_robot_timestamp(message.timestamp),
             message.message) for message in messages]
         )
 
@@ -278,8 +281,8 @@ class RobotOutputParser(object):
             [(keyword_id, arg) for arg in args]
         )
 
-    def _format_timestamp(self, timestamp):
-        return str(datetime.strptime(timestamp.split('.')[0], '%Y%m%d %H:%M:%S'))
+    def _format_robot_timestamp(self, timestamp):
+        return datetime.strptime(timestamp, '%Y%m%d %H:%M:%S.%f')
 
 
 class RobotDatabase(object):
@@ -343,7 +346,10 @@ class RobotDatabase(object):
         self.verbose('- Initializing database schema')
         self._create_table('test_runs', {
             'source_file': 'TEXT NOT NULL',
-            'generator': 'TEXT NOT NULL'
+            'generator': 'TEXT NOT NULL',
+            'started_at': 'DATETIME NOT NULL',
+            'finished_at': 'DATETIME NOT NULL',
+            'imported_at': 'DATETIME NOT NULL'
         })
         self._create_table('statistics', {
             'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
