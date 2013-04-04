@@ -8,28 +8,29 @@ from optparse import OptionParser
 from robot.result import ExecutionResult
 
 
-DEFAULT_DB_NAME = "results.db"
+DEFAULT_DB_NAME = 'robot_results.db'
 
 class DbBot(object):
     def __init__(self):
         self._config = ConfigurationParser()
-        self._parser = RobotOutputParser(self._config.include_keywords, self._output_verbose)
-        database = ":memory:" if self._config.dry_run else self._config.db_file_path
+        database = ':memory:' if self._config.dry_run else self._config.db_file_path
         self._db = RobotDatabase(database, self._output_verbose)
+        self._parser = RobotOutputParser(
+            self._config.include_keywords,
+            self._db,
+            self._output_verbose
+        )
 
     def run(self):
         try:
-            all_test_run_results = self._results_to_dict()
-            self._db.dicts_to_sql(all_test_run_results)
+            for xml_file in self._config.file_paths:
+                self._parser.xml_to_db(xml_file)
             self._db.commit()
         except Exception, message:
             sys.stderr.write('Error: %s\n\n' % message)
             exit(1)
         finally:
             self._db.close()
-
-    def _results_to_dict(self):
-        return [self._parser.xml_to_dict(xml_file) for xml_file in self._config.file_paths]
 
     def _output_verbose(self, message, header):
         if self._config.be_verbose:
@@ -111,7 +112,7 @@ class ConfigurationParser(object):
             self._parser.error('at least one input file is required')
         for file_path in options.file_paths:
             if not exists(file_path):
-                self._parser.error('file "%s" not exists' % file_path)
+                self._parser.error('file %s not exists' % file_path)
         return options
 
     def _exit_with_help(self):
@@ -120,148 +121,190 @@ class ConfigurationParser(object):
 
 
 class RobotOutputParser(object):
-    def __init__(self, include_keywords, callback_verbose=None):
+    def __init__(self, include_keywords, db, callback_verbose=None):
         self._include_keywords = include_keywords
         self._callback_verbose = callback_verbose
+        self._db = db
 
     def verbose(self, message=''):
         self._callback_verbose(message, 'Parser')
 
-    def xml_to_dict(self, xml_file):
-        self.verbose('- Parsing "%s"' % xml_file)
+    def xml_to_db(self, xml_file):
+        self.verbose('- Parsing %s' % xml_file)
         test_run = ExecutionResult(xml_file)
-        return {
+        test_run_id = self._db.insert('test_runs', {
             'source_file': test_run.source,
             'generator': test_run.generator,
-            'statistics': self.parse_statistics(test_run.statistics),
-            'errors': self._parse_messages(test_run.errors.messages),
-            'suites': self._parse_suites(test_run.suite)
-        }
+            'started_at': self._format_robot_timestamp(test_run.suite.starttime),
+            'finished_at': self._format_robot_timestamp(test_run.suite.endtime),
+            'imported_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
+        })
+        self._parse_errors(test_run.errors.messages, test_run_id)
+        self._parse_statistics(test_run.statistics, test_run_id)
+        self._parse_suites(test_run.suite, test_run_id)
 
-    def parse_statistics(self, statistics):
+    def _parse_errors(self, errors, test_run_id):
+        self._db.insert_many_or_ignore('test_run_errors',
+            ('test_run_id', 'level', 'timestamp', 'content'),
+            [(test_run_id, error.level, self._format_robot_timestamp(error.timestamp), error.message)
+            for error in errors]
+        )
+
+    def _parse_statistics(self, statistics, test_run_id):
+        self._parse_test_run_statistics(statistics.total, test_run_id)
+        self._parse_tag_statistics(statistics.tags, test_run_id)
+
+    def _parse_test_run_statistics(self, test_run_statistics, test_run_id):
         self.verbose('`--> Parsing test run statistics')
-        return [
-            self.total_statistics(statistics),
-            self.critical_statistics(statistics),
-            self.tag_statistics(statistics),
-            self.suite_statistics(statistics)
-        ]
+        [self._parse_test_run_stats(stat, test_run_id) for stat in test_run_statistics]
 
-    def total_statistics(self, statistics):
-        self.verbose('  `--> Parsing total statistics')
-        return {
-            'name': 'total', 'stats': self._get_parsed_stat(statistics.total.all)
-        }
-
-    def critical_statistics(self, statistics):
-        self.verbose('  `--> Parsing critical statistics')
-        return {
-            'name': 'critical', 'stats': self._get_parsed_stat(statistics.total.critical)
-        }
-
-    def tag_statistics(self, statistics):
+    def _parse_tag_statistics(self, tag_statistics, test_run_id):
         self.verbose('  `--> Parsing tag statistics')
-        return {
-            'name': 'tag', 'stats': [self._get_parsed_stat(tag) for tag in statistics.tags.tags.values()]
-        }
+        [self._parse_tag_stats(stat, test_run_id) for stat in tag_statistics.tags.values()]
 
-    def suite_statistics(self, statistics):
-        self.verbose('  `--> Parsing suite statistics')
-        return {
-            'name': 'suite', 'stats': [self._get_parsed_stat(suite.stat) for suite in statistics.suite.suites]
-        }
+    def _parse_tag_stats(self, stat, test_run_id):
+        self._db.insert_or_ignore('tag_status', {
+            'test_run_id': test_run_id,
+            'name': stat.name,
+            'critical': stat.critical,
+            'elapsed': stat.elapsed,
+            'failed': stat.failed,
+            'passed': stat.passed
+        })
 
-    def _get_parsed_stat(self, stat):
-        return {
+    def _parse_test_run_stats(self, stat, test_run_id):
+        self._db.insert_or_ignore('test_run_status', {
+            'test_run_id': test_run_id,
             'name': stat.name,
             'elapsed': stat.elapsed,
             'failed': stat.failed,
             'passed': stat.passed
-        }
+        })
 
-    def _parse_suites(self, suite):
-        return [self._get_parsed_suite(subsuite) for subsuite in suite.suites]
+    def _parse_suites(self, suite, test_run_id, parent_suite_id=None):
+        [self._parse_suite(subsuite, test_run_id, parent_suite_id) for subsuite in suite.suites]
 
-    def _get_parsed_suite(self, subsuite):
-        self.verbose('`--> Parsing suite: %s' % subsuite.name)
-        return {
-            'xml_id': subsuite.id,
-            'name': subsuite.name,
-            'source': subsuite.source,
-            'doc': subsuite.doc,
-            'start_time': self._format_timestamp(subsuite.starttime),
-            'end_time': self._format_timestamp(subsuite.endtime),
-            'tests': self._parse_tests(subsuite.tests),
-            'suites': self._parse_suites(subsuite),
-            'keywords': self._parse_keywords(subsuite.keywords)
-        }
+    def _parse_suite(self, suite, test_run_id, parent_suite_id):
+        self.verbose('`--> Parsing suite: %s' % suite.name)
+        try:
+            suite_id = self._db.insert('suites', {
+                'suite_id': parent_suite_id,
+                'xml_id': suite.id,
+                'name': suite.name,
+                'source': suite.source,
+                'doc': suite.doc
+            })
+        except sqlite3.IntegrityError:
+            suite_id = self._db.fetch_id('suites', {
+                'name': suite.name,
+                'source': suite.source
+            })
 
-    def _parse_tests(self, tests):
-        return [self._get_parsed_test(test) for test in tests]
+        self._parse_suite_status(test_run_id, suite_id, suite)
+        self._parse_suites(suite, test_run_id, suite_id)
+        self._parse_tests(suite.tests, test_run_id, suite_id)
+        self._parse_keywords(suite.keywords, test_run_id, suite_id, None)
 
-    def _get_parsed_test(self, test):
+    def _parse_suite_status(self, test_run_id, suite_id, suite):
+        self._db.insert_or_ignore('suite_status', {
+            'test_run_id': test_run_id,
+            'suite_id': suite_id,
+            'passed': suite.statistics.all.passed,
+            'failed': suite.statistics.all.failed,
+            'elapsed': suite.statistics.all.elapsed,
+            'status': suite.status
+        })
+
+    def _parse_tests(self, tests, test_run_id, suite_id):
+        [self._parse_test(test, test_run_id, suite_id) for test in tests]
+
+    def _parse_test(self, test, test_run_id, suite_id):
         self.verbose('  `--> Parsing test: %s' % test.name)
-        return {
-            'xml_id': test.id,
-            'name': test.name,
-            'timeout': test.timeout,
-            'doc': test.doc,
+        try:
+            test_id = self._db.insert('tests', {
+                'suite_id': suite_id,
+                'xml_id': test.id,
+                'name': test.name,
+                'timeout': test.timeout,
+                'doc': test.doc
+            })
+        except sqlite3.IntegrityError:
+            test_id = self._db.fetch_id('tests', {
+                'suite_id': suite_id,
+                'name': test.name
+            })
+        self._parse_test_status(test_run_id, test_id, test)
+        self._parse_tags(test.tags, test_id)
+        self._parse_keywords(test.keywords, test_run_id, None, test_id)
+
+    def _parse_test_status(self, test_run_id, test_id, test):
+        self._db.insert_or_ignore('test_status', {
+            'test_run_id': test_run_id,
+            'test_id': test_id,
             'status': test.status,
-            'tags': self._parse_tags(test.tags),
-            'keywords': self._parse_keywords(test.keywords)
-        }
+            'elapsed': test.elapsedtime
+        })
 
-    def _parse_keywords(self, keywords):
+    def _parse_tags(self, tags, test_id):
+        self._db.insert_many_or_ignore('tags', ('test_id', 'content'),
+            [(test_id, tag) for tag in tags]
+        )
+
+    def _parse_keywords(self, keywords, test_run_id, suite_id, test_id, keyword_id=None):
         if self._include_keywords:
-            return [self._get_parsed_keyword(keyword) for keyword in keywords]
-        else:
-            return []
+            [self._parse_keyword(keyword, test_run_id, suite_id, test_id, keyword_id)
+            for keyword in keywords]
 
-    def _get_parsed_keyword(self, keyword):
-        return {
-            'name': keyword.name,
-            'type': keyword.type,
-            'timeout': keyword.timeout,
-            'doc': keyword.doc,
-            'status': keyword.status,
-            'messages': self._parse_messages(keyword.messages),
-            'arguments': self._parse_arguments(keyword.args),
-            'keywords': self._parse_keywords(keyword.keywords)
-        }
+    def _parse_keyword(self, keyword, test_run_id, suite_id, test_id, keyword_id):
+        try:
+            keyword_id = self._db.insert('keywords', {
+                'suite_id': suite_id,
+                'test_id': test_id,
+                'keyword_id': keyword_id,
+                'name': keyword.name,
+                'type': keyword.type,
+                'timeout': keyword.timeout,
+                'doc': keyword.doc
+            })
+        except sqlite3.IntegrityError:
+            keyword_id = self._db.fetch_id('keywords', {
+                'name': keyword.name,
+                'type': keyword.type
+            })
+        self._parse_keyword_status(test_run_id, keyword_id, keyword)
+        self._parse_messages(keyword.messages, keyword_id)
+        self._parse_arguments(keyword.args, keyword_id)
+        self._parse_keywords(keyword.keywords, test_run_id, None, None, keyword_id)
 
-    def _parse_arguments(self, args):
-        return [self._get_parsed_content(arg) for arg in args]
+    def _parse_keyword_status(self, test_run_id, keyword_id, keyword):
+            self._db.insert_or_ignore('keyword_status', {
+                'test_run_id': test_run_id,
+                'keyword_id': keyword_id,
+                'status': keyword.status,
+                'elapsed': keyword.elapsedtime
+            })
 
-    def _parse_tags(self, tags):
-        return [self._get_parsed_content(tag) for tag in tags]
+    def _parse_messages(self, messages, keyword_id):
+        self._db.insert_many_or_ignore('messages', ('keyword_id', 'level', 'timestamp', 'content'),
+            [(keyword_id, message.level, self._format_robot_timestamp(message.timestamp),
+            message.message) for message in messages]
+        )
 
-    def _get_parsed_content(self, content):
-        return { 'content': content }
+    def _parse_arguments(self, args, keyword_id):
+        self._db.insert_many_or_ignore('arguments', ('keyword_id', 'content'),
+            [(keyword_id, arg) for arg in args]
+        )
 
-    def _parse_messages(self, messages):
-        return [self._get_parsed_message(message) for message in messages]
-
-    def _get_parsed_message(self, message):
-        return {
-            'level': message.level,
-            'timestamp': self._format_timestamp(message.timestamp),
-            'content': message.message
-        }
-
-    def _format_timestamp(self, timestamp):
-        return str(datetime.strptime(timestamp.split('.')[0], '%Y%m%d %H:%M:%S'))
+    def _format_robot_timestamp(self, timestamp):
+        return datetime.strptime(timestamp, '%Y%m%d %H:%M:%S.%f')
 
 
 class RobotDatabase(object):
     def __init__(self, db_file_path, callback_verbose=None):
         self._callback_verbose = callback_verbose
-
-        db_is_new = not exists(db_file_path)
         self._connection = self._connect(db_file_path)
-        self._set_db_settings()
-
-        if db_is_new:
-            self._init_schema()
+        self._configure()
+        self._init_schema()
 
     def verbose(self, message=''):
         self._callback_verbose(message, 'Database')
@@ -274,151 +317,146 @@ class RobotDatabase(object):
         self.verbose('- Committing changes into database')
         self._connection.commit()
 
-    def dicts_to_sql(self, dictionaries):
-        self.verbose('- Mapping test run results to SQL')
-        self._insert_all_elements('test_runs', dictionaries)
+    def fetch_id(self, table_name, criteria):
+        sql_statement = 'SELECT id FROM %s WHERE ' % table_name
+        sql_statement += ' AND '.join('%s=?' % key for key in criteria.keys())
+        return self._connection.execute(sql_statement, criteria.values()).fetchone()[0]
+
+    def insert(self, table_name, criteria):
+        sql_statement = self._format_insert_statement(table_name, criteria.keys())
+        cursor = self._connection.execute(sql_statement, criteria.values())
+        return cursor.lastrowid
+
+    def insert_or_ignore(self, table_name, criteria):
+        sql_statement = self._format_insert_statement(table_name, criteria.keys(), 'IGNORE')
+        self._connection.execute(sql_statement, criteria.values())
+
+    def insert_many_or_ignore(self, table_name, column_names, values):
+        sql_statement = self._format_insert_statement(table_name, column_names, 'IGNORE')
+        self._connection.executemany(sql_statement, values)
+
+    def _format_insert_statement(self, table_name, column_names, on_conflict='ABORT'):
+        return 'INSERT OR %s INTO %s (%s) VALUES (%s)' % (
+            on_conflict,
+            table_name,
+            ','.join(column_names),
+            ','.join('?' * len(column_names))
+        )
 
     def _connect(self, db_file_path):
         self.verbose('- Establishing database connection')
         return sqlite3.connect(db_file_path)
 
-    def _set_db_settings(self):
-        self._push('PRAGMA main.page_size=4096')
-        self._push('PRAGMA main.cache_size=10000')
-        self._push('PRAGMA main.synchronous=NORMAL')
-        self._push('PRAGMA main.journal_mode=WAL')
+    def _configure(self):
+        self._set_pragma('page_size', 4096)
+        self._set_pragma('cache_size', 10000)
+        self._set_pragma('synchronous', 'NORMAL')
+        self._set_pragma('journal_mode', 'WAL')
+
+    def _set_pragma(self, name, value):
+        sql_statement = 'PRAGMA %s=%s' % (name, value)
+        self._connection.execute(sql_statement)
 
     def _init_schema(self):
         self.verbose('- Initializing database schema')
-        self._push('''CREATE TABLE test_runs (
-                        id INTEGER PRIMARY KEY,
-                        source_file TEXT NOT NULL,
-                        generator TEXT NOT NULL
-                    )''')
+        self._create_table('test_runs', {
+            'source_file': 'TEXT NOT NULL',
+            'generator': 'TEXT NOT NULL',
+            'started_at': 'DATETIME NOT NULL',
+            'finished_at': 'DATETIME NOT NULL',
+            'imported_at': 'DATETIME NOT NULL'
+        })
+        self._create_table('test_run_status', {
+            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
+            'name': 'TEXT NOT NULL',
+            'elapsed': 'INTEGER NOT NULL',
+            'failed': 'INTEGER NOT NULL',
+            'passed': 'INTEGER NOT NULL'
+        }, ('test_run_id', 'name'))
+        self._create_table('test_run_errors', {
+            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
+            'level': 'TEXT NOT NULL',
+            'timestamp': 'DATETIME NOT NULL',
+            'content': 'TEXT NOT NULL'
+        }, ('test_run_id', 'level', 'content'))
+        self._create_table('tag_status', {
+            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
+            'name': 'TEXT NOT NULL',
+            'critical': 'INTEGER NOT NULL',
+            'elapsed': 'INTEGER NOT NULL',
+            'failed': 'INTEGER NOT NULL',
+            'passed': 'INTEGER NOT NULL',
+        }, ('test_run_id', 'name'))
+        self._create_table('suites', {
+            'test_run_id': 'INTEGER REFERENCES test_runs',
+            'suite_id': 'INTEGER REFERENCES suites',
+            'xml_id': 'TEXT NOT NULL',
+            'name': 'TEXT NOT NULL',
+            'source': 'TEXT NOT NULL',
+            'doc': 'TEXT NOT NULL'
+        }, ('name', 'source'))
+        self._create_table('suite_status', {
+            'test_run_id': 'INTEGER REFERENCES test_runs',
+            'suite_id': 'INTEGER REFERENCES suites',
+            'elapsed': 'INTEGER NOT NULL',
+            'failed': 'INTEGER NOT NULL',
+            'passed': 'INTEGER NOT NULL',
+            'status': 'TEXT NOT NULL'
+        }, ('test_run_id', 'suite_id'))
+        self._create_table('tests', {
+            'suite_id': 'INTEGER NOT NULL REFERENCES suites',
+            'xml_id': 'TEXT NOT NULL',
+            'name': 'TEXT NOT NULL',
+            'timeout': 'TEXT NOT NULL',
+            'doc': 'TEXT NOT NULL'
+        }, ('suite_id', 'name'))
+        self._create_table('test_status', {
+            'test_run_id': 'INTEGER REFERENCES test_runs',
+            'test_id': 'INTEGER REFERENCES tests',
+            'status': 'TEXT NOT NULL',
+            'elapsed': 'INTEGER NOT NULL'
+        }, ('test_run_id', 'test_id'))
+        self._create_table('keywords', {
+            'suite_id': 'INTEGER REFERENCES suites',
+            'test_id': 'INTEGER REFERENCES tests',
+            'keyword_id': 'INTEGER REFERENCES keywords',
+            'name': 'TEXT NOT NULL',
+            'type': 'TEXT NOT NULL',
+            'timeout': 'TEXT NOT NULL',
+            'doc': 'TEXT NOT NULL'
+        }, ('name', 'type'))
+        self._create_table('keyword_status', {
+            'test_run_id': 'INTEGER REFERENCES test_runs',
+            'keyword_id': 'INTEGER REFERENCES keyword',
+            'status': 'TEXT NOT NULL',
+            'elapsed': 'INTEGER NOT NULL'
+        }, ('test_run_id', 'keyword_id'))
+        self._create_table('messages', {
+            'keyword_id': 'INTEGER NOT NULL REFERENCES keywords',
+            'level': 'TEXT NOT NULL',
+            'timestamp': 'DATETIME NOT NULL',
+            'content': 'TEXT NOT NULL'
+        }, ('keyword_id', 'level', 'content'))
+        self._create_table('tags', {
+            'test_id': 'INTEGER NOT NULL REFERENCES tests',
+            'content': 'TEXT NOT NULL'
+        }, ('test_id', 'content'))
+        self._create_table('arguments', {
+            'keyword_id': 'INTEGER NOT NULL REFERENCES keywords',
+            'content': 'TEXT NOT NULL'
+        }, ('keyword_id', 'content'))
 
-        self._push('''CREATE TABLE statistics (
-                        id INTEGER PRIMARY KEY,
-                        test_run_id INTEGER NOT NULL REFERENCES test_runs,
-                        name TEXT NOT NULL
-                    )''')
-
-        self._push('''CREATE TABLE stats (
-                        id INTEGER PRIMARY KEY,
-                        statistic_id INTEGER NOT NULL REFERENCES statistics,
-                        name TEXT NOT NULL,
-                        elapsed INTEGER NOT NULL,
-                        failed INTEGER NOT NULL,
-                        passed INTEGER NOT NULL
-                    )''')
-
-        self._push('''CREATE TABLE suites (
-                        id INTEGER PRIMARY KEY,
-                        test_run_id INTEGER REFERENCES test_runs,
-                        suite_id INTEGER REFERENCES suites,
-                        xml_id TEXT NOT NULL,
-                        name TEXT NOT NULL,
-                        source TEXT NOT NULL,
-                        doc TEXT NOT NULL,
-                        start_time DATETIME NOT NULL,
-                        end_time DATETIME NOT NULL
-                    )''')
-
-        self._push('''CREATE TABLE tests (
-                        id INTEGER PRIMARY KEY,
-                        suite_id INTEGER NOT NULL REFERENCES suites,
-                        xml_id TEXT NOT NULL,
-                        name TEXT NOT NULL,
-                        timeout TEXT NOT NULL,
-                        doc TEXT NOT NULL,
-                        status TEXT NOT NULL
-                    )''')
-
-        self._push('''CREATE TABLE keywords (
-                        id INTEGER PRIMARY KEY,
-                        test_id INTEGER REFERENCES tests,
-                        keyword_id INTEGER REFERENCES keywords,
-                        suite_id INTEGER REFERENCES suites,
-                        name TEXT NOT NULL,
-                        type TEXT NOT NULL,
-                        timeout TEXT NOT NULL,
-                        doc TEXT NOT NULL,
-                        status TEXT NOT NULL
-                    )''')
-
-        self._push('''CREATE TABLE messages (
-                        id INTEGER PRIMARY KEY,
-                        keyword_id INTEGER NOT NULL REFERENCES keywords,
-                        level TEXT NOT NULL,
-                        timestamp DATETIME NOT NULL,
-                        content TEXT NOT NULL
-                    )''')
-
-        self._push('''CREATE TABLE errors (
-                        id INTEGER PRIMARY KEY,
-                        test_run_id INTEGER NOT NULL REFERENCES test_runs,
-                        level TEXT NOT NULL,
-                        timestamp DATETIME NOT NULL,
-                        content TEXT NOT NULL
-                    )''')
-
-        self._push('''CREATE TABLE tags (
-                        id INTEGER PRIMARY KEY,
-                        test_id INTEGER NOT NULL REFERENCES tests,
-                        content TEXT NOT NULL
-                    )''')
-
-        self._push('''CREATE TABLE arguments (
-                        id INTEGER PRIMARY KEY,
-                        keyword_id INTEGER NOT NULL REFERENCES keywords,
-                        content TEXT NOT NULL
-                    )''')
-
-        self._push('''CREATE INDEX test_run_index ON statistics(test_run_id)''')
-        self._push('''CREATE INDEX statistics_index ON stats(statistic_id)''')
-        self._push('''CREATE INDEX suite_test_run_index ON suites(test_run_id)''')
-        self._push('''CREATE INDEX suite_index ON suites(suite_id)''')
-        self._push('''CREATE INDEX test_suite_index ON tests(suite_id)''')
-        self._push('''CREATE INDEX keyword_test_index ON keywords(test_id)''')
-        self._push('''CREATE INDEX keyword_suite_index ON keywords(suite_id)''')
-        self._push('''CREATE INDEX keyword_keyword_index ON keywords(keyword_id)''')
-        self._push('''CREATE INDEX message_keyword_index ON messages(keyword_id)''')
-        self._push('''CREATE INDEX error_test_run_index ON errors(test_run_id)''')
-        self._push('''CREATE INDEX tag_test_index ON tags(test_id)''')
-        self._push('''CREATE INDEX argument_keyword_index ON arguments(keyword_id)''')
-
-
-    def _push(self, sql_statement, values=[]):
-        cursor = self._connection.execute(sql_statement, values)
-        return cursor.lastrowid
-
-    def _insert_all_elements(self, db_table_name, elements, parent_reference=None):
-        if type(elements) is not list:
-            elements = [elements]
-        [self._insert_element_as_row(db_table_name, element, parent_reference) for element in elements]
-
-    def _insert_element_as_row(self, db_table_name, element, parent_reference=None):
-        if not parent_reference is None:
-            element[parent_reference[0]] = parent_reference[1]
-        keys, values = self._get_simple_types(element)
-        query = self._make_insert_query(db_table_name, keys)
-        last_inserted_row_id = self._push(query, values)
-        parent_reference = ('%s_id' % db_table_name[:-1], last_inserted_row_id)
-        for key in list(set(element.keys()) - set(keys)):
-            self._insert_all_elements(key, element[key], parent_reference)
-
-    def _get_simple_types(self, dictionary):
-        keys, values = [], []
-        for key, value in dictionary.iteritems():
-            if not isinstance(value, (list, dict)):
-                keys.append(key)
-                values.append(value)
-        return keys, values
-
-    def _make_insert_query(self, db_table_name, keys):
-        column_names = ','.join(keys)
-        value_placeholders = ','.join(['?'] * len(keys))
-        return 'INSERT INTO %s(%s) VALUES (%s)' % (db_table_name, column_names, value_placeholders)
-
+    def _create_table(self, table_name, columns, unique_columns=()):
+        definitions = ['id INTEGER PRIMARY KEY']
+        for column_name, properties in columns.items():
+            definitions.append('%s %s' % (column_name, properties))
+        if unique_columns:
+            unique_column_names = ', '.join(unique_columns)
+            definitions.append('CONSTRAINT unique_%s UNIQUE (%s)' % (
+                table_name, unique_column_names)
+            )
+        sql_statement = 'CREATE TABLE IF NOT EXISTS %s (%s)' % (table_name, ', '.join(definitions))
+        self._connection.execute(sql_statement)
 
 if __name__ == '__main__':
     DbBot().run()
