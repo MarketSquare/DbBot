@@ -8,7 +8,7 @@ from optparse import OptionParser
 from robot.result import ExecutionResult
 
 
-DEFAULT_DB_NAME = 'results.db'
+DEFAULT_DB_NAME = 'robot_results.db'
 
 class DbBot(object):
     def __init__(self):
@@ -144,53 +144,37 @@ class RobotOutputParser(object):
         self._parse_suites(test_run.suite, test_run_id)
 
     def _parse_errors(self, errors, test_run_id):
-        self._db.insert_many_or_ignore('errors', ('test_run_id', 'level', 'timestamp', 'content'),
+        self._db.insert_many_or_ignore('test_run_errors',
+            ('test_run_id', 'level', 'timestamp', 'content'),
             [(test_run_id, error.level, self._format_robot_timestamp(error.timestamp), error.message)
             for error in errors]
         )
 
     def _parse_statistics(self, statistics, test_run_id):
+        self._parse_test_run_statistics(statistics.total, test_run_id)
+        self._parse_tag_statistics(statistics.tags, test_run_id)
+
+    def _parse_test_run_statistics(self, test_run_statistics, test_run_id):
         self.verbose('`--> Parsing test run statistics')
-        self._total_statistics(statistics, test_run_id)
-        self._critical_statistics(statistics, test_run_id)
-        self._tag_statistics(statistics, test_run_id)
-        self._suite_statistics(statistics, test_run_id)
+        [self._parse_test_run_stats(stat, test_run_id) for stat in test_run_statistics]
 
-    def _total_statistics(self, statistics, test_run_id):
-        self.verbose('  `--> Parsing total statistics')
-        statistics_id = self._db.insert('statistics', {
-            'test_run_id': test_run_id,
-            'name': 'total'
-        })
-        self._parse_stats(statistics.total.all, statistics_id)
-
-    def _critical_statistics(self, statistics, test_run_id):
-        self.verbose('  `--> Parsing critical statistics')
-        statistics_id = self._db.insert('statistics', {
-            'test_run_id': test_run_id,
-            'name': 'critical'
-        })
-        self._parse_stats(statistics.total.critical, statistics_id)
-
-    def _tag_statistics(self, statistics, test_run_id):
+    def _parse_tag_statistics(self, tag_statistics, test_run_id):
         self.verbose('  `--> Parsing tag statistics')
-        statistics_id = self._db.insert('statistics', {
-            'test_run_id': test_run_id,
-            'name': 'tag'
-        })
-        [self._parse_stats(tag, statistics_id) for tag in statistics.tags.tags.values()]
+        [self._parse_tag_stats(stat, test_run_id) for stat in tag_statistics.tags.values()]
 
-    def _suite_statistics(self, statistics, test_run_id):
-        self.verbose('  `--> Parsing suite statistics')
-        statistics_id = self._db.insert('statistics', {
+    def _parse_tag_stats(self, stat, test_run_id):
+        self._db.insert_or_ignore('tag_status', {
             'test_run_id': test_run_id,
-            'name': 'suite'
+            'name': stat.name,
+            'critical': stat.critical,
+            'elapsed': stat.elapsed,
+            'failed': stat.failed,
+            'passed': stat.passed
         })
-        [self._parse_stats(suite.stat, statistics_id) for suite in statistics.suite.suites]
 
-    def _parse_stats(self, stat, statistics_id):
-        self._db.insert_or_ignore('stats', {
-            'statistics_id': statistics_id,
+    def _parse_test_run_stats(self, stat, test_run_id):
+        self._db.insert_or_ignore('test_run_status', {
+            'test_run_id': test_run_id,
             'name': stat.name,
             'elapsed': stat.elapsed,
             'failed': stat.failed,
@@ -215,16 +199,20 @@ class RobotOutputParser(object):
                 'name': suite.name,
                 'source': suite.source
             })
-        self._parse_suite_status(test_run_id, suite_id, suite.status)
+
+        self._parse_suite_status(test_run_id, suite_id, suite)
         self._parse_suites(suite, test_run_id, suite_id)
         self._parse_tests(suite.tests, test_run_id, suite_id)
         self._parse_keywords(suite.keywords, test_run_id, suite_id, None)
 
-    def _parse_suite_status(self, test_run_id, suite_id, status):
+    def _parse_suite_status(self, test_run_id, suite_id, suite):
         self._db.insert_or_ignore('suite_status', {
             'test_run_id': test_run_id,
             'suite_id': suite_id,
-            'status': status
+            'passed': suite.statistics.all.passed,
+            'failed': suite.statistics.all.failed,
+            'elapsed': suite.statistics.all.elapsed,
+            'status': suite.status
         })
 
     def _parse_tests(self, tests, test_run_id, suite_id):
@@ -245,16 +233,17 @@ class RobotOutputParser(object):
                 'suite_id': suite_id,
                 'name': test.name
             })
-        self._parse_test_status(test_run_id, test_id, test.status)
+        self._parse_test_status(test_run_id, test_id, test)
         self._parse_tags(test.tags, test_id)
         self._parse_keywords(test.keywords, test_run_id, None, test_id)
 
-    def _parse_test_status(self, test_run_id, test_id, status):
-            self._db.insert_or_ignore('test_status', {
-                'test_run_id': test_run_id,
-                'test_id': test_id,
-                'status': status
-            })
+    def _parse_test_status(self, test_run_id, test_id, test):
+        self._db.insert_or_ignore('test_status', {
+            'test_run_id': test_run_id,
+            'test_id': test_id,
+            'status': test.status,
+            'elapsed': test.elapsedtime
+        })
 
     def _parse_tags(self, tags, test_id):
         self._db.insert_many_or_ignore('tags', ('test_id', 'content'),
@@ -282,16 +271,17 @@ class RobotOutputParser(object):
                 'name': keyword.name,
                 'type': keyword.type
             })
-        self._parse_keyword_status(test_run_id, keyword_id, keyword.status)
+        self._parse_keyword_status(test_run_id, keyword_id, keyword)
         self._parse_messages(keyword.messages, keyword_id)
         self._parse_arguments(keyword.args, keyword_id)
         self._parse_keywords(keyword.keywords, test_run_id, None, None, keyword_id)
 
-    def _parse_keyword_status(self, test_run_id, keyword_id, status):
+    def _parse_keyword_status(self, test_run_id, keyword_id, keyword):
             self._db.insert_or_ignore('keyword_status', {
                 'test_run_id': test_run_id,
                 'keyword_id': keyword_id,
-                'status': status
+                'status': keyword.status,
+                'elapsed': keyword.elapsedtime
             })
 
     def _parse_messages(self, messages, keyword_id):
@@ -312,11 +302,9 @@ class RobotOutputParser(object):
 class RobotDatabase(object):
     def __init__(self, db_file_path, callback_verbose=None):
         self._callback_verbose = callback_verbose
-        db_is_new = not exists(db_file_path)
         self._connection = self._connect(db_file_path)
         self._configure()
-        if db_is_new:
-            self._init_schema()
+        self._init_schema()
 
     def verbose(self, message=''):
         self._callback_verbose(message, 'Database')
@@ -378,17 +366,27 @@ class RobotDatabase(object):
             'finished_at': 'DATETIME NOT NULL',
             'imported_at': 'DATETIME NOT NULL'
         })
-        self._create_table('statistics', {
+        self._create_table('test_run_status', {
             'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
-            'name': 'TEXT NOT NULL'
-        }, ('test_run_id', 'name'))
-        self._create_table('stats', {
-            'statistics_id': 'INTEGER NOT NULL REFERENCES statistics',
             'name': 'TEXT NOT NULL',
             'elapsed': 'INTEGER NOT NULL',
             'failed': 'INTEGER NOT NULL',
             'passed': 'INTEGER NOT NULL'
-        }, ('statistics_id', 'name'))
+        }, ('test_run_id', 'name'))
+        self._create_table('test_run_errors', {
+            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
+            'level': 'TEXT NOT NULL',
+            'timestamp': 'DATETIME NOT NULL',
+            'content': 'TEXT NOT NULL'
+        }, ('test_run_id', 'level', 'content'))
+        self._create_table('tag_status', {
+            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
+            'name': 'TEXT NOT NULL',
+            'critical': 'INTEGER NOT NULL',
+            'elapsed': 'INTEGER NOT NULL',
+            'failed': 'INTEGER NOT NULL',
+            'passed': 'INTEGER NOT NULL',
+        }, ('test_run_id', 'name'))
         self._create_table('suites', {
             'test_run_id': 'INTEGER REFERENCES test_runs',
             'suite_id': 'INTEGER REFERENCES suites',
@@ -400,13 +398,11 @@ class RobotDatabase(object):
         self._create_table('suite_status', {
             'test_run_id': 'INTEGER REFERENCES test_runs',
             'suite_id': 'INTEGER REFERENCES suites',
-            'status': 'TEXT NOT NULL',
-        }, ('test_run_id', 'suite_id'))
-        self._create_table('test_status', {
-            'test_run_id': 'INTEGER REFERENCES test_runs',
-            'test_id': 'INTEGER REFERENCES tests',
+            'elapsed': 'INTEGER NOT NULL',
+            'failed': 'INTEGER NOT NULL',
+            'passed': 'INTEGER NOT NULL',
             'status': 'TEXT NOT NULL'
-        }, ('test_run_id', 'test_id'))
+        }, ('test_run_id', 'suite_id'))
         self._create_table('tests', {
             'suite_id': 'INTEGER NOT NULL REFERENCES suites',
             'xml_id': 'TEXT NOT NULL',
@@ -414,6 +410,12 @@ class RobotDatabase(object):
             'timeout': 'TEXT NOT NULL',
             'doc': 'TEXT NOT NULL'
         }, ('suite_id', 'name'))
+        self._create_table('test_status', {
+            'test_run_id': 'INTEGER REFERENCES test_runs',
+            'test_id': 'INTEGER REFERENCES tests',
+            'status': 'TEXT NOT NULL',
+            'elapsed': 'INTEGER NOT NULL'
+        }, ('test_run_id', 'test_id'))
         self._create_table('keywords', {
             'suite_id': 'INTEGER REFERENCES suites',
             'test_id': 'INTEGER REFERENCES tests',
@@ -426,7 +428,8 @@ class RobotDatabase(object):
         self._create_table('keyword_status', {
             'test_run_id': 'INTEGER REFERENCES test_runs',
             'keyword_id': 'INTEGER REFERENCES keyword',
-            'status': 'TEXT NOT NULL'
+            'status': 'TEXT NOT NULL',
+            'elapsed': 'INTEGER NOT NULL'
         }, ('test_run_id', 'keyword_id'))
         self._create_table('messages', {
             'keyword_id': 'INTEGER NOT NULL REFERENCES keywords',
@@ -434,12 +437,6 @@ class RobotDatabase(object):
             'timestamp': 'DATETIME NOT NULL',
             'content': 'TEXT NOT NULL'
         }, ('keyword_id', 'level', 'content'))
-        self._create_table('errors', {
-            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
-            'level': 'TEXT NOT NULL',
-            'timestamp': 'DATETIME NOT NULL',
-            'content': 'TEXT NOT NULL'
-        }, ('test_run_id', 'level', 'content'))
         self._create_table('tags', {
             'test_id': 'INTEGER NOT NULL REFERENCES tests',
             'content': 'TEXT NOT NULL'
@@ -458,7 +455,7 @@ class RobotDatabase(object):
             definitions.append('CONSTRAINT unique_%s UNIQUE (%s)' % (
                 table_name, unique_column_names)
             )
-        sql_statement = 'CREATE TABLE %s (%s)' % (table_name, ', '.join(definitions))
+        sql_statement = 'CREATE TABLE IF NOT EXISTS %s (%s)' % (table_name, ', '.join(definitions))
         self._connection.execute(sql_statement)
 
 if __name__ == '__main__':
