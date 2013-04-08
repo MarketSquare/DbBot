@@ -1,8 +1,6 @@
 *.idea
 *.pyc
-output.xml
-log.xml
-report.xml
 *.db*
-fixtures
-
+output.xml
+log.html
+report.html

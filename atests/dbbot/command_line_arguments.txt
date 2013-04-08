@@ -1,0 +1,167 @@
+*** Settings ***
+Library  OperatingSystem
+
+
+*** Variables ***
+${program_name}       dbbot
+${program_path}       ../../${program_name}
+${test_file}          ../testdata/output.xml
+${not_existing_file}  not_exist.xml
+${default_database}   robot_results.db
+
+
+*** Keywords ***
+Run With ${arguments}
+    ${rc}  ${output}=  Run And Return Rc And Output  ${program_path} ${arguments}
+    [Return]  ${rc}  ${output}
+
+Exits With ${value}
+    Should Be Equal As Integers  ${rc}  ${value}
+
+Prints Help
+    Should Contain  ${output}  Options:
+
+Prints Usage
+    Should Contain  ${output}  Usage: ${program_name} [options]
+
+Prints No Such Option ${option}
+    Prints Usage
+    Should Contain  ${output}  ${program_name}: error: no such option: ${option}
+
+Prints Input Files Required
+    Prints Usage
+    Should Contain  ${output}  ${program_name}: error: at least one input file is required
+
+Prints ${option} Requires Argument
+    Prints Usage
+    Should Contain  ${output}  ${program_name}: error: ${option} option requires an argument
+
+Prints File ${filename} Not Exists
+    Should Contain  ${output}  ${program_name}: error: file ${filename} not exists
+
+Is Verbose
+    Should Contain  ${output}  Database |   - Establishing database connection
+
+Should Create Database
+    [Arguments]  ${database_filename}=${default_database}
+    File Should Exist  ${database_filename}
+    [Teardown]  Remove File  ${default_database}
+
+Should Not Create Database
+    [Arguments]  ${database_filename}=${default_database}
+    File Should Not Exist  ${database_filename}
+
+
+*** Test Cases ***
+Without any options
+    ${rc}  ${output}=  Run With ${EMPTY}
+    Prints Help
+    Should Not Create Database
+    Exits With 1
+
+With -h prints help
+    ${rc}  ${output}=  Run With -h
+    Prints Help
+    Should Not Create Database
+    Exits With 0
+
+With --help prints help
+    ${rc}  ${output}=  Run With --help
+    Prints Help
+    Should Not Create Database
+    Exits With 0
+
+With invalid option
+    ${rc}  ${output}=  Run With --invalid
+    Prints No Such Option --invalid
+    Should Not Create Database
+    Exits With 2
+
+With --files and an existing file
+    ${rc}  ${output}=  Run with --files ${test_file}
+    Should Create Database
+    Exits With 0
+
+With --files and multiple existing files
+    ${rc}  ${output}=  Run with --files ${test_file} ${test_file}
+    Should Create Database
+    Exits With 0
+
+With -f but no filenames
+    ${rc}  ${output}=  Run With -f
+    Prints Input Files Required
+    Should Not Create Database
+    Exits With 2
+
+With --files but no filenames
+    ${rc}  ${output}=  Run With --files
+    Prints Input Files Required
+    Should Not Create Database
+    Exits With 2
+
+With --files and a not existing file
+    ${rc}  ${output}=  Run With --files ${not_existing_file}
+    Prints File ${not_existing_file} Not Exists
+    Should Not Create Database
+    Exits With 2
+
+With --files and one of the files not existing
+    ${rc}  ${output}=  Run with --files ${test_file} ${not_existing_file}
+    Should Not Create Database
+    Exits With 2
+
+With --database and filename
+    ${rc}  ${output}=  Run With --database=my_database.db --files ${test_file}
+    Should Not Create Database  ${default_database}
+    Should Create Database  my_database.db
+    Exits With 0
+
+With --database but no filename
+    ${rc}  ${output}=  Run With --database
+    Prints --database Requires Argument
+    Should Not Create Database
+    Exits With 2
+
+With -b and filename
+    ${rc}  ${output}=  Run With -b my_database.db --files ${test_file}
+    Should Not Create Database  ${default_database}
+    Should Create Database  my_database.db
+    Exits With 0
+
+With -b but no filename
+    ${rc}  ${output}=  Run With -b
+    Prints -b Requires Argument
+    Should Not Create Database
+    Exits With 2
+
+With -v
+    ${rc}  ${output}=  Run With -v --files ${test_file}
+    Is Verbose
+    Should Create Database
+    Exits With 0
+
+With --verbose
+    ${rc}  ${output}=  Run With --verbose --files ${test_file}
+    Is Verbose
+    Should Create Database
+    Exits With 0
+
+With -d
+    ${rc}  ${output}=  Run With -d --files ${test_file}
+    Should Not Create Database
+    Exits With 0
+
+With --dry-run
+    ${rc}  ${output}=  Run With --dry-run --files ${test_file}
+    Should Not Create Database
+    Exits With 0
+
+With -k
+    ${rc}  ${output}=  Run With -k --files ${test_file}
+    Should Create Database
+    Exits With 0
+
+With --also-keywords
+    ${rc}  ${output}=  Run With --also-keywords --files ${test_file}
+    Should Create Database
+    Exits With 0

@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generated="20130312 13:26:02.158" generator="Robot trunk 20130226 (Python 2.7.3 on darwin)">
+    <suite id="s1" name="Call Method" source="/Users/asyrjasalo/eficode/robot/robotframework/atest/robot/standard_libraries/builtin/call_method.txt">
+        <kw name="atest_resource.Run Tests" timeout="" type="setup">
+            <doc/>
+            <arguments>
+                <arg>${EMPTY}</arg>
+                <arg>standard_libraries/builtin/call_method.txt</arg>
+            </arguments>
+            <kw name="atest_resource.Run Tests Helper" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${options}</arg>
+                    <arg>@{data list}</arg>
+                </arguments>
+                <kw name="${data string} = atest_resource.Set Variables And Get Datasources" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>@{data list}</arg>
+                    </arguments>
+                    <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                        <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                        <arguments>
+                            <arg>$SUITE</arg>
+                            <arg>${NONE}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130312 13:26:02.283">${SUITE} = None</msg>
+                        <status endtime="20130312 13:26:02.284" starttime="20130312 13:26:02.283" status="PASS"/>
+                    </kw>
+                    <kw name="${name} = TestHelper.Get Output Name" timeout="" type="kw">
+                        <doc/>
+                        <arguments>
+                            <arg>@{data list}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130312 13:26:02.284">${name} = call_method</msg>
+                        <status endtime="20130312 13:26:02.284" starttime="20130312 13:26:02.284" status="PASS"/>
+                    </kw>
+                    <kw name="atest_resource.Set Variables" timeout="" type="kw">
+                        <doc/>
+                        <arguments>
+                            <arg>${name}</arg>
+                        </arguments>
+                        <kw name="${OUTDIR} = OperatingSystem.Join Path" timeout="" type="kw">
+                            <doc>Joins the given path part(s) to the given base path.</doc>
+                            <arguments>
+                                <arg>${OUTPUTDIR}</arg>
+                                <arg>output</arg>
+                                <arg>${name}</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130312 13:26:02.286">${OUTDIR} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method</msg>
+                            <status endtime="20130312 13:26:02.286" starttime="20130312 13:26:02.285" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Global Variable" timeout="" type="kw">
+                            <doc>Makes a variable available globally in all tests and suites.</doc>
+                            <arguments>
+                                <arg>$OUTDIR</arg>
+                                <arg>${OUTDIR.encode('ascii', 'ignore').replace('?', '_') .replace('*', '_')}</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130312 13:26:02.287">${OUTDIR} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method</msg>
+                            <status endtime="20130312 13:26:02.287" starttime="20130312 13:26:02.286" status="PASS"/>
+                        </kw>
+                        <kw name="OperatingSystem.Create Directory" timeout="" type="kw">
+                            <doc>Creates the specified directory.</doc>
+                            <arguments>
+                                <arg>${OUTDIR}</arg>
+                            </arguments>
+                            <msg html="yes" level="INFO" timestamp="20130312 13:26:02.288">Created directory '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method&lt;/a&gt;'</msg>
+                            <status endtime="20130312 13:26:02.288" starttime="20130312 13:26:02.287" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                            <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                            <arguments>
+                                <arg>$OUTFILE</arg>
+                                <arg>${OUTDIR}${/}output.xml</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130312 13:26:02.289">${OUTFILE} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/output.xml</msg>
+                            <status endtime="20130312 13:26:02.289" starttime="20130312 13:26:02.288" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                            <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                            <arguments>
+                                <arg>$STDOUT_FILE</arg>
+                                <arg>${OUTDIR}${/}stdout.txt</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130312 13:26:02.289">${STDOUT_FILE} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/stdout.txt</msg>
+                            <status endtime="20130312 13:26:02.289" starttime="20130312 13:26:02.289" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                            <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                            <arguments>
+                                <arg>$STDERR_FILE</arg>
+                                <arg>${OUTDIR}${/}stderr.txt</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130312 13:26:02.290">${STDERR_FILE} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/stderr.txt</msg>
+                            <status endtime="20130312 13:26:02.290" starttime="20130312 13:26:02.290" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                            <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                            <arguments>
+                                <arg>$SYSLOG_FILE</arg>
+                                <arg>${OUTDIR}${/}syslog.txt</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130312 13:26:02.291">${SYSLOG_FILE} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/syslog.txt</msg>
+                            <status endtime="20130312 13:26:02.291" starttime="20130312 13:26:02.290" status="PASS"/>
+                        </kw>
+                        <kw name="OperatingSystem.Set Environment Variable" timeout="" type="kw">
+                            <doc>Sets an environment variable to a specified value.</doc>
+                            <arguments>
+                                <arg>ROBOT_SYSLOG_FILE</arg>
+                                <arg>${SYSLOG_FILE}</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130312 13:26:02.292">Environment variable 'ROBOT_SYSLOG_FILE' set to value '/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/syslog.txt'</msg>
+                            <status endtime="20130312 13:26:02.292" starttime="20130312 13:26:02.291" status="PASS"/>
+                        </kw>
+                        <kw name="atest_resource.Set Runners" timeout="" type="kw">
+                            <doc/>
+                            <arguments/>
+                            <kw name="${robot} = OperatingSystem.Join Path" timeout="" type="kw">
+                                <doc>Joins the given path part(s) to the given base path.</doc>
+                                <arguments>
+                                    <arg>${ROBOTPATH}</arg>
+                                    <arg>run.py</arg>
+                                </arguments>
+                                <msg level="INFO" timestamp="20130312 13:26:02.293">${robot} = /Users/asyrjasalo/eficode/robot/robotframework/src/robot/run.py</msg>
+                                <status endtime="20130312 13:26:02.293" starttime="20130312 13:26:02.293" status="PASS"/>
+                            </kw>
+                            <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                                <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                                <arguments>
+                                    <arg>$ROBOT</arg>
+                                    <arg>${INTERPRETER} ${robot}</arg>
+                                </arguments>
+                                <msg level="INFO" timestamp="20130312 13:26:02.294">${ROBOT} = python /Users/asyrjasalo/eficode/robot/robotframework/src/robot/run.py</msg>
+                                <status endtime="20130312 13:26:02.294" starttime="20130312 13:26:02.293" status="PASS"/>
+                            </kw>
+                            <kw name="${rebot} = OperatingSystem.Join Path" timeout="" type="kw">
+                                <doc>Joins the given path part(s) to the given base path.</doc>
+                                <arguments>
+                                    <arg>${ROBOTPATH}</arg>
+                                    <arg>rebot.py</arg>
+                                </arguments>
+                                <msg level="INFO" timestamp="20130312 13:26:02.294">${rebot} = /Users/asyrjasalo/eficode/robot/robotframework/src/robot/rebot.py</msg>
+                                <status endtime="20130312 13:26:02.294" starttime="20130312 13:26:02.294" status="PASS"/>
+                            </kw>
+                            <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                                <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                                <arguments>
+                                    <arg>$REBOT</arg>
+                                    <arg>${INTERPRETER} ${rebot}</arg>
+                                </arguments>
+                                <msg level="INFO" timestamp="20130312 13:26:02.295">${REBOT} = python /Users/asyrjasalo/eficode/robot/robotframework/src/robot/rebot.py</msg>
+                                <status endtime="20130312 13:26:02.295" starttime="20130312 13:26:02.294" status="PASS"/>
+                            </kw>
+                            <status endtime="20130312 13:26:02.295" starttime="20130312 13:26:02.292" status="PASS"/>
+                        </kw>
+                        <status endtime="20130312 13:26:02.295" starttime="20130312 13:26:02.284" status="PASS"/>
+                    </kw>
+                    <kw name="@{data list} = OperatingSystem.Join Paths" timeout="" type="kw">
+                        <doc>Joins given paths with base and returns resulted paths.</doc>
+                        <arguments>
+                            <arg>${DATADIR}</arg>
+                            <arg>@{data list}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130312 13:26:02.296">@{data list} = [ /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/standard_libraries/builtin/call_method.txt ]</msg>
+                        <status endtime="20130312 13:26:02.296" starttime="20130312 13:26:02.295" status="PASS"/>
+                    </kw>
+                    <kw name="${data string} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>@{data list}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130312 13:26:02.296">${data string} = /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/standard_libraries/builtin/call_method.txt</msg>
+                        <status endtime="20130312 13:26:02.296" starttime="20130312 13:26:02.296" status="PASS"/>
+                    </kw>
+                    <msg level="INFO" timestamp="20130312 13:26:02.297">${data string} = /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/standard_libraries/builtin/call_method.txt</msg>
+                    <status endtime="20130312 13:26:02.297" starttime="20130312 13:26:02.282" status="PASS"/>
+                </kw>
+                <kw name="${options} = BuiltIn.Catenate" timeout="" type="kw">
+                    <doc>Catenates the given items together and returns the resulted string.</doc>
+                    <arguments>
+                        <arg>--MonitorMarkers OFF</arg>
+                        <arg>${user options}</arg>
+                        <arg>--variable interpreter:${INTERPRETER}</arg>
+                        <arg>--pythonpath ${LIBPATH1}</arg>
+                        <arg>--pythonpath ${LIBPATH2}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130312 13:26:02.298">${options} = --MonitorMarkers OFF  --variable interpreter:python --pythonpath /Users/asyrjasalo/eficode/robot/robotframework/atest/resources/../testresources/testlibs --pythonpath /Users/asyrjasalo/eficode/robot/r...</msg>
+                    <status endtime="20130312 13:26:02.298" starttime="20130312 13:26:02.297" status="PASS"/>
+                </kw>
+                <kw name="atest_resource.Run Helper" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${ROBOT}</arg>
+                        <arg>${options}</arg>
+                        <arg>${data string}</arg>
+                    </arguments>
+                    <kw name="OperatingSystem.Remove Files" timeout="" type="kw">
+                        <doc>Uses `Remove File` to remove multiple files one-by-one.</doc>
+                        <arguments>
+                            <arg>${OUTFILE}</arg>
+                            <arg>${OUTDIR}/*.xml</arg>
+                            <arg>${OUTDIR}/*.html</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130312 13:26:02.299">File '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/output.xml&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/output.xml&lt;/a&gt;' does not exist</msg>
+                        <msg html="yes" level="INFO" timestamp="20130312 13:26:02.300">File '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/*.xml&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/*.xml&lt;/a&gt;' does not exist</msg>
+                        <msg html="yes" level="INFO" timestamp="20130312 13:26:02.300">File '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/*.html&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/*.html&lt;/a&gt;' does not exist</msg>
+                        <status endtime="20130312 13:26:02.300" starttime="20130312 13:26:02.299" status="PASS"/>
+                    </kw>
+                    <kw name="${cmd} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>${runner}</arg>
+                            <arg>--monitorcolors OFF</arg>
+                            <arg>--outputdir ${OUTDIR}</arg>
+                            <arg>--output ${OUTFILE}</arg>
+                            <arg>--report NONE</arg>
+                            <arg>--log NONE</arg>
+                            <arg>${options}</arg>
+                            <arg>${data string}</arg>
+                            <arg>1&gt;${STDOUTFILE}</arg>
+                            <arg>2&gt;${STDERRFILE}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130312 13:26:02.301">${cmd} = python /Users/asyrjasalo/eficode/robot/robotframework/src/robot/run.py --monitorcolors OFF --outputdir /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method --output /...</msg>
+                        <status endtime="20130312 13:26:02.301" starttime="20130312 13:26:02.300" status="PASS"/>
+                    </kw>
+                    <kw name="${rc} = OperatingSystem.Run And Return Rc" timeout="" type="kw">
+                        <doc>Runs the given command in the system and returns the return code.</doc>
+                        <arguments>
+                            <arg>${cmd}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130312 13:26:02.302">Running command 'python /Users/asyrjasalo/eficode/robot/robotframework/src/robot/run.py --monitorcolors OFF --outputdir /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method --output /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/output.xml --report NONE --log NONE --MonitorMarkers OFF  --variable interpreter:python --pythonpath /Users/asyrjasalo/eficode/robot/robotframework/atest/resources/../testresources/testlibs --pythonpath /Users/asyrjasalo/eficode/robot/robotframework/atest/resources/../testresources/listeners /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/standard_libraries/builtin/call_method.txt 1&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/stdout.txt 2&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/stderr.txt'</msg>
+                        <msg level="INFO" timestamp="20130312 13:26:02.638">${rc} = 3</msg>
+                        <status endtime="20130312 13:26:02.638" starttime="20130312 13:26:02.302" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${OUTDIR}&quot;&gt;${OUTDIR}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130312 13:26:02.639">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method&lt;/a&gt;</msg>
+                        <status endtime="20130312 13:26:02.639" starttime="20130312 13:26:02.638" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${OUTFILE}&quot;&gt;${OUTFILE}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130312 13:26:02.639">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/output.xml&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/output.xml&lt;/a&gt;</msg>
+                        <status endtime="20130312 13:26:02.639" starttime="20130312 13:26:02.639" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${STDOUTFILE}&quot;&gt;${STDOUTFILE}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130312 13:26:02.640">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/stdout.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/stdout.txt&lt;/a&gt;</msg>
+                        <status endtime="20130312 13:26:02.640" starttime="20130312 13:26:02.640" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${STDERRFILE}&quot;&gt;${STDERRFILE}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130312 13:26:02.640">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/stderr.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/stderr.txt&lt;/a&gt;</msg>
+                        <status endtime="20130312 13:26:02.641" starttime="20130312 13:26:02.640" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${SYSLOGFILE}&quot;&gt;${SYSLOGFILE}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130312 13:26:02.641">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/syslog.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/syslog.txt&lt;/a&gt;</msg>
+                        <status endtime="20130312 13:26:02.641" starttime="20130312 13:26:02.641" status="PASS"/>
+                    </kw>
+                    <status endtime="20130312 13:26:02.641" starttime="20130312 13:26:02.298" status="PASS"/>
+                </kw>
+                <status endtime="20130312 13:26:02.641" starttime="20130312 13:26:02.281" status="PASS"/>
+            </kw>
+            <kw name="TestCheckerLibrary.Process Output" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${OUTFILE}</arg>
+                </arguments>
+                <msg level="INFO" timestamp="20130312 13:26:02.645">${SUITE} = Call Method</msg>
+                <msg level="INFO" timestamp="20130312 13:26:02.645">${STATISTICS} = &lt;robot.model.statistics.Statistics object at 0x10a952990&gt;</msg>
+                <msg level="INFO" timestamp="20130312 13:26:02.646">${ERRORS} = &lt;robot.result.executionerrors.ExecutionErrors object at 0x10a94cc50&gt;</msg>
+                <msg level="INFO" timestamp="20130312 13:26:02.646">Processing output '/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/call_method/output.xml'</msg>
+                <status endtime="20130312 13:26:02.646" starttime="20130312 13:26:02.642" status="PASS"/>
+            </kw>
+            <status endtime="20130312 13:26:02.646" starttime="20130312 13:26:02.280" status="PASS"/>
+        </kw>
+        <test id="s1-t1" name="Call Method" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TEST NAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130312 13:26:02.649">${test} = Call Method</msg>
+                    <status endtime="20130312 13:26:02.649" starttime="20130312 13:26:02.648" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130312 13:26:02.649" starttime="20130312 13:26:02.649" status="PASS"/>
+                </kw>
+                <status endtime="20130312 13:26:02.650" starttime="20130312 13:26:02.647" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130312 13:26:02.650" starttime="20130312 13:26:02.646" status="PASS"/>
+        </test>
+        <test id="s1-t2" name="Call Method Returns" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TEST NAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130312 13:26:02.653">${test} = Call Method Returns</msg>
+                    <status endtime="20130312 13:26:02.653" starttime="20130312 13:26:02.652" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130312 13:26:02.653" starttime="20130312 13:26:02.653" status="PASS"/>
+                </kw>
+                <status endtime="20130312 13:26:02.654" starttime="20130312 13:26:02.651" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130312 13:26:02.654" starttime="20130312 13:26:02.650" status="PASS"/>
+        </test>
+        <test id="s1-t3" name="Call Method From Module" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TEST NAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130312 13:26:02.657">${test} = Call Method From Module</msg>
+                    <status endtime="20130312 13:26:02.657" starttime="20130312 13:26:02.656" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130312 13:26:02.657" starttime="20130312 13:26:02.657" status="PASS"/>
+                </kw>
+                <status endtime="20130312 13:26:02.658" starttime="20130312 13:26:02.655" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130312 13:26:02.658" starttime="20130312 13:26:02.654" status="PASS"/>
+        </test>
+        <test id="s1-t4" name="Call Non Existing Method" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TEST NAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130312 13:26:02.661">${test} = Call Non Existing Method</msg>
+                    <status endtime="20130312 13:26:02.661" starttime="20130312 13:26:02.660" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130312 13:26:02.661" starttime="20130312 13:26:02.661" status="PASS"/>
+                </kw>
+                <status endtime="20130312 13:26:02.661" starttime="20130312 13:26:02.659" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130312 13:26:02.662" starttime="20130312 13:26:02.658" status="PASS"/>
+        </test>
+        <doc>Robot Framework acceptance tests</doc>
+        <metadata>
+            <item name="Interpreter">python</item>
+            <item name="Platform">darwin</item>
+        </metadata>
+        <status endtime="20130312 13:26:02.662" starttime="20130312 13:26:02.158" status="PASS"/>
+    </suite>
+    <statistics>
+        <total>
+            <stat fail="0" pass="4">Critical Tests</stat>
+            <stat fail="0" pass="4">All Tests</stat>
+        </total>
+        <tag>
+            <stat combined="" doc="" fail="0" info="critical" links="" pass="4">regression</stat>
+            <stat combined="jybot NOT pybot" doc="" fail="0" info="combined" links="" pass="0">jybot NOT pybot</stat>
+            <stat combined="pybot NOT jybot" doc="" fail="0" info="combined" links="" pass="0">pybot NOT jybot</stat>
+        </tag>
+        <suite>
+            <stat fail="0" id="s1" name="Call Method" pass="4">Call Method</stat>
+    </statistics>
+    <errors/>
+</robot>
