@@ -21,7 +21,7 @@ class DbBot(object):
                 self._parser.xml_to_db(xml_file)
             self._db.commit()
         except Exception, message:
-            stderr.write('Error: %s\n\n' % message)
+            stderr.write('dbbot: error: %s\n\n' % message)
             exit(1)
         finally:
             self._db.close()
