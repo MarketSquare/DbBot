@@ -4,10 +4,12 @@ Library  OperatingSystem
 
 *** Variables ***
 ${program_name}       dbbot
-${program_path}       ../../${program_name}
-${test_file}          ../testdata/output.xml
+${program_path}       ${CURDIR}${/}..${/}..${/}${program_name}
+${valid_output}       ${CURDIR}${/}..${/}testdata${/}output.xml
+${invalid_output}     ${CURDIR}${/}..${/}testdata${/}invalid_output.xml
 ${not_existing_file}  not_exist.xml
 ${default_database}   robot_results.db
+${own_database}       my_database.db
 
 
 *** Keywords ***
@@ -17,6 +19,22 @@ Run With ${arguments}
 
 Exits With ${value}
     Should Be Equal As Integers  ${rc}  ${value}
+
+Exits With Success
+    Should Not Contain  ${output}  error:
+    Should Be Equal As Integers  ${rc}  0
+
+Exits With Error
+    Should Contain  ${output}  dbbot: error:
+    Should Be Equal As Integers  ${rc}  1
+
+Exits With Misused Arguments
+    Should Contain  ${output}  dbbot: error:
+    Should Be Equal As Integers  ${rc}  2
+
+Exits With Help
+    Prints Help
+    Should Be Equal As Integers  ${rc}  1
 
 Prints Help
     Should Contain  ${output}  Options:
@@ -39,129 +57,132 @@ Prints ${option} Requires Argument
 Prints File ${filename} Not Exists
     Should Contain  ${output}  ${program_name}: error: file ${filename} not exists
 
+Prints Parse Error In ${filename}
+    Should Contain  ${output}  ${program_name}: error: Reading XML source '${filename}' failed: ParseError:
+
 Is Verbose
-    Should Contain  ${output}  Database |   - Establishing database connection
+    Should Contain  ${output}  Database |
+    Should Contain  ${output}  Parser   |
 
 Should Create Database
-    [Arguments]  ${database_filename}=${default_database}
-    File Should Exist  ${database_filename}
-    [Teardown]  Remove File  ${default_database}
+    [Arguments]  ${database}
+    File Should Exist  ${database}
+    [Teardown]  Remove File  ${database}
 
-Should Not Create Database
-    [Arguments]  ${database_filename}=${default_database}
-    File Should Not Exist  ${database_filename}
+Should Not Create Default Database
+    File Should Not Exist  ${default_database}
+
+Remove Databases
+    Remove File  ${default_database}
+    Remove File  ${own_database}
 
 
 *** Test Cases ***
-Without any options
+Without arguments
     ${rc}  ${output}=  Run With ${EMPTY}
-    Prints Help
-    Should Not Create Database
-    Exits With 1
+    Exits With Help
 
-With -h prints help
+With -h
     ${rc}  ${output}=  Run With -h
     Prints Help
-    Should Not Create Database
-    Exits With 0
+    Exits With Success
 
-With --help prints help
+With --help
     ${rc}  ${output}=  Run With --help
     Prints Help
-    Should Not Create Database
-    Exits With 0
+    Exits With Success
 
 With invalid option
     ${rc}  ${output}=  Run With --invalid
     Prints No Such Option --invalid
-    Should Not Create Database
-    Exits With 2
+    Exits With Misused Arguments
 
 With --files and an existing file
-    ${rc}  ${output}=  Run with --files ${test_file}
-    Should Create Database
-    Exits With 0
+    ${rc}  ${output}=  Run with --files ${valid_output}
+    Exits With Success
 
 With --files and multiple existing files
-    ${rc}  ${output}=  Run with --files ${test_file} ${test_file}
-    Should Create Database
-    Exits With 0
+    ${rc}  ${output}=  Run with --files ${valid_output} ${valid_output}
+    Exits With Success
 
-With -f but no filenames
+With -f and no file names
     ${rc}  ${output}=  Run With -f
     Prints Input Files Required
-    Should Not Create Database
-    Exits With 2
+    Exits With Misused Arguments
 
-With --files but no filenames
+With --files and no file names
     ${rc}  ${output}=  Run With --files
     Prints Input Files Required
-    Should Not Create Database
-    Exits With 2
+    Exits With Misused Arguments
 
-With --files and a not existing file
+With --files and not existing file
     ${rc}  ${output}=  Run With --files ${not_existing_file}
     Prints File ${not_existing_file} Not Exists
-    Should Not Create Database
-    Exits With 2
+    Exits With Misused Arguments
 
 With --files and one of the files not existing
-    ${rc}  ${output}=  Run with --files ${test_file} ${not_existing_file}
-    Should Not Create Database
-    Exits With 2
+    ${rc}  ${output}=  Run with --files ${valid_output} ${not_existing_file}
+    Exits With Misused Arguments
 
-With --database and filename
-    ${rc}  ${output}=  Run With --database=my_database.db --files ${test_file}
-    Should Not Create Database  ${default_database}
-    Should Create Database  my_database.db
-    Exits With 0
+With --files and an invalid XML file
+    ${rc}  ${output}=  Run With --files ${invalid_output}
+    Prints Parse Error In ${invalid_output}
+    Exits With Error
 
-With --database but no filename
+With --database and database name
+    [Setup]  Remove Databases
+    ${rc}  ${output}=  Run With --database=${own_database} --files ${valid_output}
+    Should Not Create Default Database
+    Should Create Database  ${own_database}
+    Exits With Success
+
+With --database and no database name
+    [Setup]  Remove Databases
     ${rc}  ${output}=  Run With --database
     Prints --database Requires Argument
-    Should Not Create Database
-    Exits With 2
+    Should Not Create Default Database
+    Exits With Misused Arguments
 
-With -b and filename
-    ${rc}  ${output}=  Run With -b my_database.db --files ${test_file}
-    Should Not Create Database  ${default_database}
-    Should Create Database  my_database.db
-    Exits With 0
+With -b and database name
+    [Setup]  Remove Databases
+    ${rc}  ${output}=  Run With -b ${own_database} --files ${valid_output}
+    Should Not Create Default Database
+    Should Create Database  ${own_database}
+    Exits With Success
 
-With -b but no filename
+With -b and no database file name
+    [Setup]  Remove Databases
     ${rc}  ${output}=  Run With -b
     Prints -b Requires Argument
-    Should Not Create Database
-    Exits With 2
+    Should Not Create Default Database
+    Exits With Misused Arguments
 
 With -v
-    ${rc}  ${output}=  Run With -v --files ${test_file}
+    ${rc}  ${output}=  Run With -v --files ${valid_output}
     Is Verbose
-    Should Create Database
-    Exits With 0
+    Exits With Success
 
 With --verbose
-    ${rc}  ${output}=  Run With --verbose --files ${test_file}
+    ${rc}  ${output}=  Run With --verbose --files ${valid_output}
     Is Verbose
-    Should Create Database
-    Exits With 0
+    Exits With Success
 
 With -d
-    ${rc}  ${output}=  Run With -d --files ${test_file}
-    Should Not Create Database
-    Exits With 0
+    [Setup]  Remove Databases
+    ${rc}  ${output}=  Run With -d --files ${valid_output}
+    Should Not Create Default Database
+    Exits With Success
 
 With --dry-run
-    ${rc}  ${output}=  Run With --dry-run --files ${test_file}
-    Should Not Create Database
-    Exits With 0
+    [Setup]  Remove Databases
+    ${rc}  ${output}=  Run With --dry-run --files ${valid_output}
+    Should Not Create Default Database
+    Exits With Success
 
 With -k
-    ${rc}  ${output}=  Run With -k --files ${test_file}
-    Should Create Database
-    Exits With 0
+    ${rc}  ${output}=  Run With -k --files ${valid_output}
+    Exits With Success
 
 With --also-keywords
-    ${rc}  ${output}=  Run With --also-keywords --files ${test_file}
-    Should Create Database
-    Exits With 0
+    ${rc}  ${output}=  Run With --also-keywords --files ${valid_output}
+    Exits With Success
