@@ -6,15 +6,16 @@ Resource  ../resources/database.txt
 
 
 *** Variables ***
-${one_suite}        ${CURDIR}${/}..${/}testdata${/}one_suite.xml
-${multiple_suites}  ${CURDIR}${/}..${/}testdata${/}multiple_suites.xml
+${test_run}          ${CURDIR}${/}..${/}testdata${/}one_suite${/}output.xml
+${latter_test_run}   ${CURDIR}${/}..${/}testdata${/}one_suite${/}output_latter.xml
+${another_suite}     ${CURDIR}${/}..${/}testdata${/}multiple_suite${/}output.xml
 
 
 *** Keywords ***
-Parse Without Keywords ${files}
+Parse ${files}
     Run  ${program_path} --files ${files}
 
-Parse With Keywords ${files}
+With Keywords ${files}
     Run  ${program_path} --files ${files} --also-keywords
 
 Should Store ${n} Test Runs
@@ -64,39 +65,27 @@ Should Store Nothing Related To Keywords
 
 
 *** Test Cases ***
-A single run without keywords
+Single test run results
     [Setup]  Remove Database
-    Parse Without Keywords ${one_suite}
+    Parse ${test_run}
     Should Store 1 Test Runs
-    Should Store 2 Test Run Statuses
-    Should Store 0 Test Run Errors
-    Should Store 1 Suites
-    Should Store 1 Suite Statuses
-    Should Store 19 Tests
-    Should Store 19 Test Statuses
-    Should Store 57 Tags
-    Should Store 3 Tag Statuses
-    Should Store Nothing Related To Keywords
     [Teardown]  Remove Database
 
-Several runs without keywords
+Single test run results multiple times
     [Setup]  Remove Database
-    Parse Without Keywords ${one_suite} ${one_suite}
+    Parse ${test_run} ${test_run}
+    Should Store 1 Test Runs
+    [Teardown]  Remove Database
+
+Multiple test run results
+    [Setup]  Remove Database
+    Parse ${test_run} ${latter_test_run}
     Should Store 2 Test Runs
-    Should Store 4 Test Run Statuses
-    Should Store 0 Test Run Errors
-    Should Store 1 Suites
-    Should Store 2 Suite Statuses
-    Should Store 19 Tests
-    Should Store 38 Test Statuses
-    Should Store 57 Tags
-    Should Store 6 Tag Statuses
-    Should Store Nothing Related To Keywords
     [Teardown]  Remove Database
 
-A single run with keywords
-    [Setup]  Remove Database
-    Parse With Keywords ${one_suite}
+Single test run results without keywords
+    [Setup]  Remove Database
+    Parse ${test_run}
     Should Store 1 Test Runs
     Should Store 2 Test Run Statuses
     Should Store 0 Test Run Errors
@@ -106,26 +95,33 @@ A single run with keywords
     Should Store 19 Test Statuses
     Should Store 57 Tags
     Should Store 3 Tag Statuses
+    Should Store Nothing Related To Keywords
+    [Teardown]  Remove Database
+
+Single test run results with keywords
+    [Setup]  Remove Database
+    With Keywords ${test_run}
     Should Store 39 Keywords
     Should Store 39 Keyword Statuses
     Should Store 131 Arguments
     Should Store 87 Messages
     [Teardown]  Remove Database
 
-Several runs with keywords
-    [Setup]  Remove Database
-    Parse With Keywords ${one_suite} ${one_suite}
-    Should Store 2 Test Runs
-    Should Store 4 Test Run Statuses
+Multiple test run results with the same root suite
+    [Setup]  Remove Database
+    With Keywords ${test_run}
+    With Keywords ${latter_test_run}
+    Should Store ${2*1} Test Runs
+    Should Store ${2*2} Test Run Statuses
     Should Store 0 Test Run Errors
     Should Store 1 Suites
     Should Store 2 Suite Statuses
     Should Store 19 Tests
-    Should Store 38 Test Statuses
+    Should Store ${2*19} Test Statuses
     Should Store 57 Tags
-    Should Store 6 Tag Statuses
+    Should Store ${2*3} Tag Statuses
     Should Store 39 Keywords
-    Should Store 78 Keyword Statuses
+    Should Store ${2*39} Keyword Statuses
     Should Store 131 Arguments
-    Should Store 87 Messages
+    Should Store 99 Messages
     [Teardown]  Remove Database

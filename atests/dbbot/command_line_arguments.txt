@@ -5,7 +5,7 @@ Resource  ../resources/database.txt
 
 
 *** Variables ***
-${valid_output}       ${CURDIR}${/}..${/}testdata${/}one_suite.xml
+${valid_output}       ${CURDIR}${/}..${/}testdata${/}one_suite${/}output.xml
 ${invalid_output}     ${CURDIR}${/}..${/}testdata${/}invalid_output.xml
 ${not_existing_file}  ${CURDIR}${/}..${/}testdata${/}not_exist.xml
 
