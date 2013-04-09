@@ -24,7 +24,7 @@ class ResultsParser(object):
         })
         self._parse_errors(test_run.errors.messages, test_run_id)
         self._parse_statistics(test_run.statistics, test_run_id)
-        self._parse_suites(test_run.suite, test_run_id)
+        self._parse_suite(test_run.suite, test_run_id)
 
     def _parse_errors(self, errors, test_run_id):
         self._db.insert_many_or_ignore('test_run_errors',
@@ -64,10 +64,10 @@ class ResultsParser(object):
             'passed': stat.passed
         })
 
-    def _parse_suites(self, suite, test_run_id, parent_suite_id=None):
+    def _parse_suites(self, suite, test_run_id, parent_suite_id):
         [self._parse_suite(subsuite, test_run_id, parent_suite_id) for subsuite in suite.suites]
 
-    def _parse_suite(self, suite, test_run_id, parent_suite_id):
+    def _parse_suite(self, suite, test_run_id, parent_suite_id=None):
         self.verbose('`--> Parsing suite: %s' % suite.name)
         try:
             suite_id = self._db.insert('suites', {
