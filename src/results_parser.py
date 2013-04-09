@@ -15,13 +15,21 @@ class ResultsParser(object):
     def xml_to_db(self, xml_file):
         self.verbose('- Parsing %s' % xml_file)
         test_run = ExecutionResult(xml_file)
-        test_run_id = self._db.insert('test_runs', {
-            'source_file': test_run.source,
-            'generator': test_run.generator,
-            'started_at': self._format_robot_timestamp(test_run.suite.starttime),
-            'finished_at': self._format_robot_timestamp(test_run.suite.endtime),
-            'imported_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
-        })
+        try:
+            test_run_id = self._db.insert('test_runs', {
+                'source_file': test_run.source,
+                'generator': test_run.generator,
+                'started_at': self._format_robot_timestamp(test_run.suite.starttime),
+                'finished_at': self._format_robot_timestamp(test_run.suite.endtime),
+                'imported_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
+            })
+        except IntegrityError:
+            test_run_id = self._db.fetch_id('test_runs', {
+                'source_file': test_run.source,
+                'generator': test_run.generator,
+                'started_at': self._format_robot_timestamp(test_run.suite.starttime),
+                'finished_at': self._format_robot_timestamp(test_run.suite.endtime)
+            })
         self._parse_errors(test_run.errors.messages, test_run_id)
         self._parse_statistics(test_run.statistics, test_run_id)
         self._parse_suite(test_run.suite, test_run_id)
@@ -82,7 +90,6 @@ class ResultsParser(object):
                 'name': suite.name,
                 'source': suite.source
             })
-
         self._parse_suite_status(test_run_id, suite_id, suite)
         self._parse_suites(suite, test_run_id, suite_id)
         self._parse_tests(suite.tests, test_run_id, suite_id)

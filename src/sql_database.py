@@ -66,8 +66,8 @@ class SQLDatabase(object):
             'generator': 'TEXT NOT NULL',
             'started_at': 'DATETIME NOT NULL',
             'finished_at': 'DATETIME NOT NULL',
-            'imported_at': 'DATETIME NOT NULL'
-        })
+            'imported_at': 'DATETIME NOT NULL',
+        }, ('generator', 'source_file', 'started_at', 'finished_at'))
         self._create_table('test_run_status', {
             'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
             'name': 'TEXT NOT NULL',
