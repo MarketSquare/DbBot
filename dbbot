@@ -19,7 +19,7 @@ class DbBot(object):
         try:
             for xml_file in self._config.file_paths:
                 self._parser.xml_to_db(xml_file)
-            self._db.commit()
+                self._db.commit()
         except Exception, message:
             stderr.write('dbbot: error: %s\n\n' % message)
             exit(1)
