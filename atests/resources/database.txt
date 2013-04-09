@@ -1,0 +1,16 @@
+*** Variables ***
+${default_database}   robot_results.db
+${own_database}       my_database.db
+
+
+*** Keywords ***
+Should Create Database
+    [Arguments]  ${database}
+    File Should Exist  ${database}
+
+Should Not Create Default Database
+    File Should Not Exist  ${default_database}
+
+Remove Database
+    [Arguments]  ${database}=${default_database}
+    Remove File  ${database}

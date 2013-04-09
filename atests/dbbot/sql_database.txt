@@ -1,0 +1,131 @@
+*** Settings ***
+Library   OperatingSystem
+Library   ../libraries/robot_sqlite_database.py
+Resource  ../resources/commandline.txt
+Resource  ../resources/database.txt
+
+
+*** Variables ***
+${one_suite}        ${CURDIR}${/}..${/}testdata${/}one_suite.xml
+${multiple_suites}  ${CURDIR}${/}..${/}testdata${/}multiple_suites.xml
+
+
+*** Keywords ***
+Parse Without Keywords ${files}
+    Run  ${program_path} --files ${files}
+
+Parse With Keywords ${files}
+    Run  ${program_path} --files ${files} --also-keywords
+
+Should Store ${n} Test Runs
+    Should Have  ${n}  test_runs  ${default_database}
+
+Should Store ${n} Test Run Statuses
+    Should Have  ${n}  test_run_status  ${default_database}
+
+Should Store ${n} Test Run Errors
+    Should Have  ${n}  test_run_errors  ${default_database}
+
+Should Store ${n} Suites
+    Should Have  ${n}  suites  ${default_database}
+
+Should Store ${n} Suite Statuses
+    Should Have  ${n}  suite_status  ${default_database}
+
+Should Store ${n} Tests
+    Should Have  ${n}  tests  ${default_database}
+
+Should Store ${n} Test Statuses
+    Should Have  ${n}  test_status  ${default_database}
+
+Should Store ${n} Tags
+    Should Have  ${n}  tags  ${default_database}
+
+Should Store ${n} Tag Statuses
+    Should Have  ${n}  tag_status  ${default_database}
+
+Should Store ${n} Keywords
+    Should Have  ${n}  keywords  ${default_database}
+
+Should Store ${n} Keyword Statuses
+    Should Have  ${n}  keyword_status  ${default_database}
+
+Should Store ${n} Arguments
+    Should Have  ${n}  arguments  ${default_database}
+
+Should Store ${n} Messages
+    Should Have  ${n}  messages  ${default_database}
+
+Should Store Nothing Related To Keywords
+    Should Store 0 Keywords
+    Should Store 0 Keyword Statuses
+    Should Store 0 Arguments
+    Should Store 0 Messages
+
+
+*** Test Cases ***
+A single run without keywords
+    [Setup]  Remove Database
+    Parse Without Keywords ${one_suite}
+    Should Store 1 Test Runs
+    Should Store 2 Test Run Statuses
+    Should Store 0 Test Run Errors
+    Should Store 1 Suites
+    Should Store 1 Suite Statuses
+    Should Store 19 Tests
+    Should Store 19 Test Statuses
+    Should Store 57 Tags
+    Should Store 3 Tag Statuses
+    Should Store Nothing Related To Keywords
+    [Teardown]  Remove Database
+
+Several runs without keywords
+    [Setup]  Remove Database
+    Parse Without Keywords ${one_suite} ${one_suite}
+    Should Store 2 Test Runs
+    Should Store 4 Test Run Statuses
+    Should Store 0 Test Run Errors
+    Should Store 1 Suites
+    Should Store 2 Suite Statuses
+    Should Store 19 Tests
+    Should Store 38 Test Statuses
+    Should Store 57 Tags
+    Should Store 6 Tag Statuses
+    Should Store Nothing Related To Keywords
+    [Teardown]  Remove Database
+
+A single run with keywords
+    [Setup]  Remove Database
+    Parse With Keywords ${one_suite}
+    Should Store 1 Test Runs
+    Should Store 2 Test Run Statuses
+    Should Store 0 Test Run Errors
+    Should Store 1 Suites
+    Should Store 1 Suite Statuses
+    Should Store 19 Tests
+    Should Store 19 Test Statuses
+    Should Store 57 Tags
+    Should Store 3 Tag Statuses
+    Should Store 39 Keywords
+    Should Store 39 Keyword Statuses
+    Should Store 131 Arguments
+    Should Store 87 Messages
+    [Teardown]  Remove Database
+
+Several runs with keywords
+    [Setup]  Remove Database
+    Parse With Keywords ${one_suite} ${one_suite}
+    Should Store 2 Test Runs
+    Should Store 4 Test Run Statuses
+    Should Store 0 Test Run Errors
+    Should Store 1 Suites
+    Should Store 2 Suite Statuses
+    Should Store 19 Tests
+    Should Store 38 Test Statuses
+    Should Store 57 Tags
+    Should Store 6 Tag Statuses
+    Should Store 39 Keywords
+    Should Store 78 Keyword Statuses
+    Should Store 131 Arguments
+    Should Store 87 Messages
+    [Teardown]  Remove Database

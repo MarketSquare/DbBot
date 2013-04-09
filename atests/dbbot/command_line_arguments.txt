@@ -1,22 +1,16 @@
 *** Settings ***
-Library  OperatingSystem
+Library   OperatingSystem
+Resource  ../resources/commandline.txt
+Resource  ../resources/database.txt
 
 
 *** Variables ***
-${program_name}       dbbot
-${program_path}       ${CURDIR}${/}..${/}..${/}${program_name}
-${valid_output}       ${CURDIR}${/}..${/}testdata${/}output.xml
+${valid_output}       ${CURDIR}${/}..${/}testdata${/}one_suite.xml
 ${invalid_output}     ${CURDIR}${/}..${/}testdata${/}invalid_output.xml
-${not_existing_file}  not_exist.xml
-${default_database}   robot_results.db
-${own_database}       my_database.db
+${not_existing_file}  ${CURDIR}${/}..${/}testdata${/}not_exist.xml
 
 
 *** Keywords ***
-Run With ${arguments}
-    ${rc}  ${output}=  Run And Return Rc And Output  ${program_path} ${arguments}
-    [Return]  ${rc}  ${output}
-
 Exits With ${value}
     Should Be Equal As Integers  ${rc}  ${value}
 
@@ -64,18 +58,6 @@ Is Verbose
     Should Contain  ${output}  Database |
     Should Contain  ${output}  Parser   |
 
-Should Create Database
-    [Arguments]  ${database}
-    File Should Exist  ${database}
-    [Teardown]  Remove File  ${database}
-
-Should Not Create Default Database
-    File Should Not Exist  ${default_database}
-
-Remove Databases
-    Remove File  ${default_database}
-    Remove File  ${own_database}
-
 
 *** Test Cases ***
 Without arguments
@@ -100,10 +82,12 @@ With invalid option
 With --files and an existing file
     ${rc}  ${output}=  Run with --files ${valid_output}
     Exits With Success
+    [Teardown]  Remove Database
 
 With --files and multiple existing files
     ${rc}  ${output}=  Run with --files ${valid_output} ${valid_output}
     Exits With Success
+    [Teardown]  Remove Database
 
 With -f and no file names
     ${rc}  ${output}=  Run With -f
@@ -128,30 +112,33 @@ With --files and an invalid XML file
     ${rc}  ${output}=  Run With --files ${invalid_output}
     Prints Parse Error In ${invalid_output}
     Exits With Error
+    [Teardown]  Remove Database
 
 With --database and database name
-    [Setup]  Remove Databases
+    [Setup]  Remove Database  ${own_database}
     ${rc}  ${output}=  Run With --database=${own_database} --files ${valid_output}
-    Should Not Create Default Database
     Should Create Database  ${own_database}
+    Should Not Create Default Database
     Exits With Success
+    [Teardown]  Remove Database  ${own_database}
 
 With --database and no database name
-    [Setup]  Remove Databases
+    [Setup]  Remove Database
     ${rc}  ${output}=  Run With --database
     Prints --database Requires Argument
     Should Not Create Default Database
     Exits With Misused Arguments
 
 With -b and database name
-    [Setup]  Remove Databases
+    [Setup]  Remove Database  ${own_database}
     ${rc}  ${output}=  Run With -b ${own_database} --files ${valid_output}
-    Should Not Create Default Database
     Should Create Database  ${own_database}
+    Should Not Create Default Database
     Exits With Success
+    [Teardown]  Remove Database  ${own_database}
 
 With -b and no database file name
-    [Setup]  Remove Databases
+    [Setup]  Remove Database
     ${rc}  ${output}=  Run With -b
     Prints -b Requires Argument
     Should Not Create Default Database
@@ -168,13 +155,13 @@ With --verbose
     Exits With Success
 
 With -d
-    [Setup]  Remove Databases
+    [Setup]  Remove Database
     ${rc}  ${output}=  Run With -d --files ${valid_output}
     Should Not Create Default Database
     Exits With Success
 
 With --dry-run
-    [Setup]  Remove Databases
+    [Setup]  Remove Database
     ${rc}  ${output}=  Run With --dry-run --files ${valid_output}
     Should Not Create Default Database
     Exits With Success

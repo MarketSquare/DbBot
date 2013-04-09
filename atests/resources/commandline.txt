@@ -1,0 +1,9 @@
+*** Variables ***
+${program_name}  dbbot
+${program_path}  ${CURDIR}${/}..${/}..${/}${program_name}
+
+
+*** Keywords ***
+Run With ${arguments}
+    ${rc}  ${output}=  Run And Return Rc And Output  ${program_path} ${arguments}
+    [Return]  ${rc}  ${output}
