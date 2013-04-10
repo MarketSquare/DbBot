@@ -1,6 +1,6 @@
 *** Settings ***
 Library   OperatingSystem
-Library   ../libraries/robot_sqlite_database.py
+Library   ../libraries/RobotSqliteDatabase.py
 Resource  ../resources/commandline.txt
 Resource  ../resources/database.txt
 
@@ -12,11 +12,19 @@ ${test_run_with_subsuites}  ${CURDIR}${/}..${/}testdata${/}multiple${/}output.xm
 
 
 *** Keywords ***
-Without Keywords ${files}
+Parse Without Keywords ${files}
+    Remove Database
     Run  ${program_path} --files ${files}
+    Connect To Database  ${default_database}
 
-With Keywords ${files}
+Parse With Keywords ${files}
+    Remove Database
     Run  ${program_path} --files ${files} --also-keywords
+    Connect To Database  ${default_database}
+
+Disconnect And Cleanup
+    Close Connection
+    Remove Database  ${default_database}
 
 Should Have ${n} Test Runs
     Row Count Is Equal To  ${n}  test_runs  ${default_database}
@@ -83,40 +91,34 @@ Should Not Store Keywords
 
 *** Test Cases ***
 Single test run results
-    [Setup]  Remove Database
-    Without Keywords ${test_run}
+    [Setup]  Parse Without Keywords ${test_run}
     Should Have 1 Test Runs
-    [Teardown]  Remove Database
+    [Teardown]  Disconnect And Cleanup
 
 Single test run multiple times
-    [Setup]  Remove Database
-    Without Keywords ${test_run} ${test_run}
+    [Setup]  Parse Without Keywords ${test_run} ${test_run}
     Should Have 1 Test Runs
-    [Teardown]  Remove Database
+    [Teardown]  Disconnect And Cleanup
 
 Multiple test runs
-    [Setup]  Remove Database
-    Without Keywords ${test_run} ${latter_test_run}
+    [Setup]  Parse Without Keywords ${test_run} ${latter_test_run}
     Should Have 2 Test Runs
-    [Teardown]  Remove Database
+    [Teardown]  Disconnect And Cleanup
 
 Single test run without keywords
-    [Setup]  Remove Database
-    Without Keywords ${test_run}
+    [Setup]  Parse Without Keywords ${test_run}
     Should Have Suites And Tests
     Should Not Store Keywords
-    [Teardown]  Remove Database
+    [Teardown]  Disconnect And Cleanup
 
 Single test run with keywords
-    [Setup]  Remove Database
-    With Keywords ${test_run}
+    [Setup]  Parse With Keywords ${test_run}
     Should Have Suites And Tests
     Should Have Keywords
-    [Teardown]  Remove Database
+    [Teardown]  Disconnect And Cleanup
 
 Single test run with subsuites
-    [Setup]  Remove Database
-    With Keywords ${test_run_with_subsuites}
+    [Setup]  Parse With Keywords ${test_run_with_subsuites}
     Should Have 1 Test Runs
     Should Have 2 Test Run Statuses
     Should Have 0 Test Run Errors
@@ -130,12 +132,10 @@ Single test run with subsuites
     Should Have 41 Keyword Statuses
     Should Have 139 Arguments
     Should Have 176 Messages
-    [Teardown]  Remove Database
+    [Teardown]  Disconnect And Cleanup
 
 Multiple test runs with the same root suite
-    [Setup]  Remove Database
-    With Keywords ${test_run}
-    With Keywords ${latter_test_run}
+    [Setup]  Parse With Keywords ${test_run} ${latter_test_run}
     Should Have ${2*1} Test Runs
     Should Have ${2*2} Test Run Statuses
     Should Have 0 Test Run Errors
@@ -149,5 +149,5 @@ Multiple test runs with the same root suite
     Should Have ${2*39} Keyword Statuses
     Should Have 131 Arguments
     Should Have 99 Messages
-    [Teardown]  Remove Database
+    [Teardown]  Disconnect And Cleanup
 
