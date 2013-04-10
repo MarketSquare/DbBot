@@ -6,122 +6,148 @@ Resource  ../resources/database.txt
 
 
 *** Variables ***
-${test_run}          ${CURDIR}${/}..${/}testdata${/}one_suite${/}output.xml
-${latter_test_run}   ${CURDIR}${/}..${/}testdata${/}one_suite${/}output_latter.xml
-${another_suite}     ${CURDIR}${/}..${/}testdata${/}multiple_suite${/}output.xml
+${test_run}                 ${CURDIR}${/}..${/}testdata${/}one_suite${/}output.xml
+${latter_test_run}          ${CURDIR}${/}..${/}testdata${/}one_suite${/}output_latter.xml
+${test_run_with_subsuites}  ${CURDIR}${/}..${/}testdata${/}multiple${/}output.xml
 
 
 *** Keywords ***
-Parse ${files}
+Without Keywords ${files}
     Run  ${program_path} --files ${files}
 
 With Keywords ${files}
     Run  ${program_path} --files ${files} --also-keywords
 
-Should Store ${n} Test Runs
-    Should Have  ${n}  test_runs  ${default_database}
+Should Have ${n} Test Runs
+    Row Count Is Equal To  ${n}  test_runs  ${default_database}
 
-Should Store ${n} Test Run Statuses
-    Should Have  ${n}  test_run_status  ${default_database}
+Should Have ${n} Test Run Statuses
+    Row Count Is Equal To  ${n}  test_run_status  ${default_database}
 
-Should Store ${n} Test Run Errors
-    Should Have  ${n}  test_run_errors  ${default_database}
+Should Have ${n} Test Run Errors
+    Row Count Is Equal To  ${n}  test_run_errors  ${default_database}
 
-Should Store ${n} Suites
-    Should Have  ${n}  suites  ${default_database}
+Should Have ${n} Suites
+    Row Count Is Equal To  ${n}  suites  ${default_database}
 
-Should Store ${n} Suite Statuses
-    Should Have  ${n}  suite_status  ${default_database}
+Should Have ${n} Suite Statuses
+    Row Count Is Equal To  ${n}  suite_status  ${default_database}
 
-Should Store ${n} Tests
-    Should Have  ${n}  tests  ${default_database}
+Should Have ${n} Tests
+    Row Count Is Equal To  ${n}  tests  ${default_database}
 
-Should Store ${n} Test Statuses
-    Should Have  ${n}  test_status  ${default_database}
+Should Have ${n} Test Statuses
+    Row Count Is Equal To  ${n}  test_status  ${default_database}
 
-Should Store ${n} Tags
-    Should Have  ${n}  tags  ${default_database}
+Should Have ${n} Tags
+    Row Count Is Equal To  ${n}  tags  ${default_database}
 
-Should Store ${n} Tag Statuses
-    Should Have  ${n}  tag_status  ${default_database}
+Should Have ${n} Tag Statuses
+    Row Count Is Equal To  ${n}  tag_status  ${default_database}
 
-Should Store ${n} Keywords
-    Should Have  ${n}  keywords  ${default_database}
+Should Have ${n} Keywords
+    Row Count Is Equal To  ${n}  keywords  ${default_database}
 
-Should Store ${n} Keyword Statuses
-    Should Have  ${n}  keyword_status  ${default_database}
+Should Have ${n} Keyword Statuses
+    Row Count Is Equal To  ${n}  keyword_status  ${default_database}
 
-Should Store ${n} Arguments
-    Should Have  ${n}  arguments  ${default_database}
+Should Have ${n} Arguments
+    Row Count Is Equal To  ${n}  arguments  ${default_database}
 
-Should Store ${n} Messages
-    Should Have  ${n}  messages  ${default_database}
+Should Have ${n} Messages
+    Row Count Is Equal To  ${n}  messages  ${default_database}
 
-Should Store Nothing Related To Keywords
-    Should Store 0 Keywords
-    Should Store 0 Keyword Statuses
-    Should Store 0 Arguments
-    Should Store 0 Messages
+Should Have Suites and Tests
+    Should Have 1 Test Runs
+    Should Have 2 Test Run Statuses
+    Should Have 0 Test Run Errors
+    Should Have 1 Suites
+    Should Have 1 Suite Statuses
+    Should Have 19 Tests
+    Should Have 19 Test Statuses
+    Should Have 57 Tags
+    Should Have 3 Tag Statuses
+
+Should Have Keywords
+    Should Have 39 Keywords
+    Should Have 39 Keyword Statuses
+    Should Have 131 Arguments
+    Should Have 87 Messages
+
+Should Not Store Keywords
+    Should Have 0 Keywords
+    Should Have 0 Keyword Statuses
+    Should Have 0 Arguments
+    Should Have 0 Messages
 
 
 *** Test Cases ***
 Single test run results
     [Setup]  Remove Database
-    Parse ${test_run}
-    Should Store 1 Test Runs
+    Without Keywords ${test_run}
+    Should Have 1 Test Runs
     [Teardown]  Remove Database
 
-Single test run results multiple times
+Single test run multiple times
     [Setup]  Remove Database
-    Parse ${test_run} ${test_run}
-    Should Store 1 Test Runs
+    Without Keywords ${test_run} ${test_run}
+    Should Have 1 Test Runs
     [Teardown]  Remove Database
 
-Multiple test run results
+Multiple test runs
     [Setup]  Remove Database
-    Parse ${test_run} ${latter_test_run}
-    Should Store 2 Test Runs
+    Without Keywords ${test_run} ${latter_test_run}
+    Should Have 2 Test Runs
     [Teardown]  Remove Database
 
-Single test run results without keywords
+Single test run without keywords
     [Setup]  Remove Database
-    Parse ${test_run}
-    Should Store 1 Test Runs
-    Should Store 2 Test Run Statuses
-    Should Store 0 Test Run Errors
-    Should Store 1 Suites
-    Should Store 1 Suite Statuses
-    Should Store 19 Tests
-    Should Store 19 Test Statuses
-    Should Store 57 Tags
-    Should Store 3 Tag Statuses
-    Should Store Nothing Related To Keywords
+    Without Keywords ${test_run}
+    Should Have Suites And Tests
+    Should Not Store Keywords
     [Teardown]  Remove Database
 
-Single test run results with keywords
+Single test run with keywords
     [Setup]  Remove Database
     With Keywords ${test_run}
-    Should Store 39 Keywords
-    Should Store 39 Keyword Statuses
-    Should Store 131 Arguments
-    Should Store 87 Messages
+    Should Have Suites And Tests
+    Should Have Keywords
     [Teardown]  Remove Database
 
-Multiple test run results with the same root suite
+Single test run with subsuites
+    [Setup]  Remove Database
+    With Keywords ${test_run_with_subsuites}
+    Should Have 1 Test Runs
+    Should Have 2 Test Run Statuses
+    Should Have 0 Test Run Errors
+    Should Have 4 Suites
+    Should Have 4 Suite Statuses
+    Should Have 50 Tests
+    Should Have 50 Test Statuses
+    Should Have 150 Tags
+    Should Have 3 Tag Statuses
+    Should Have 41 Keywords
+    Should Have 41 Keyword Statuses
+    Should Have 139 Arguments
+    Should Have 176 Messages
+    [Teardown]  Remove Database
+
+Multiple test runs with the same root suite
     [Setup]  Remove Database
     With Keywords ${test_run}
     With Keywords ${latter_test_run}
-    Should Store ${2*1} Test Runs
-    Should Store ${2*2} Test Run Statuses
-    Should Store 0 Test Run Errors
-    Should Store 1 Suites
-    Should Store 2 Suite Statuses
-    Should Store 19 Tests
-    Should Store ${2*19} Test Statuses
-    Should Store 57 Tags
-    Should Store ${2*3} Tag Statuses
-    Should Store 39 Keywords
-    Should Store ${2*39} Keyword Statuses
-    Should Store 131 Arguments
-    Should Store 99 Messages
+    Should Have ${2*1} Test Runs
+    Should Have ${2*2} Test Run Statuses
+    Should Have 0 Test Run Errors
+    Should Have 1 Suites
+    Should Have 2 Suite Statuses
+    Should Have 19 Tests
+    Should Have ${2*19} Test Statuses
+    Should Have 57 Tags
+    Should Have ${2*3} Tag Statuses
+    Should Have 39 Keywords
+    Should Have ${2*39} Keyword Statuses
+    Should Have 131 Arguments
+    Should Have 99 Messages
     [Teardown]  Remove Database
+

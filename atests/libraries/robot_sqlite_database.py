@@ -1,7 +1,7 @@
 from sqlite3 import connect
 
 
-def should_have(count, db_table_name, db_file_path):
+def row_count_is_equal_to(count, db_table_name, db_file_path):
     connection = connect(db_file_path)
     cursor = connection.cursor()
     cursor.execute('SELECT count() FROM %s' % db_table_name)
