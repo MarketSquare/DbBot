@@ -167,12 +167,12 @@ class ResultsParser(object):
         self._parse_keywords(keyword.keywords, test_run_id, None, None, keyword_id)
 
     def _parse_keyword_status(self, test_run_id, keyword_id, keyword):
-            self._db.insert_or_ignore('keyword_status', {
-                'test_run_id': test_run_id,
-                'keyword_id': keyword_id,
-                'status': keyword.status,
-                'elapsed': keyword.elapsedtime
-            })
+        self._db.insert_or_ignore('keyword_status', {
+            'test_run_id': test_run_id,
+            'keyword_id': keyword_id,
+            'status': keyword.status,
+            'elapsed': keyword.elapsedtime
+        })
 
     def _parse_messages(self, messages, keyword_id):
         self._db.insert_many_or_ignore('messages', ('keyword_id', 'level', 'timestamp', 'content'),
