@@ -90,7 +90,6 @@ class SQLDatabase(object):
             'passed': 'INTEGER NOT NULL',
         }, ('test_run_id', 'name'))
         self._create_table('suites', {
-            'test_run_id': 'INTEGER REFERENCES test_runs',
             'suite_id': 'INTEGER REFERENCES suites',
             'xml_id': 'TEXT NOT NULL',
             'name': 'TEXT NOT NULL',
