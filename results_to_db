@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+from sys import stderr
+from dbbot import RobotDatabase
+from dbbot.reader import ReaderOptions, ResultsParser
+
+
+class ResultsToDb(object):
+    def __init__(self):
+        self._options = ReaderOptions()
+        database = ':memory:' if self._options.dry_run else self._options.db_file_path
+        self._db = RobotDatabase(database, self._options.be_verbose)
+        self._parser = ResultsParser(
+            self._options.include_keywords,
+            self._db,
+            self._options.be_verbose
+        )
+
+    def run(self):
+        try:
+            for xml_file in self._options.file_paths:
+                self._parser.xml_to_db(xml_file)
+                self._db.commit()
+        except Exception, message:
+            stderr.write('results_to_db: error: %s\n\n' % message)
+            exit(1)
+        finally:
+            self._db.close()
+
+
+if __name__ == '__main__':
+    ResultsToDb().run()

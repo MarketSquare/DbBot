@@ -1,19 +1,22 @@
 from datetime import datetime
-from sqlite3 import IntegrityError
 from robot.result import ExecutionResult
+from sqlite3 import IntegrityError
+
+from dbbot import Logger
 
 
 class ResultsParser(object):
-    def __init__(self, include_keywords, db, callback_verbose=None):
+    def __init__(self, include_keywords, db, be_verbose=False):
+        self._logger = Logger('Parser') if be_verbose else None
         self._include_keywords = include_keywords
-        self._callback_verbose = callback_verbose
         self._db = db
 
-    def verbose(self, message=''):
-        self._callback_verbose(message, 'Parser')
+    def _verbose(self, message):
+        if self._logger:
+            self._logger(message)
 
     def xml_to_db(self, xml_file):
-        self.verbose('- Parsing %s' % xml_file)
+        self._verbose('- Parsing %s' % xml_file)
         test_run = ExecutionResult(xml_file)
         try:
             test_run_id = self._db.insert('test_runs', {
@@ -46,11 +49,11 @@ class ResultsParser(object):
         self._parse_tag_statistics(statistics.tags, test_run_id)
 
     def _parse_test_run_statistics(self, test_run_statistics, test_run_id):
-        self.verbose('`--> Parsing test run statistics')
+        self._verbose('`--> Parsing test run statistics')
         [self._parse_test_run_stats(stat, test_run_id) for stat in test_run_statistics]
 
     def _parse_tag_statistics(self, tag_statistics, test_run_id):
-        self.verbose('  `--> Parsing tag statistics')
+        self._verbose('  `--> Parsing tag statistics')
         [self._parse_tag_stats(stat, test_run_id) for stat in tag_statistics.tags.values()]
 
     def _parse_tag_stats(self, stat, test_run_id):
@@ -76,7 +79,7 @@ class ResultsParser(object):
         [self._parse_suite(subsuite, test_run_id, parent_suite_id) for subsuite in suite.suites]
 
     def _parse_suite(self, suite, test_run_id, parent_suite_id=None):
-        self.verbose('`--> Parsing suite: %s' % suite.name)
+        self._verbose('`--> Parsing suite: %s' % suite.name)
         try:
             suite_id = self._db.insert('suites', {
                 'suite_id': parent_suite_id,
@@ -109,7 +112,7 @@ class ResultsParser(object):
         [self._parse_test(test, test_run_id, suite_id) for test in tests]
 
     def _parse_test(self, test, test_run_id, suite_id):
-        self.verbose('  `--> Parsing test: %s' % test.name)
+        self._verbose('  `--> Parsing test: %s' % test.name)
         try:
             test_id = self._db.insert('tests', {
                 'suite_id': suite_id,

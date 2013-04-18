@@ -1,5 +1,5 @@
 *** Variables ***
-${program_name}  dbbot
+${program_name}  results_to_db
 ${program_path}  ${CURDIR}${/}..${/}..${/}${program_name}
 
 

@@ -1,28 +1,64 @@
 import sqlite3
 
+from .logger import Logger
 
-class SQLDatabase(object):
-    def __init__(self, db_file_path, callback_verbose=None):
-        self._callback_verbose = callback_verbose
+
+class RobotDatabase(object):
+    def __init__(self, db_file_path, be_verbose=False):
+        self._logger = Logger('Database') if be_verbose else None
         self._connection = self._connect(db_file_path)
+        self._connection.row_factory = sqlite3.Row
         self._configure()
         self._init_schema()
 
-    def verbose(self, message=''):
-        self._callback_verbose(message, 'Database')
+    def _verbose(self, message):
+        if self._logger:
+            self._logger(message)
 
     def close(self):
-        self.verbose('- Closing database connection')
+        self._verbose('- Closing database connection')
         self._connection.close()
 
     def commit(self):
-        self.verbose('- Committing changes into database')
+        self._verbose('- Committing changes into database')
         self._connection.commit()
 
     def fetch_id(self, table_name, criteria):
         sql_statement = 'SELECT id FROM %s WHERE ' % table_name
         sql_statement += ' AND '.join('%s=?' % key for key in criteria.keys())
         return self._connection.execute(sql_statement, criteria.values()).fetchone()[0]
+
+    def failed_suites(self):
+        sql_statement = '''
+            SELECT count() as count, suites.id, suites.name, suites.source
+            FROM suites, suite_status
+            WHERE suites.id == suite_status.suite_id AND
+            suite_status.status == "FAIL"
+            GROUP BY suites.source
+        '''
+        return self._connection.execute(sql_statement).fetchall()
+
+    def failed_tests_for_suite(self, suite_id):
+        sql_statement = '''
+            SELECT count() as count, tests.id, tests.name, tests.suite_id
+            FROM tests, test_status
+            WHERE tests.id == test_status.test_id AND
+            tests.suite_id == ? AND
+            test_status.status == "FAIL"
+            GROUP BY tests.name
+        '''
+        return self._connection.execute(sql_statement, [suite_id]).fetchall()
+
+    def failed_keywords_for_test(self, test_id):
+        sql_statement = '''
+            SELECT count() as count, keywords.name, keywords.type
+            FROM keywords, keyword_status
+            WHERE keywords.id == keyword_status.keyword_id AND
+            keywords.test_id == ? AND
+            keyword_status.status == "FAIL"
+            GROUP BY keywords.name, keywords.type
+        '''
+        return self._connection.execute(sql_statement, [test_id]).fetchall()
 
     def insert(self, table_name, criteria):
         sql_statement = self._format_insert_statement(table_name, criteria.keys())
@@ -46,7 +82,7 @@ class SQLDatabase(object):
         )
 
     def _connect(self, db_file_path):
-        self.verbose('- Establishing database connection')
+        self._verbose('- Establishing database connection')
         return sqlite3.connect(db_file_path)
 
     def _configure(self):
@@ -60,7 +96,7 @@ class SQLDatabase(object):
         self._connection.execute(sql_statement)
 
     def _init_schema(self):
-        self.verbose('- Initializing database schema')
+        self._verbose('- Initializing database schema')
         self._create_table('test_runs', {
             'source_file': 'TEXT NOT NULL',
             'generator': 'TEXT NOT NULL',

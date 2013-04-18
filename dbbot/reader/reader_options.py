@@ -1,27 +1,13 @@
 from sys import argv
 from os.path import exists
-from optparse import OptionParser
+
+from dbbot import CommandLineOptions
 
 
-DEFAULT_DB_NAME = 'robot_results.db'
-
-class Configuration(object):
-    def __init__(self):
-        self._parser = OptionParser()
-        self._add_parser_options()
-        self._options = self._get_validated_options()
-
+class ReaderOptions(CommandLineOptions):
     @property
     def file_paths(self):
         return self._options.file_paths
-
-    @property
-    def db_file_path(self):
-        return self._options.db_file_path
-
-    @property
-    def be_verbose(self):
-        return self._options.verbose
 
     @property
     def dry_run(self):
@@ -32,6 +18,7 @@ class Configuration(object):
         return self._options.include_keywords
 
     def _add_parser_options(self):
+        CommandLineOptions._add_parser_options(self)
         def files_args_parser(option, opt_str, _, parser):
             values = []
             for arg in parser.rargs:
@@ -43,11 +30,6 @@ class Configuration(object):
             del parser.rargs[:len(values)]
             setattr(parser.values, option.dest, values)
 
-        self._parser.add_option('-v', '--verbose',
-            action='store_true',
-            dest='verbose',
-            help='print information about execution '
-        )
         self._parser.add_option('-d', '--dry-run',
             action='store_true',
             dest='dry_run',
@@ -57,11 +39,6 @@ class Configuration(object):
             action='store_true',
             dest='include_keywords',
             help='include suites\' and tests\' keywords'
-        )
-        self._parser.add_option('-b', '--database',
-            dest='db_file_path',
-            default=DEFAULT_DB_NAME,
-            help='path to the sqlite3 database to save to',
         )
         self._parser.add_option('-f', '--files',
             action='callback',
@@ -82,7 +59,3 @@ class Configuration(object):
             if not exists(file_path):
                 self._parser.error('file %s not exists' % file_path)
         return options
-
-    def _exit_with_help(self):
-        self._parser.print_help()
-        exit(1)
