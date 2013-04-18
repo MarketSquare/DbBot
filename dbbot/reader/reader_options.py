@@ -18,7 +18,7 @@ class ReaderOptions(CommandLineOptions):
         return self._options.include_keywords
 
     def _add_parser_options(self):
-        CommandLineOptions._add_parser_options(self)
+        super(ReaderOptions, self)._add_parser_options()
         def files_args_parser(option, opt_str, _, parser):
             values = []
             for arg in parser.rargs:

@@ -9,11 +9,11 @@ class DbToHtml(object):
     def __init__(self):
         self._options = WriterOptions()
         self._db = RobotDatabase(self._options.db_file_path, self._options.be_verbose)
-        self._output = HtmlWriter(self._db, self._options.be_verbose)
+        self._writer = HtmlWriter(self._db, self._options.be_verbose)
 
     def run(self):
         try:
-            self._output.write()
+            self._writer.write()
         except Exception, message:
             stderr.write('db_to_html: error: %s\n\n' % message)
             exit(1)

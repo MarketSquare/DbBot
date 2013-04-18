@@ -21,13 +21,16 @@ class CommandLineOptions(object):
         self._parser.add_option('-v', '--verbose',
             action='store_true',
             dest='verbose',
-            help='print information about the execution '
+            help='show information about execution stages'
         )
         self._parser.add_option('-b', '--database',
             dest='db_file_path',
             default=DEFAULT_DB_NAME,
-            help='sqlite3 database containing the results',
+            help='sqlite3 database storing the test run results'
         )
+
+    def _get_validated_options():
+        raise NotImplementedError
 
     def _exit_with_help(self):
         self._parser.print_help()

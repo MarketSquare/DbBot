@@ -1,6 +1,8 @@
 from os.path import exists
 from sys import argv
 
+from dbbot import CommandLineOptions
+
 
 DEFAULT_HTML_FILE_NAME = 'index.html'
 
@@ -10,11 +12,11 @@ class WriterOptions(CommandLineOptions):
         return self._options.output_file_path
 
     def _add_parser_options(self):
-        CommandLineOptions._add_parser_options(self)
+        super(WriterOptions, self)._add_parser_options()
         self._parser.add_option('-o', '--output',
             dest='output_file_path',
             default=DEFAULT_HTML_FILE_NAME,
-            help='output HTML file',
+            help='output test run summary html file',
         )
 
     def _get_validated_options(self):
