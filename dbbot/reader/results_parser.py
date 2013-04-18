@@ -6,14 +6,11 @@ from dbbot import Logger
 
 
 class ResultsParser(object):
-    def __init__(self, include_keywords, db, be_verbose=False):
-        self._logger = Logger('Parser') if be_verbose else None
+
+    def __init__(self, include_keywords, db, output):
+        self._verbose = Logger('Parser', output)
         self._include_keywords = include_keywords
         self._db = db
-
-    def _verbose(self, message):
-        if self._logger:
-            self._logger(message)
 
     def xml_to_db(self, xml_file):
         self._verbose('- Parsing %s' % xml_file)

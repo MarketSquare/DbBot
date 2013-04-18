@@ -1,11 +1,11 @@
-class HtmlWriter(object):
-    def __init__(self, db, be_verbose=False):
-        self._logger = Logger('HtmlWriter') if be_verbose else None
-        self._db = db
+from dbbot import Logger
 
-    def _verbose(self, message):
-        if self._logger:
-            self._logger(message)
+
+class HtmlWriter(object):
+
+    def __init__(self, db, output):
+        self._verbose = Logger('HtmlWriter', output)
+        self._db = db
 
     def write(self):
         for suite in self._db.failed_suites():

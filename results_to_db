@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
-from sys import stderr
-from dbbot import RobotDatabase
-from dbbot.reader import ReaderOptions, ResultsParser
+from sys import stderr, stdout
+from dbbot.reader import DatabaseWriter, ReaderOptions, ResultsParser
 
 
 class ResultsToDb(object):
     def __init__(self):
         self._options = ReaderOptions()
+        output = stdout if self._options.be_verbose else None
         database = ':memory:' if self._options.dry_run else self._options.db_file_path
-        self._db = RobotDatabase(database, self._options.be_verbose)
+        self._db = DatabaseWriter(database, output)
         self._parser = ResultsParser(
             self._options.include_keywords,
             self._db,
-            self._options.be_verbose
+            output
         )
 
     def run(self):

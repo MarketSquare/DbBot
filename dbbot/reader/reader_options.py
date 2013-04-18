@@ -1,10 +1,10 @@
-from sys import argv
 from os.path import exists
 
 from dbbot import CommandLineOptions
 
 
 class ReaderOptions(CommandLineOptions):
+
     @property
     def file_paths(self):
         return self._options.file_paths
@@ -48,11 +48,7 @@ class ReaderOptions(CommandLineOptions):
         )
 
     def _get_validated_options(self):
-        if len(argv) < 2:
-            self._exit_with_help()
-        options, args = self._parser.parse_args()
-        if args:
-            self._exit_with_help()
+        options = super(ReaderOptions, self)._get_validated_options()
         if options.file_paths is None or len(options.file_paths) < 1:
             self._parser.error('at least one input file is required')
         for file_path in options.file_paths:

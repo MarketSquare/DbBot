@@ -1,9 +1,12 @@
+from sys import argv
+
 from optparse import OptionParser
 
 
 DEFAULT_DB_NAME = 'robot_results.db'
 
 class CommandLineOptions(object):
+
     def __init__(self):
         self._parser = OptionParser()
         self._add_parser_options()
@@ -29,8 +32,13 @@ class CommandLineOptions(object):
             help='sqlite3 database storing the test run results'
         )
 
-    def _get_validated_options():
-        raise NotImplementedError
+    def _get_validated_options(self):
+        if len(argv) < 2:
+            self._exit_with_help()
+        options, args = self._parser.parse_args()
+        if args:
+            self._exit_with_help()
+        return options
 
     def _exit_with_help(self):
         self._parser.print_help()
