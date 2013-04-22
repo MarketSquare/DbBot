@@ -5,9 +5,9 @@ Resource  ../resources/database.txt
 
 
 *** Variables ***
-${valid_output}       ${CURDIR}${/}..${/}testdata${/}results_to_db${/}one_suite${/}output.xml
-${invalid_output}     ${CURDIR}${/}..${/}testdata${/}results_to_db${/}invalid_output.xml
-${not_existing_file}  ${CURDIR}${/}..${/}testdata${/}results_to_db${/}not_exist.xml
+${valid_output}       ${CURDIR}${/}..${/}testdata${/}one_suite${/}output.xml
+${invalid_output}     ${CURDIR}${/}..${/}testdata${/}invalid_output.xml
+${not_existing_file}  ${CURDIR}${/}..${/}testdata${/}not_exist.xml
 
 
 *** Keywords ***

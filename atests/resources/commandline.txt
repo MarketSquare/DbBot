@@ -1,6 +1,6 @@
 *** Variables ***
-${program_name}  results_to_db
-${program_path}  ${CURDIR}${/}..${/}..${/}${program_name}
+${program_name}  dbbot
+${program_path}  ${CURDIR}${/}..${/}..${/}bin${/}/${program_name}
 
 
 *** Keywords ***

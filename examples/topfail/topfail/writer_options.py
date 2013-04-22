@@ -13,13 +13,13 @@ class WriterOptions(CommandLineOptions):
         super(WriterOptions, self)._add_parser_options()
         self._parser.add_option('-o', '--output',
             dest='output_file_path',
-            help='test summary html file',
+            help='path to the resulting html file',
         )
 
     def _get_validated_options(self):
         options = super(WriterOptions, self)._get_validated_options()
         if not options.output_file_path:
-            self._parser.error('output html filename required')
+            self._parser.error('output filename is required')
         if not exists(options.db_file_path):
             self._parser.error('database %s not exists' % options.db_file_path)
         return options

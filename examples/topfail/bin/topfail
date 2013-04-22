@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 
-from sys import stderr, stdout
-from dbbot.writer import DatabaseReader, HtmlWriter, WriterOptions
+import sys
+import os
+
+sys.path.append(os.path.abspath(__file__ + '/../../'))
+from topfail import DatabaseReader, HtmlWriter, WriterOptions
 
 
 class DbToHtml(object):
 
     def __init__(self):
         self._options = WriterOptions()
-        output = stdout if self._options.be_verbose else None
+        output = sys.stdout if self._options.be_verbose else None
         self._db = DatabaseReader(self._options.db_file_path, output)
         self._writer = HtmlWriter(self._db, output)
 
@@ -16,7 +19,7 @@ class DbToHtml(object):
         try:
             self._writer.write()
         except Exception, message:
-            stderr.write('db_to_html: error: %s\n\n' % message)
+            sys.stderr.write('topfail: error: %s\n\n' % message)
             exit(1)
         finally:
             self._db.close()
