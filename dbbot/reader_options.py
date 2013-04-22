@@ -33,18 +33,18 @@ class ReaderOptions(CommandLineOptions):
         self._parser.add_option('-d', '--dry-run',
             action='store_true',
             dest='dry_run',
-            help='don\'t save anything into database'
+            help='do everything except store results into disk'
         )
         self._parser.add_option('-k', '--also-keywords',
             action='store_true',
             dest='include_keywords',
-            help='include suites\' and tests\' keywords'
+            help='parse also suites\' and tests\' keywords'
         )
         self._parser.add_option('-f', '--files',
             action='callback',
             callback=files_args_parser,
             dest='file_paths',
-            help='one or more output.xml files to save to db'
+            help='one or more Robot output.xml files'
         )
 
     def _get_validated_options(self):

@@ -24,12 +24,12 @@ class CommandLineOptions(object):
         self._parser.add_option('-v', '--verbose',
             action='store_true',
             dest='verbose',
-            help='show information about execution stages'
+            help='be verbose about the operation'
         )
         self._parser.add_option('-b', '--database',
             dest='db_file_path',
             default=DEFAULT_DB_NAME,
-            help='sqlite3 database storing the test run results'
+            help='path to the sqlite3 database for test run results'
         )
 
     def _get_validated_options(self):
