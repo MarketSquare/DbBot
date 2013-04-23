@@ -52,7 +52,7 @@ Prints File ${filename} Not Exists
     Should Contain  ${output}  ${program_name}: error: file ${filename} not exists
 
 Prints Parse Error In ${filename}
-    Should Contain  ${output}  ${program_name}: error: Reading XML source '${filename}' failed: ParseError:
+    Should Contain  ${output}  ${program_name}: error: Invalid XML: Reading XML source '${filename}' failed: ParseError:
 
 Is Verbose
     Should Contain  ${output}  Database |
