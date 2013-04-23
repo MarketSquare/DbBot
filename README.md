@@ -40,7 +40,7 @@ Requirements
 * Python 2.6 or newer installed
 * Robot Framework 2.7 or newer installed
 
-Tested and verified on Python 2.7.4 and Robot Framework 2.7.7
+Tested and verified on Python 2.7.4 and Robot Framework 2.7.7.
 
 
 Usage
@@ -85,7 +85,7 @@ Giving multiple output files at the same time:
 Database
 --------
 
-You may inspect the created database using the 'sqlite3' commandline tool:
+You may inspect the created database using the 'sqlite3' command-line tool:
 
     $ sqlite3 robot_results.db
 
