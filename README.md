@@ -54,17 +54,20 @@ The executable is 'dbbot' in directory 'bin'. Run the script from command-line:
 
     ./dbbot [options]
 
-Valid options are:
+Required options are:
 
 Short format    | Long format             | Description
 --------------- |-------------------------| ------------------------------------------
--f              | --files                 | One or more Robot output.xml files (required)
--k              | --also-keywords         | Parse also suites' and tests' keywords (optional)
--v              | --verbose               | Be verbose about the operation (optional)
--b DB_FILE_PATH | --database=DB_FILE_PATH | SQLite database for test run results (optional, robot_results.db by default)
--d              | --dry-run               | Do everything except store results into disk (optional)
+-f              | --files                 | One or more Robot output.xml files
 
+Additional options are:
 
+Short format    | Long format             | Description
+--------------- |-------------------------| ------------------------------------------
+-k              | --also-keywords         | Parse also suites' and tests' keywords
+-v              | --verbose               | Be verbose about the operation
+-b DB_FILE_PATH | --database=DB_FILE_PATH | SQLite database for test run results (robot_results.db by default)
+-d              | --dry-run               | Do everything except store results into disk
 
 On Windows environments, you might need to rename the executable to have the '.py' file extension
 ('dbbot' -> 'dbbot.py').
