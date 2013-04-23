@@ -17,9 +17,9 @@ class DbToHtml(object):
     def run(self):
         try:
             self._writer.write()
-        #except Exception, message:
-        #    sys.stderr.write('topfail: error: %s\n\n' % message)
-        #    exit(1)
+        except Exception, message:
+            sys.stderr.write('topfail: error: %s\n\n' % message)
+            exit(1)
         finally:
             self._db.close()
 
