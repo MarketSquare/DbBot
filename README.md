@@ -59,7 +59,7 @@ Valid options are:
 Short format    | Long format             | Description
 --------------- |-------------------------| ------------------------------------------
 -v              | --verbose               | Be verbose about the operation (optional)
--b DB_FILE_PATH | --database=DB_FILE_PATH | Path to the sqlite3 database for test run results (optional, robot_results.db by default)
+-b DB_FILE_PATH | --database=DB_FILE_PATH | Sqlite3 database for test run results (optional, robot_results.db by default)
 -d              | --dry-run               | Do everything except store results into disk (optional)
 -k              | --also-keywords         | Parse also suites' and tests' keywords (optional)
 -f              | --files                 | One or more Robot output.xml files (REQUIRED)
