@@ -1,8 +1,9 @@
 dbbot
 =====
 
-DbBot is a Python script used to serialize Robot Framework produced
-test run results, i.e. output.xml files, into a SQLite database.
+DbBot is a Python script used to serialize Robot Framework produced test run results,
+i.e. output.xml files, into a SQLite database. That way the future Robot Framework
+related tools and plugins will have a common storage for the test result data.
 
 The script takes one or more output.xml files as input, initializes the
 database schema, produces the respective insert statements and finally commits the results
