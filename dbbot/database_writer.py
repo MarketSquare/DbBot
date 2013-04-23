@@ -77,8 +77,8 @@ class DatabaseWriter(RobotDatabase):
             'doc': 'TEXT NOT NULL'
         }, ('name', 'source'))
         self._create_table('suite_status', {
-            'test_run_id': 'INTEGER REFERENCES test_runs',
-            'suite_id': 'INTEGER REFERENCES suites',
+            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
+            'suite_id': 'INTEGER  NOT NULL REFERENCES suites',
             'elapsed': 'INTEGER NOT NULL',
             'failed': 'INTEGER NOT NULL',
             'passed': 'INTEGER NOT NULL',
@@ -92,8 +92,8 @@ class DatabaseWriter(RobotDatabase):
             'doc': 'TEXT NOT NULL'
         }, ('suite_id', 'name'))
         self._create_table('test_status', {
-            'test_run_id': 'INTEGER REFERENCES test_runs',
-            'test_id': 'INTEGER REFERENCES tests',
+            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
+            'test_id': 'INTEGER  NOT NULL REFERENCES tests',
             'status': 'TEXT NOT NULL',
             'elapsed': 'INTEGER NOT NULL'
         }, ('test_run_id', 'test_id'))
@@ -107,8 +107,8 @@ class DatabaseWriter(RobotDatabase):
             'doc': 'TEXT NOT NULL'
         }, ('name', 'type'))
         self._create_table('keyword_status', {
-            'test_run_id': 'INTEGER REFERENCES test_runs',
-            'keyword_id': 'INTEGER REFERENCES keyword',
+            'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
+            'keyword_id': 'INTEGER NOT NULL REFERENCES keyword',
             'status': 'TEXT NOT NULL',
             'elapsed': 'INTEGER NOT NULL'
         }, ('test_run_id', 'keyword_id'))
