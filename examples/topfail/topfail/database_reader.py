@@ -17,7 +17,7 @@ class DatabaseReader(RobotDatabase):
             suite_status.status == "FAIL"
             GROUP BY suites.source
         '''
-        return self._connection.execute(sql_statement).fetchall()
+        return self._fetch_by(sql_statement)
 
     def most_failed_tests(self):
         sql_statement = '''
@@ -25,9 +25,9 @@ class DatabaseReader(RobotDatabase):
             FROM tests, test_status
             WHERE tests.id == test_status.test_id AND
             test_status.status == "FAIL"
-            GROUP BY tests.name
+            GROUP BY tests.name, tests.suite_id
         '''
-        return self._connection.execute(sql_statement).fetchall()
+        return self._fetch_by(sql_statement)
 
     def most_failed_keywords(self):
         sql_statement = '''
@@ -37,7 +37,7 @@ class DatabaseReader(RobotDatabase):
             keyword_status.status == "FAIL"
             GROUP BY keywords.name, keywords.type
         '''
-        return self._connection.execute(sql_statement).fetchall()
+        return self._fetch_by(sql_statement)
 
     def failed_tests_for_suite(self, suite_id):
         sql_statement = '''
@@ -48,7 +48,7 @@ class DatabaseReader(RobotDatabase):
             test_status.status == "FAIL"
             GROUP BY tests.name
         '''
-        return self._connection.execute(sql_statement, [suite_id]).fetchall()
+        return self._fetch_by(sql_statement, [suite_id])
 
     def failed_keywords_for_test(self, test_id):
         sql_statement = '''
@@ -59,4 +59,8 @@ class DatabaseReader(RobotDatabase):
             keyword_status.status == "FAIL"
             GROUP BY keywords.name, keywords.type
         '''
-        return self._connection.execute(sql_statement, [test_id]).fetchall()
+        return self._fetch_by(sql_statement, [test_id])
+
+    def _fetch_by(self, sql_statement, values=[]):
+        return self._connection.execute(sql_statement, values).fetchall()
+
