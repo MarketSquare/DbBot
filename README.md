@@ -85,9 +85,9 @@ Giving multiple output files at the same time:
 Database
 --------
 
-You may inspect the created database using the sqlite3 command-line tool:
+You may inspect the created database using the 'sqlite3' commandline tool:
 
-    sqlite3 robot_results.db
+    $ sqlite3 robot_results.db
 
     sqlite> .tables
     arguments        suite_status     test_run_errors  tests
@@ -101,7 +101,7 @@ You may inspect the created database using the sqlite3 command-line tool:
             test_status.status == "FAIL"
             GROUP BY tests.name;
 
-For detailed DbBot database documentation, see 'doc/robot_database.md'.
+For detailed database documentation, see 'doc/robot_database.md'.
 
 
 Directory structure
@@ -114,3 +114,10 @@ bin       | Contains the executables, mainly 'dbbot'. You may want to append thi
 dbbot     | Contains the packages used by dbbot. You may want to append this directory to your PYTHONPATH if your scripts are inheriting from the abstract classes in the package 'dbbot'
 doc       | Mainly technical documentation about the DbBot database schema.
 examples  | Examples that are using the DbBot created database and extending the 'dbbot' modules.
+
+
+Troubleshooting
+---------------
+
+Problem: ...
+Solution: ...
