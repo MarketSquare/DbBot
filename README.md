@@ -47,7 +47,7 @@ Usage
 -----
 The executable is 'dbbot' under directory 'bin'. Use the script from command-line:
 
-    dbbot [options]
+    ./dbbot [options]
 
 Valid command-line options are:
 
@@ -67,19 +67,19 @@ Usage examples
 
 With a single output.xml file:
 
-    dbbot -f atest/testdata/multiple/output.xml
+    ./dbbot -f atest/testdata/multiple/output.xml
 
 With custom database name (robot_results.db being the default)
 
-    dbbot -f atest/testdata/multiple/output.xml -b my_own_database.db
+    ./dbbot -f atest/testdata/multiple/output.xml -b my_own_database.db
 
 Parse test run with keywords included:
 
-    dbbot --files atest/testdata/multiple/output.xml -k
+    ./dbbot --files atest/testdata/multiple/output.xml -k
 
 Giving multiple output files at the same time:
 
-    dbbot -f atest/testdata/one_suite/output.xml atest/testdata/one_suite/output_latter.xml
+    ./dbbot --files atest/testdata/one_suite/output.xml atest/testdata/one_suite/output_latter.xml
 
 
 
