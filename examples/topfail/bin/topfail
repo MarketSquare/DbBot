@@ -11,16 +11,15 @@ class DbToHtml(object):
 
     def __init__(self):
         self._options = WriterOptions()
-        output = sys.stdout if self._options.be_verbose else None
-        self._db = DatabaseReader(self._options.db_file_path, output)
-        self._writer = HtmlWriter(self._db, output)
+        self._db = DatabaseReader(self._options.db_file_path)
+        self._writer = HtmlWriter(self._db, self._options.output_file_path)
 
     def run(self):
         try:
             self._writer.write()
-        except Exception, message:
-            sys.stderr.write('topfail: error: %s\n\n' % message)
-            exit(1)
+        #except Exception, message:
+        #    sys.stderr.write('topfail: error: %s\n\n' % message)
+        #    exit(1)
         finally:
             self._db.close()
 
