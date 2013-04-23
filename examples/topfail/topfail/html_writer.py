@@ -1,9 +1,7 @@
 from string import Template
 
-from dbbot import Logger
-
-
 TEMPLATE_PATH = '../templates'
+
 
 class HtmlWriter(object):
 
