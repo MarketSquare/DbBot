@@ -53,7 +53,7 @@ Short format    | Long format             | Description
 -k              | --also-keywords         | parse also suites' and tests' keywords
 -f              | --files                 | one or more Robot output.xml files
 
-On Windows environments you might need to rename the script to have '.py' file extension.
+On Windows environments you might need to rename the executable to have the '.py' file extension.
 
 
 Usage examples
@@ -66,11 +66,8 @@ Directory structure
 
 Directory | Description
 ----------|------------
-atests    | Robot Framework powered acceptance tests for DbBot. Also contains test fixtures.
+atests    | Robot Framework powered acceptance tests for DbBot. Also has some test data.
 bin       | Contains the executables, mainly 'dbbot'. You may want to append this directory to your PATH.
-dbbot     | Contains the packages used by dbbot. You may want to append this directory to your PYTHONPATH if you are developing scripts that inherit the abstract classes in package 'dbbot'
-doc       | Mainly technical documentation about the database schema.
-examples  | Examples that are using the dbbot created database and inhering from the 'dbbot' package.
-
-
-
+dbbot     | Contains the packages used by dbbot. You may want to append this directory to your PYTHONPATH if your scripts are inheriting from the abstract classes in the package 'dbbot'
+doc       | Mainly technical documentation about the DbBot database schema.
+examples  | Examples that are using the DbBot created database and extending the 'dbbot' modules.
