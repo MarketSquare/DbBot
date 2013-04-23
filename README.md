@@ -36,7 +36,6 @@ Python that uses the classes.
 
 Requirements
 ------------
-
 * Python 2.6 or newer installed
 * Robot Framework 2.7 or newer installed
 
@@ -69,7 +68,12 @@ With a single output.xml file:
 
     ./dbbot -f atest/testdata/multiple/output.xml
 
-With custom database name (robot_results.db being the default)
+If database does not already exist, it's created. Otherwise the test results
+are just inserted into existing database. Only new results are inserted.
+
+The default database is file 'robot_results.db'.
+
+With custom database name:
 
     ./dbbot -f atest/testdata/multiple/output.xml -b my_own_database.db
 
@@ -77,7 +81,7 @@ Parse test run with keywords included:
 
     ./dbbot --files atest/testdata/multiple/output.xml -k
 
-Giving multiple output files at the same time:
+Giving multiple result files at the same time:
 
     ./dbbot --files atest/testdata/one_suite/output.xml atest/testdata/one_suite/output_latter.xml
 
@@ -100,6 +104,10 @@ You may inspect the created database using the 'sqlite3' command-line tool:
             WHERE tests.id == test_status.test_id AND
             test_status.status == "FAIL"
             GROUP BY tests.name;
+
+Please note that when the database is initialized, no indices are created by DbBot.
+This is to not slow down the inserts. You might want to add indices to the
+database by hand to speed up certain queries in your own scripts.
 
 For detailed database documentation, see 'doc/robot_database.md'.
 
