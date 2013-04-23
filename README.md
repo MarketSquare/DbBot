@@ -1,4 +1,4 @@
-dbbot
+DbBot
 =====
 
 DbBot is a Python script used to serialize Robot Framework produced test run results,
@@ -45,9 +45,9 @@ Tested and verified on Python 2.7.4 and Robot Framework 2.7.7
 
 Usage
 -----
-There is an executable Python script named 'dbbot' under directory 'bin'.
+The executable is 'dbbot' under directory 'bin'.
 
-Run the script from command-line: dbbot [options]
+Use the script from command-line: dbbot [options]
 
 Valid command-line options are:
 
