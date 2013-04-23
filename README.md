@@ -58,11 +58,11 @@ Valid options are:
 
 Short format    | Long format             | Description
 --------------- |-------------------------| ------------------------------------------
--v              | --verbose               | Be verbose about the operation
--b DB_FILE_PATH | --database=DB_FILE_PATH | Path to the sqlite3 database for test run results
--d              | --dry-run               | Do everything except store results into disk
--k              | --also-keywords         | Parse also suites' and tests' keywords
--f              | --files                 | One or more Robot output.xml files
+-v              | --verbose               | Be verbose about the operation (optional)
+-b DB_FILE_PATH | --database=DB_FILE_PATH | Path to the sqlite3 database for test run results (optional, robot_results.db by default)
+-d              | --dry-run               | Do everything except store results into disk (optional)
+-k              | --also-keywords         | Parse also suites' and tests' keywords (optional)
+-f              | --files                 | One or more Robot output.xml files (REQUIRED)
 
 On Windows environments, you might need to rename the executable to have the '.py' file extension
 ('dbbot' -> 'dbbot.py').
