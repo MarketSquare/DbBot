@@ -68,8 +68,7 @@ Directory | Description
 ----------|------------
 atests    | Robot Framework powered acceptance tests for DbBot. Also contains test fixtures.
 bin       | Contains the executables, mainly 'dbbot'. You may want to append this directory to your PATH.
-dbbot     | Contains the packages used by dbbot. You may want to append this directory to your PYTHONPATH
-            if you are developing scripts that inherit the abstract classes in package 'dbbot'
+dbbot     | Contains the packages used by dbbot. You may want to append this directory to your PYTHONPATH if you are developing scripts that inherit the abstract classes in package 'dbbot'
 doc       | Mainly technical documentation about the database schema.
 examples  | Examples that are using the dbbot created database and inhering from the 'dbbot' package.
 
