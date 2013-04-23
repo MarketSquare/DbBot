@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(__file__ + '/../../'))
 from topfail import DatabaseReader, HtmlWriter, WriterOptions
 
 
-class DbToHtml(object):
+class TopFail(object):
 
     def __init__(self):
         self._options = WriterOptions()
@@ -22,4 +22,4 @@ class DbToHtml(object):
 
 
 if __name__ == '__main__':
-    DbToHtml().run()
+    TopFail().run()
