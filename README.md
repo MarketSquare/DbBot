@@ -46,6 +46,7 @@ Tested and verified on Python 2.7.4 and Robot Framework 2.7.7
 Usage
 -----
 The executable is 'dbbot' under directory 'bin'. Use the script from command-line:
+
     dbbot [options]
 
 Valid command-line options are:
@@ -65,15 +66,19 @@ Usage examples
 --------------
 
 With a single output.xml file:
+
     dbbot -f atest/testdata/multiple/output.xml
 
 With custom database name (robot_results.db being the default)
+
     dbbot -f atest/testdata/multiple/output.xml -b my_own_database.db
 
 Parse test run with keywords included:
+
     dbbot --files atest/testdata/multiple/output.xml -k
 
 Giving multiple output files at the same time:
+
     dbbot -f atest/testdata/one_suite/output.xml atest/testdata/one_suite/output_latter.xml
 
 
