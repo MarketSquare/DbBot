@@ -2,30 +2,35 @@ dbbot
 =====
 
 DbBot is a Python script used to serialize Robot Framework produced
-test run results, i.e. output.xml files into a SQLite database.
+test run results, i.e. output.xml files, into a SQLite database.
 
 The script takes one or more output.xml files as input, initializes the
-database schema, creates respective insert statements and finally inserts the results
-into the database (robot_results.db by default, can be specified using -b or --database).
+database schema, produces the respective insert statements and finally commits the results
+into the database (robot_results.db by default, can be changed by -b or --database).
 
 Both the test data (names and paths) and test statistics (how many did pass or fail,
 possible errors occurred, how long it took to run, etc.) related to suites and test cases
-are stored. Optionally keywords can be stored (by -k or --also-keywords flag) but
-this is not the default behavior as it might take a while for massive test runs.
+are stored by default. Optionally, keywords can be stored by -k or --also-keywords flag, but
+this is not the default behavior as it might take tens of seconds for massive test runs.
 
 
 Use cases
 ---------
-One of the common needs is to get a report of the most commonly failing suites,
-tests and keywords. DbBot comes with an executable example named 'topfail',
+One of the common use cases is to get a report of the most commonly failing suites,
+tests and keywords. DbBot comes with an executable example for this, named 'topfail',
 bundled in 'examples/topfail/bin/topfail'.
 
 Topfail is used to produce an html summary based on the test data serialized
-into the dbbot database. Feel free to adjust (the very basic) html templates
-to your needs.
+into the dbbot database. Feel free to adjust (the very barebone) html templates
+in 'topfail/templates' to your needs.
 
-Another potential use case would be to build a script that generates an html
+Another possible use case is to build a script that produces an html
 summary of the most time-consuming tests, keywords etc.
+
+Take a look at the modules under 'examples/topfail/topfail' on how to extend the
+DbBot provided classes to your own scripting needs. You may also want to append
+'dbbot/dbbot' directory to your PYTHONPATH if you are building something with
+Python that uses the classes.
 
 
 Requirements
