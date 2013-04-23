@@ -13,7 +13,7 @@ class WriterOptions(CommandLineOptions):
         super(WriterOptions, self)._add_parser_options()
         self._parser.add_option('-o', '--output',
             dest='output_file_path',
-            help='path to the resulting html file',
+            help='path to the result html file',
         )
 
     def _get_validated_options(self):
