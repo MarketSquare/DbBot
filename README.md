@@ -82,6 +82,27 @@ Giving multiple output files at the same time:
     ./dbbot --files atest/testdata/one_suite/output.xml atest/testdata/one_suite/output_latter.xml
 
 
+Database
+--------
+
+You may inspect the created database using the sqlite3 command-line tool:
+
+    sqlite3 robot_results.db
+
+    sqlite> .tables
+    arguments        suite_status     test_run_errors  tests
+    keyword_status   suites           test_run_status
+    keywords         tag_status       test_runs
+    messages         tags             test_status
+
+    sqlite> SELECT count(), tests.id, tests.name
+            FROM tests, test_status
+            WHERE tests.id == test_status.test_id AND
+            test_status.status == "FAIL"
+            GROUP BY tests.name;
+
+For detailed DbBot database documentation, see 'doc/robot_database.md'.
+
 
 Directory structure
 -------------------
