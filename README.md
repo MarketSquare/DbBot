@@ -5,16 +5,19 @@ DbBot is a Python script used to serialize Robot Framework produced test run res
 i.e. output.xml files, into a SQLite database. This way the future Robot Framework
 related tools and plugins will have a unified storage for the test result data.
 
+How it works
+------------
 The script takes one or more output.xml files as input, initializes the
 database schema, produces the respective insert statements and finally commits the results
 into database (robot_results.db by default, can be changed with -b or --database).
 
+What is stored
+--------------
 Both the test data (names, content) and test statistics (how many did pass or fail,
 possible errors occurred, how long it took to run, etc.) related to suites and test cases
 are stored by default. However, keywords are not stored by default as it might take
 tens of seconds for massive test runs. Keywords can be stored by using -k or
 --also-keywords flag.
-
 
 Use cases
 ---------
@@ -28,6 +31,8 @@ Feel free to adjust (the barebone) html templates in 'topfail/templates' to your
 Another future use case is to build a script that produces a summary output of the most
 time-consuming tests, keywords etc.
 
+Writing your own scripts
+------------------------
 Please take a look at the modules in 'examples/topfail/topfail' as an example on how
 to extend the DbBot provided classes to your own scripting needs.
 
