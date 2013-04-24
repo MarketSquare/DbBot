@@ -53,7 +53,7 @@ Usage
 -----
 The executable is 'dbbot' in directory 'bin'. Run the script from command-line:
 
-    ./dbbot [options]
+    bin/dbbot [options]
 
 Required options are:
 
@@ -79,7 +79,7 @@ Usage examples
 
 Typical usage with a single output.xml file:
 
-    ./dbbot -f atest/testdata/one_suite/output.xml
+    dbbot -f atest/testdata/one_suite/output.xml
 
 If the database does not already exist, it's created. Otherwise the test results
 are just inserted into the existing database. However, only not existing results are inserted.
@@ -88,15 +88,15 @@ The default database is a file named 'robot_results.db'.
 
 Specifying custom database name:
 
-    ./dbbot -f atest/testdata/one_suite/output.xml -b my_own_database.db
+    dbbot -f atest/testdata/one_suite/output.xml -b my_own_database.db
 
 Parsing test run results with keywords included:
 
-    ./dbbot -k --files atest/testdata/one_suite/output.xml
+    dbbot -k --files atest/testdata/one_suite/output.xml
 
 Giving multiple test run result files at the same time:
 
-    ./dbbot --files atest/testdata/one_suite/output.xml atest/testdata/one_suite/output_latter.xml
+    dbbot --files atest/testdata/one_suite/output.xml atest/testdata/one_suite/output_latter.xml
 
 
 Database

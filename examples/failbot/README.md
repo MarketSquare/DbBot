@@ -17,9 +17,14 @@ Tested and verified on Python 2.7.4.
 
 Usage
 -----
-The executable is 'failbot' in directory 'bin'. Run the script from command-line:
+The executable is 'failbot' in directory 'bin'.
 
-    ./failbot [options]
+You need to append the DbBot root path to your PYTHONPATH,
+because some of the DbBot's packages are used by FailBot.
+
+So running the script from command-line:
+
+    PYTHONPATH=/path/to/DbBot bin/failbot [options]
 
 Required options are:
 
@@ -41,19 +46,38 @@ On Windows environments, you might need to rename the executable to have the '.p
 Usage examples
 --------------
 
+Please make sure that you append the DbBot root path to your PYTHONPATH.
+Otherwise you will end up getting errors like this:
+
+    Traceback (most recent call last):
+      File "bin/failbot", line 7, in <module>
+        from failbot import DatabaseReader, HtmlWriter, WriterOptions
+      File "/something/FailBot/failbot/__init__.py", line 4, in <module>
+        from .database_reader import DatabaseReader
+      File "/something/FailBot/failbot/database_reader.py", line 3, in <module>
+        from dbbot import RobotDatabase
+    ImportError: No module named dbbot
+
+So please issue this command (if using Bash) before running failbot:
+
+    export PYTHONPATH=$PYTHONPATH:/path/to/DbBot
+
+You may also want to add this line to your .bash_profile to avoid running
+the command in every new shell.
+
 The output HTML filename is always required:
 
-    ./failbot -o index.html
+    failbot -o index.html
 
 You might want to create the output somewhere under your public_html:
 
-    ./failbot -o /home/<username>/public_html/index.html
+    failbot -o /home/<username>/public_html/index.html
 
 If -b/--database is not specified, a database file 'robot_results.db' is used by default.
 
 With a non-default named database:
 
-    ./failbot -f atest/testdata/one_suite/output.xml -b my_own_database.db
+    failbot -f atest/testdata/one_suite/output.xml -b my_own_database.db
 
 
 Directory structure
@@ -63,4 +87,4 @@ Directory | Description
 ----------|------------
 bin       | Contains the executable. You may want to append this directory to your PATH.
 templates | HTML templates used to produced the summary page.
-failbot   | Contains the packages used by failbot. You may want to append this directory to your PYTHONPATH.
+failbot   | Contains the packages internally used by failbot.
