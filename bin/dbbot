@@ -11,13 +11,13 @@ from robot.errors import DataError
 class ResultsToDb(object):
     def __init__(self):
         self._options = ReaderOptions()
-        output = sys.stdout if self._options.be_verbose else None
+        verbose = sys.stdout if self._options.be_verbose else None
         database = ':memory:' if self._options.dry_run else self._options.db_file_path
-        self._db = DatabaseWriter(database, output)
+        self._db = DatabaseWriter(database, verbose)
         self._parser = ResultsParser(
             self._options.include_keywords,
             self._db,
-            output
+            verbose
         )
 
     def run(self):

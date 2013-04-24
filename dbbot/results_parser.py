@@ -7,8 +7,8 @@ from dbbot import Logger
 
 class ResultsParser(object):
 
-    def __init__(self, include_keywords, db, output):
-        self._verbose = Logger('Parser', output)
+    def __init__(self, include_keywords, db, verbose):
+        self._verbose = Logger('Parser', verbose)
         self._include_keywords = include_keywords
         self._db = db
 

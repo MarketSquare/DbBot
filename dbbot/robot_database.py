@@ -5,8 +5,8 @@ from .logger import Logger
 
 class RobotDatabase(object):
 
-    def __init__(self, db_file_path, output):
-        self._verbose = Logger('Database', output)
+    def __init__(self, db_file_path, verbose):
+        self._verbose = Logger('Database', verbose)
         self._connection = self._connect(db_file_path)
         self._configure()
 

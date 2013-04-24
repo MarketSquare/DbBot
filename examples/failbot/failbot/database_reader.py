@@ -5,8 +5,8 @@ from dbbot import RobotDatabase
 
 class DatabaseReader(RobotDatabase):
 
-    def __init__(self, db_file_path):
-        super(DatabaseReader, self).__init__(db_file_path, None)
+    def __init__(self, db_file_path, verbose):
+        super(DatabaseReader, self).__init__(db_file_path, verbose)
         self._connection.row_factory = sqlite3.Row
 
     def most_failed_suites(self):

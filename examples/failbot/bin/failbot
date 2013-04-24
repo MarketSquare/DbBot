@@ -11,12 +11,13 @@ class FailBot(object):
 
     def __init__(self):
         self._options = WriterOptions()
-        self._db = DatabaseReader(self._options.db_file_path)
-        self._writer = HtmlWriter(self._db, self._options.output_file_path)
+        verbose = sys.stdout if self._options.be_verbose else None
+        self._db = DatabaseReader(self._options.db_file_path, verbose)
+        self._writer = HtmlWriter(self._db, self._options.output_file_path, verbose)
 
     def run(self):
         try:
-            self._writer.write()
+            self._writer.produce()
         finally:
             self._db.close()
 

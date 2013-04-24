@@ -3,10 +3,10 @@ from sys import stdout
 
 class Logger(object):
 
-    def __init__(self, header, output):
+    def __init__(self, header, stream):
         self._header = header
-        self._output = output
+        self._stream = stream
 
     def __call__(self, message):
-        if self._output:
-            self._output.write(' %-8s |   %s\n' % (self._header, message))
+        if self._stream:
+            self._stream.write(' %-8s |   %s\n' % (self._header, message))
