@@ -3,9 +3,18 @@
 import sys
 import os
 
-sys.path.append(os.path.abspath(__file__ + '/../../'))
-from failbot import DatabaseReader, HtmlWriter, WriterOptions
-
+try:
+    sys.path.append(os.path.abspath(__file__ + '/../../'))
+    from failbot import DatabaseReader, HtmlWriter, WriterOptions
+except ImportError, message:
+    sys.exit(
+        'Please make sure you have DbBot root in your PYTHONPATH.\n\n'
+        'With Bash:\n'
+        'export PYTHONPATH=$PYTHONPATH:/path/to/DbBot\n\n'
+        'You may also want to add this line to your .bash_profile to avoid running the command in every new shell.\n\n'
+        'On Windows:\n'
+        'set PYTHONPATH=%PYTHONPATH%;C:\path\\to\DbBot\n'
+    )
 
 class FailBot(object):
 

@@ -39,31 +39,29 @@ Short format    | Long format             | Description
 -v              | --verbose               | Be verbose about the operation
 -b DB_FILE_PATH | --database=DB_FILE_PATH | SQLite database of test run results (robot_results.db by default)
 
-On Windows environments, you might need to rename the executable to have the '.py' file extension
-('failbot' -> 'failbot.py').
+On Windows environments, you might need to rename the executable to have the '.py'
+file extension ('failbot' -> 'failbot.py').
 
 
-Usage examples
---------------
+Setup
+-----
 
-Please make sure that you append the DbBot root path to your PYTHONPATH.
-Otherwise you will end up getting errors like this:
+Please make sure you have DbBot installed somewhere and it's root in your PYTHONPATH.
 
-    Traceback (most recent call last):
-      File "bin/failbot", line 7, in <module>
-        from failbot import DatabaseReader, HtmlWriter, WriterOptions
-      File "/something/FailBot/failbot/__init__.py", line 4, in <module>
-        from .database_reader import DatabaseReader
-      File "/something/FailBot/failbot/database_reader.py", line 3, in <module>
-        from dbbot import RobotDatabase
-    ImportError: No module named dbbot
-
-So please issue this command (if using Bash) before running failbot:
+With Bash:
 
     export PYTHONPATH=$PYTHONPATH:/path/to/DbBot
 
 You may also want to add this line to your .bash_profile to avoid running
 the command in every new shell.
+
+On Windows:
+
+    set PYTHONPATH=%PYTHONPATH%;C:\path\to\DbBot
+
+
+Usage examples
+--------------
 
 The output HTML filename is always required:
 
