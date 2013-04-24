@@ -12,36 +12,6 @@ Requirements
 * Python 2.6 or newer installed
 * DbBot
 
-Tested and verified on Python 2.7.4.
-
-
-Usage
------
-The executable is 'failbot' in directory 'bin'.
-
-You need to append the DbBot root path to your PYTHONPATH,
-because some of the DbBot's packages are used by FailBot.
-
-So running the script from command-line:
-
-    PYTHONPATH=/path/to/DbBot bin/failbot [options]
-
-Required options are:
-
-Short format    | Long format             | Description
---------------- |-------------------------| ------------------------------------------
--o              | --output                 | Output HTML file name
-
-Additional options are:
-
-Short format    | Long format             | Description
---------------- |-------------------------| ------------------------------------------
--v              | --verbose               | Be verbose about the operation
--b DB_FILE_PATH | --database=DB_FILE_PATH | SQLite database of test run results (robot_results.db by default)
-
-On Windows environments, you might need to rename the executable to have the '.py'
-file extension ('failbot' -> 'failbot.py').
-
 
 Setup
 -----
@@ -58,6 +28,34 @@ the command in every new shell.
 On Windows:
 
     set PYTHONPATH=%PYTHONPATH%;C:\path\to\DbBot
+
+
+Usage
+-----
+The executable is 'failbot' in directory 'bin'.
+
+You need to append the DbBot root path to your PYTHONPATH,
+because some of the DbBot's packages are used by FailBot.
+
+So running the script from command-line:
+
+    bin/failbot [options]
+
+Required options are:
+
+Short format    | Long format             | Description
+--------------- |-------------------------| ------------------------------------------
+-o              | --output                 | Output HTML file name
+
+Additional options are:
+
+Short format    | Long format             | Description
+--------------- |-------------------------| ------------------------------------------
+-v              | --verbose               | Be verbose about the operation
+-b DB_FILE_PATH | --database=DB_FILE_PATH | SQLite database of test run results (robot_results.db by default)
+
+On Windows environments, you might need to rename the executable to have the '.py'
+file extension ('failbot' -> 'failbot.py').
 
 
 Usage examples
