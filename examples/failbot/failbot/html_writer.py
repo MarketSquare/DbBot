@@ -1,8 +1,9 @@
+import os
 from string import Template
 
 from dbbot import Logger
 
-TEMPLATE_PATH = '../templates'
+TEMPLATE_PATH = os.path.abspath(__file__ + '../../../templates')
 
 
 class HtmlWriter(object):
