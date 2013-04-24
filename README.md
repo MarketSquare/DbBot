@@ -25,7 +25,7 @@ One of the common use cases is to get a report of the most commonly failing suit
 tests and keywords. DbBot comes with an executable example for this purpose, named 'failbot',
 bundled in 'examples/FailBot/bin/failbot'.
 
-Failbot is a Python script used to produce a summary web page about the most failing
+Failbot is a Python script used to produce a summary web page about the failing
 suites, tests and keywords, using the information stored in a DbBot database.
 Please adjust (the barebone) HTML templates in 'examples/FailBot/templates' to your needs.
 

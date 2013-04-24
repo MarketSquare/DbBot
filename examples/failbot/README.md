@@ -1,7 +1,7 @@
 FailBot
 =======
 
-FailBot is a Python script used to produce a summary web page about the most failing
+FailBot is a Python script used to produce a summary web page about the failing
 suites, tests and keywords, using the information stored in a DbBot database.
 
 Please adjust (the barebone) HTML templates in 'failbot/templates' to your needs.
