@@ -5,20 +5,6 @@ DbBot is a Python script to serialize Robot Framework produced test run results,
 i.e. output.xml files, into a SQLite database. This way the future Robot Framework
 related tools and plugins will have a unified storage for the test result data.
 
-How it's used
--------------
-The script takes one or more output.xml files as input, initializes the
-database schema, produces the respective insert statements and finally commits the results
-into database (robot_results.db by default, can be changed with -b or --database).
-
-What is stored
---------------
-Both the test data (names, content) and test statistics (how many did pass or fail,
-possible errors occurred, how long it took to run, etc.) related to suites and test cases
-are stored by default. However, keywords are not stored by default as it might take
-tens of seconds for massive test runs. Keywords can be stored by using -k or
---also-keywords flag.
-
 What are the use cases
 ----------------------
 One of the common use cases is to get a report of the most commonly failing suites,
@@ -32,14 +18,6 @@ Please adjust (the barebone) HTML templates in 'examples/FailBot/templates' to y
 Another future use case is to build a script that produces a summary output of the most
 time-consuming tests, keywords etc.
 
-Writing your own scripts
-------------------------
-Please take a look at the modules in 'examples/FailBot/failbot' as an example on how
-to extend the DbBot provided classes to your own scripting needs.
-
-You may also want to append 'dbbot/dbbot' directory to your PYTHONPATH
-if you are developing something that uses the classes.
-
 
 Requirements
 ------------
@@ -47,6 +25,13 @@ Requirements
 * Robot Framework 2.7 or newer installed
 
 Tested and verified on Python 2.7.4 and Robot Framework 2.7.7.
+
+
+How it's used
+-------------
+The script takes one or more output.xml files as input, initializes the
+database schema, produces the respective insert statements and finally commits the results
+into database (robot_results.db by default, can be changed with -b or --database).
 
 
 Usage
@@ -99,6 +84,15 @@ Giving multiple test run result files at the same time:
     dbbot --files atest/testdata/one_suite/output.xml atest/testdata/one_suite/output_latter.xml
 
 
+What is stored
+--------------
+Both the test data (names, content) and test statistics (how many did pass or fail,
+possible errors occurred, how long it took to run, etc.) related to suites and test cases
+are stored by default. However, keywords are not stored by default as it might take
+tens of seconds for massive test runs. Keywords can be stored by using -k or
+--also-keywords flag.
+
+
 Database
 --------
 
@@ -135,6 +129,15 @@ bin       | Contains the executables, mainly 'dbbot'. You may want to append thi
 dbbot     | Contains the packages used by dbbot. You may want to append this directory to your PYTHONPATH if your scripts are inheriting from the abstract classes in the package 'dbbot'
 doc       | Mainly technical documentation about the database schema.
 examples  | Examples that are using the DbBot created database and extending the 'dbbot' modules.
+
+
+Writing your own scripts
+------------------------
+Please take a look at the modules in 'examples/FailBot/failbot' as an example on how
+to extend the DbBot provided classes to your own scripting needs.
+
+You may also want to append 'dbbot/dbbot' directory to your PYTHONPATH
+if you are developing something that uses the classes.
 
 
 Troubleshooting
