@@ -25,8 +25,9 @@ One of the common use cases is to get a report of the most commonly failing suit
 tests and keywords. DbBot comes with an executable example for this purpose, named 'topfail',
 bundled in 'examples/topfail/bin/topfail'.
 
-Topfail is used to produce an html summary page based on the test data in the dbbot database.
-Feel free to adjust (the barebone) html templates in 'topfail/templates' to your needs.
+Topfail is a Python script used to produce a summary web page about the most failing
+suites, tests and keywords, using the information stored in a DbBot database.
+Please adjust (the barebone) HTML templates in 'examples/topfail/templates' to your needs.
 
 Another future use case is to build a script that produces a summary output of the most
 time-consuming tests, keywords etc.
