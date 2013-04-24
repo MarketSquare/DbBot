@@ -22,19 +22,19 @@ tens of seconds for massive test runs. Keywords can be stored by using -k or
 What are the use cases
 ----------------------
 One of the common use cases is to get a report of the most commonly failing suites,
-tests and keywords. DbBot comes with an executable example for this purpose, named 'topfail',
-bundled in 'examples/topfail/bin/topfail'.
+tests and keywords. DbBot comes with an executable example for this purpose, named 'failbot',
+bundled in 'examples/FailBot/bin/failbot'.
 
-Topfail is a Python script used to produce a summary web page about the most failing
+Failbot is a Python script used to produce a summary web page about the most failing
 suites, tests and keywords, using the information stored in a DbBot database.
-Please adjust (the barebone) HTML templates in 'examples/topfail/templates' to your needs.
+Please adjust (the barebone) HTML templates in 'examples/FailBot/templates' to your needs.
 
 Another future use case is to build a script that produces a summary output of the most
 time-consuming tests, keywords etc.
 
 Writing your own scripts
 ------------------------
-Please take a look at the modules in 'examples/topfail/topfail' as an example on how
+Please take a look at the modules in 'examples/FailBot/failbot' as an example on how
 to extend the DbBot provided classes to your own scripting needs.
 
 You may also want to append 'dbbot/dbbot' directory to your PYTHONPATH
