@@ -139,7 +139,7 @@ Writing your own scripts
 Please take a look at the modules in 'examples/FailBot/failbot' as an example on how
 to extend the DbBot provided classes to your own scripting needs.
 
-You may also want to append 'dbbot/dbbot' directory to your PYTHONPATH
+You may also want to append the DbBot root directory to your PYTHONPATH
 if you are developing something that uses the classes.
 
 
