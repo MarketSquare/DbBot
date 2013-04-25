@@ -34,7 +34,7 @@ column      | type     | not null | description
 id          | INTEGER  | X        | primary key
 test_run_id | INTEGER  | X        | FOREIGN KEY to test_runs
 name        | TEXT     | X        | 'total' or 'critical'
-elapsed     | INTEGER  | X        | number of milliseconds took to run
+elapsed     | INTEGER  |          | number of milliseconds took to run
 failed      | INTEGER  | X        | number of tests failed
 passed      | INTEGER  | X        | number of tests passed
 
@@ -66,7 +66,7 @@ id          | INTEGER  | X        | primary key
 test_run_id | INTEGER  | X        | FOREIGN KEY to test_runs
 name        | TEXT     | X        | name of the tag
 critical    | INTEGER  | X        | 0 if not critical, 1 if critical (SQLite has no booleans)
-elapsed     | INTEGER  | X        | number of milliseconds took to run
+elapsed     | INTEGER  |          | number of milliseconds took to run
 failed      | INTEGER  | X        | number of tests failed
 passed      | INTEGER  | X        | number of tests passed
 

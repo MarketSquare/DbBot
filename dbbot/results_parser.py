@@ -58,7 +58,7 @@ class ResultsParser(object):
             'test_run_id': test_run_id,
             'name': stat.name,
             'critical': stat.critical,
-            'elapsed': stat.elapsed,
+            'elapsed': getattr(stat, 'elapsed', None),
             'failed': stat.failed,
             'passed': stat.passed
         })
@@ -67,7 +67,7 @@ class ResultsParser(object):
         self._db.insert_or_ignore('test_run_status', {
             'test_run_id': test_run_id,
             'name': stat.name,
-            'elapsed': stat.elapsed,
+            'elapsed': getattr(stat, 'elapsed', None),
             'failed': stat.failed,
             'passed': stat.passed
         })
@@ -101,7 +101,7 @@ class ResultsParser(object):
             'suite_id': suite_id,
             'passed': suite.statistics.all.passed,
             'failed': suite.statistics.all.failed,
-            'elapsed': suite.statistics.all.elapsed,
+            'elapsed': suite.elapsedtime,
             'status': suite.status
         })
 

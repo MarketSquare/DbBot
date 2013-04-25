@@ -26,6 +26,9 @@ Requirements
 
 Tested and verified on Python 2.7.4 and Robot Framework 2.7.7.
 
+Robot Framework version 2.7.4 or later is recommended as versions prior to 2.7.4
+do not support storing elapsed time for the whole test run or tags.
+
 
 How it's used
 -------------

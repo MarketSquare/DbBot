@@ -51,7 +51,7 @@ class DatabaseWriter(RobotDatabase):
         self._create_table('test_run_status', {
             'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
             'name': 'TEXT NOT NULL',
-            'elapsed': 'INTEGER NOT NULL',
+            'elapsed': 'INTEGER',
             'failed': 'INTEGER NOT NULL',
             'passed': 'INTEGER NOT NULL'
         }, ('test_run_id', 'name'))
@@ -65,7 +65,7 @@ class DatabaseWriter(RobotDatabase):
             'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
             'name': 'TEXT NOT NULL',
             'critical': 'INTEGER NOT NULL',
-            'elapsed': 'INTEGER NOT NULL',
+            'elapsed': 'INTEGER',
             'failed': 'INTEGER NOT NULL',
             'passed': 'INTEGER NOT NULL',
         }, ('test_run_id', 'name'))
