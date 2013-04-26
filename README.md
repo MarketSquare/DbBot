@@ -46,7 +46,7 @@ Short format    | Long format             | Description
 -d              | --dry-run               | Do everything except store results into disk
 
 On Windows environments, you might need to rename the executable to have the '.py' file extension
-('dbbot' -> 'dbbot.py').
+('bin/dbbot' -> 'bin/dbbot.py').
 
 
 Usage examples
