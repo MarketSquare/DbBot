@@ -3,20 +3,7 @@ DbBot
 
 DbBot is a Python script to serialize Robot Framework produced test run results,
 i.e. output.xml files, into a SQLite database. This way the future Robot Framework
-related tools and plugins will have a unified storage for the test result data.
-
-What are the use cases
-----------------------
-One of the common use cases is to get a report of the most commonly failing suites,
-tests and keywords. DbBot comes with an executable example for this purpose, named 'failbot',
-bundled in 'examples/FailBot/bin/failbot'.
-
-Failbot is a Python script used to produce a summary web page about the failing
-suites, tests and keywords, using the information stored in a DbBot database.
-Please adjust (the barebone) HTML templates in 'examples/FailBot/templates' to your needs.
-
-Another future use case is to build a script that produces a summary output of the most
-time-consuming tests, keywords etc.
+related tools and plugins will have a unified storage for the test run results.
 
 
 Requirements
@@ -27,14 +14,14 @@ Requirements
 Tested and verified on Python 2.7.4 and Robot Framework 2.7.7.
 
 Robot Framework version 2.7.4 or later is recommended as versions prior to 2.7.4
-do not support storing elapsed time for the whole test run or tags.
+do not support storing total elapsed time for test runs or tags.
 
 
 How it's used
 -------------
 The script takes one or more output.xml files as input, initializes the
-database schema, produces the respective insert statements and finally commits the results
-into database (robot_results.db by default, can be changed with -b or --database).
+database schema, and stores the respective results into a database
+(robot_results.db by default, can be changed with -b or --database).
 
 
 Usage
@@ -132,6 +119,18 @@ bin       | Contains the executables, mainly 'dbbot'. You may want to append thi
 dbbot     | Contains the packages used by dbbot. You may want to append this directory to your PYTHONPATH if your scripts are inheriting from the abstract classes in the package 'dbbot'
 doc       | Mainly technical documentation about the database schema.
 examples  | Examples that are using the DbBot created database and extending the 'dbbot' modules.
+
+
+Use case: Most failing tests
+----------------------------
+One of the common use cases for DbBot is to get a report of the most commonly failing suites,
+tests and keywords. There's an example for this purpose in 'examples/FailBot/bin/failbot'.
+
+Failbot is a Python script used to produce a summary web page of the failing
+suites, tests and keywords, using the information stored in the DbBot database.
+Please adjust (the barebone) HTML templates in 'examples/FailBot/templates' to your needs.
+
+Another potential use case is to build a script to output the most time-consuming test cases, keywords etc.
 
 
 Writing your own scripts
