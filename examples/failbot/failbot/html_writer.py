@@ -1,4 +1,5 @@
 import os
+from xml.sax.saxutils import escape
 from string import Template
 
 from dbbot import Logger
@@ -6,6 +7,12 @@ from dbbot import Logger
 
 class HtmlWriter(object):
     template_path = os.path.abspath(__file__ + '../../../templates')
+
+    # escape() takes care of &, < and > only.
+    additional_html_escapes = {
+        '"': "&quot;",
+        "'": "&apos;"
+    }
 
     def __init__(self, db, output_file_path, verbose):
         self._verbose = Logger('HTML', verbose)
@@ -54,6 +61,9 @@ class HtmlWriter(object):
 
     def _format_row(self, item):
         return self._row_layout.substitute({
-            'name': item['name'],
+            'name': self._escape(item['name']),
             'count': item['count']
         })
+
+    def _escape(self, text):
+        return escape(text, self.additional_html_escapes)
