@@ -1,3 +1,3 @@
 from .database_writer import DatabaseWriter
 from .reader_options import ReaderOptions
-from .results_parser import ResultsParser
+from .robot_results_parser import RobotResultsParser

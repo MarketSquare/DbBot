@@ -5,10 +5,10 @@ from sqlite3 import IntegrityError
 from dbbot import Logger
 
 
-class ResultsParser(object):
+class RobotResultsParser(object):
 
-    def __init__(self, include_keywords, db, verbose):
-        self._verbose = Logger('Parser', verbose)
+    def __init__(self, include_keywords, db, verbose_stream):
+        self._verbose = Logger('Parser', verbose_stream)
         self._include_keywords = include_keywords
         self._db = db
 

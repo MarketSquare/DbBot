@@ -16,13 +16,18 @@ except ImportError, message:
         'set PYTHONPATH=%PYTHONPATH%;C:\path\\to\DbBot\n'
     )
 
+
 class FailBot(object):
 
     def __init__(self):
         self._options = WriterOptions()
-        verbose = sys.stdout if self._options.be_verbose else None
-        self._db = DatabaseReader(self._options.db_file_path, verbose)
-        self._writer = HtmlWriter(self._db, self._options.output_file_path, verbose)
+        verbose_stream = sys.stdout if self._options.be_verbose else None
+        self._db = DatabaseReader(self._options.db_file_path, verbose_stream)
+        self._writer = HtmlWriter(
+            self._db,
+            self._options.output_file_path,
+            verbose_stream
+        )
 
     def run(self):
         try:

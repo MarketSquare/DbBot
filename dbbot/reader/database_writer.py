@@ -5,8 +5,8 @@ from dbbot import RobotDatabase
 
 class DatabaseWriter(RobotDatabase):
 
-    def __init__(self, db_file_path, verbose):
-        super(DatabaseWriter, self).__init__(db_file_path, verbose)
+    def __init__(self, db_file_path, verbose_stream):
+        super(DatabaseWriter, self).__init__(db_file_path, verbose_stream)
         self._init_schema()
 
     def commit(self):

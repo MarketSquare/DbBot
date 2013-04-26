@@ -14,8 +14,8 @@ class HtmlWriter(object):
         "'": "&apos;"
     }
 
-    def __init__(self, db, output_file_path, verbose):
-        self._verbose = Logger('HTML', verbose)
+    def __init__(self, db, output_file_path, verbose_stream):
+        self._verbose = Logger('HTML', verbose_stream)
         self._db = db
         self._output_file_path = output_file_path
         self._init_layouts()

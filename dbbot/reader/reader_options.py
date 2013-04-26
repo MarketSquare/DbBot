@@ -45,7 +45,7 @@ class ReaderOptions(CommandLineOptions):
             action='callback',
             callback=files_args_parser,
             dest='file_paths',
-            help='one or more Robot output.xml files'
+            help='one or more Robot Framework output.xml files'
         )
 
     def _get_validated_options(self):
