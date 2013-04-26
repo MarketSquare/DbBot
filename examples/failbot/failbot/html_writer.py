@@ -3,10 +3,10 @@ from string import Template
 
 from dbbot import Logger
 
-TEMPLATE_PATH = os.path.abspath(__file__ + '../../../templates')
-
 
 class HtmlWriter(object):
+
+    template_path = os.path.abspath(__file__ + '../../../templates')
 
     def __init__(self, db, output_file_path, verbose):
         self._verbose = Logger('HTML', verbose)
@@ -21,7 +21,7 @@ class HtmlWriter(object):
         self._row_layout = self._read_template('row.html')
 
     def _read_template(self, filename):
-        with open('{}/{}'.format(TEMPLATE_PATH, filename), 'r') as file:
+        with open(os.path.join(self.template_path, filename), 'r') as file:
             content = file.read()
         return Template(content)
 
