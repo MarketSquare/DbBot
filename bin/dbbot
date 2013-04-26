@@ -4,7 +4,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(__file__ + '/../..'))
-from dbbot import DatabaseWriter, ReaderOptions, ResultsParser
+from dbbot.reader import DatabaseWriter, ReaderOptions, ResultsParser
 from robot.errors import DataError
 
 
