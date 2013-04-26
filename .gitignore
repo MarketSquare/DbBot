@@ -1,7 +1,6 @@
 *.idea
 *.pyc
 *.db*
-index.html
 output.xml
 log.html
 report.html
