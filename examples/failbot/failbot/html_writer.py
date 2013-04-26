@@ -5,7 +5,6 @@ from dbbot import Logger
 
 
 class HtmlWriter(object):
-
     template_path = os.path.abspath(__file__ + '../../../templates')
 
     def __init__(self, db, output_file_path, verbose):
