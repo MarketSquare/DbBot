@@ -17,8 +17,8 @@ Robot Framework version 2.7.4 or later is recommended as versions prior to 2.7.4
 do not support storing total elapsed time for test runs or tags.
 
 
-How it's used
--------------
+How it works
+------------
 The script takes one or more output.xml files as input, initializes the
 database schema, and stores the respective results into a database
 (robot_results.db by default, can be changed with -b or --database).
