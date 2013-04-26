@@ -8,7 +8,7 @@ from dbbot import Logger
 class HtmlWriter(object):
     template_path = os.path.abspath(__file__ + '../../../templates')
 
-    # escape() takes care of &, < and > only.
+    # escape() only takes care of &, < and >
     additional_html_escapes = {
         '"': "&quot;",
         "'": "&apos;"

@@ -9,36 +9,6 @@ class DatabaseWriter(RobotDatabase):
         super(DatabaseWriter, self).__init__(db_file_path, verbose_stream)
         self._init_schema()
 
-    def commit(self):
-        self._verbose('- Committing changes into database')
-        self._connection.commit()
-
-    def fetch_id(self, table_name, criteria):
-        sql_statement = 'SELECT id FROM %s WHERE ' % table_name
-        sql_statement += ' AND '.join('%s=?' % key for key in criteria.keys())
-        return self._connection.execute(sql_statement, criteria.values()).fetchone()[0]
-
-    def insert(self, table_name, criteria):
-        sql_statement = self._format_insert_statement(table_name, criteria.keys())
-        cursor = self._connection.execute(sql_statement, criteria.values())
-        return cursor.lastrowid
-
-    def insert_or_ignore(self, table_name, criteria):
-        sql_statement = self._format_insert_statement(table_name, criteria.keys(), 'IGNORE')
-        self._connection.execute(sql_statement, criteria.values())
-
-    def insert_many_or_ignore(self, table_name, column_names, values):
-        sql_statement = self._format_insert_statement(table_name, column_names, 'IGNORE')
-        self._connection.executemany(sql_statement, values)
-
-    def _format_insert_statement(self, table_name, column_names, on_conflict='ABORT'):
-        return 'INSERT OR %s INTO %s (%s) VALUES (%s)' % (
-            on_conflict,
-            table_name,
-            ','.join(column_names),
-            ','.join('?' * len(column_names))
-        )
-
     def _init_schema(self):
         self._verbose('- Initializing database schema')
         self._create_table('test_runs', {
@@ -138,3 +108,34 @@ class DatabaseWriter(RobotDatabase):
             )
         sql_statement = 'CREATE TABLE IF NOT EXISTS %s (%s)' % (table_name, ', '.join(definitions))
         self._connection.execute(sql_statement)
+
+    def fetch_id(self, table_name, criteria):
+        sql_statement = 'SELECT id FROM %s WHERE ' % table_name
+        sql_statement += ' AND '.join('%s=?' % key for key in criteria.keys())
+        return self._connection.execute(sql_statement, criteria.values()).fetchone()[0]
+
+    def insert(self, table_name, criteria):
+        sql_statement = self._format_insert_statement(table_name, criteria.keys())
+        cursor = self._connection.execute(sql_statement, criteria.values())
+        return cursor.lastrowid
+
+    def insert_or_ignore(self, table_name, criteria):
+        sql_statement = self._format_insert_statement(table_name, criteria.keys(), 'IGNORE')
+        self._connection.execute(sql_statement, criteria.values())
+
+    def insert_many_or_ignore(self, table_name, column_names, values):
+        sql_statement = self._format_insert_statement(table_name, column_names, 'IGNORE')
+        self._connection.executemany(sql_statement, values)
+
+    def _format_insert_statement(self, table_name, column_names, on_conflict='ABORT'):
+        return 'INSERT OR %s INTO %s (%s) VALUES (%s)' % (
+            on_conflict,
+            table_name,
+            ','.join(column_names),
+            ','.join('?' * len(column_names))
+        )
+
+    def commit(self):
+        self._verbose('- Committing changes into database')
+        self._connection.commit()
+

@@ -72,9 +72,6 @@ class RobotResultsParser(object):
             'passed': stat.passed
         })
 
-    def _parse_suites(self, suite, test_run_id, parent_suite_id):
-        [self._parse_suite(subsuite, test_run_id, parent_suite_id) for subsuite in suite.suites]
-
     def _parse_suite(self, suite, test_run_id, parent_suite_id=None):
         self._verbose('`--> Parsing suite: %s' % suite.name)
         try:
@@ -104,6 +101,9 @@ class RobotResultsParser(object):
             'elapsed': suite.elapsedtime,
             'status': suite.status
         })
+
+    def _parse_suites(self, suite, test_run_id, parent_suite_id):
+        [self._parse_suite(subsuite, test_run_id, parent_suite_id) for subsuite in suite.suites]
 
     def _parse_tests(self, tests, test_run_id, suite_id):
         [self._parse_test(test, test_run_id, suite_id) for test in tests]

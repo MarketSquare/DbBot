@@ -10,10 +10,6 @@ class RobotDatabase(object):
         self._connection = self._connect(db_file_path)
         self._configure()
 
-    def close(self):
-        self._verbose('- Closing database connection')
-        self._connection.close()
-
     def _connect(self, db_file_path):
         self._verbose('- Establishing database connection')
         return sqlite3.connect(db_file_path)
@@ -27,3 +23,7 @@ class RobotDatabase(object):
     def _set_pragma(self, name, value):
         sql_statement = 'PRAGMA %s=%s' % (name, value)
         self._connection.execute(sql_statement)
+
+    def close(self):
+        self._verbose('- Closing database connection')
+        self._connection.close()

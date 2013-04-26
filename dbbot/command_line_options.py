@@ -15,22 +15,23 @@ class CommandLineOptions(object):
 
     @property
     def be_verbose(self):
-        return self._options.verbose
+        return self._options.be_verbose
 
     def _add_parser_options(self):
         self._parser.add_option('-v', '--verbose',
             action='store_true',
-            dest='verbose',
+            dest='be_verbose',
             help='be verbose about the operation'
         )
         self._parser.add_option('-b', '--database',
             dest='db_file_path',
             default=self.default_db_name,
-            help='path to the sqlite3 database for test run results'
+            help='path to the SQLite database for test run results'
         )
 
     def _get_validated_options(self):
         options, args = self._parser.parse_args()
+        # if unknown are arguments given
         if args:
             self._exit_with_help()
         return options
