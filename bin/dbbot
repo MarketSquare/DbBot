@@ -8,7 +8,7 @@ from dbbot import DatabaseWriter, ReaderOptions, ResultsParser
 from robot.errors import DataError
 
 
-class ResultsToDb(object):
+class DbBot(object):
     def __init__(self):
         self._options = ReaderOptions()
         verbose = sys.stdout if self._options.be_verbose else None
@@ -33,4 +33,4 @@ class ResultsToDb(object):
 
 
 if __name__ == '__main__':
-    ResultsToDb().run()
+    DbBot().run()
