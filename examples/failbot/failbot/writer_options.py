@@ -1,4 +1,5 @@
 from os.path import exists
+from sys import argv
 
 from dbbot import CommandLineOptions
 
@@ -17,6 +18,8 @@ class WriterOptions(CommandLineOptions):
         )
 
     def _get_validated_options(self):
+        if len(argv) < 2:
+            self._exit_with_help()
         options = super(WriterOptions, self)._get_validated_options()
         if not options.output_file_path:
             self._parser.error('output filename is required')

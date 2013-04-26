@@ -1,6 +1,6 @@
 import os
-from xml.sax.saxutils import escape
 from string import Template
+from xml.sax.saxutils import escape
 
 from dbbot import Logger
 

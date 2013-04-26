@@ -1,5 +1,3 @@
-from sys import argv
-
 from optparse import OptionParser
 
 
@@ -32,8 +30,6 @@ class CommandLineOptions(object):
         )
 
     def _get_validated_options(self):
-        if len(argv) < 2:
-            self._exit_with_help()
         options, args = self._parser.parse_args()
         if args:
             self._exit_with_help()
