@@ -3,9 +3,8 @@ from sys import argv
 from optparse import OptionParser
 
 
-DEFAULT_DB_NAME = 'robot_results.db'
-
 class CommandLineOptions(object):
+    default_db_name = 'robot_results.db'
 
     def __init__(self):
         self._parser = OptionParser()
@@ -28,7 +27,7 @@ class CommandLineOptions(object):
         )
         self._parser.add_option('-b', '--database',
             dest='db_file_path',
-            default=DEFAULT_DB_NAME,
+            default=self.default_db_name,
             help='path to the sqlite3 database for test run results'
         )
 
