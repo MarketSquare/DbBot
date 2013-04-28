@@ -1,0 +1,2583 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generated="20130409 15:06:21.461" generator="Robot trunk 20130226 (Python 2.7.4 on darwin)">
+    <suite id="s1" name="Dryrun" source="/Users/asyrjasalo/eficode/robot/robotframework/atest/robot/cli/dryrun/dryrun.txt">
+        <kw name="atest_resource.Run Tests" timeout="" type="setup">
+            <doc/>
+            <arguments>
+                <arg>--runmode dryrun</arg>
+                <arg>cli/dryrun/dryrun.txt</arg>
+                <arg>cli/dryrun/more_tests.txt</arg>
+            </arguments>
+            <kw name="atest_resource.Run Tests Helper" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${options}</arg>
+                    <arg>@{data list}</arg>
+                </arguments>
+                <kw name="${data string} = atest_resource.Set Variables And Get Datasources" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>@{data list}</arg>
+                    </arguments>
+                    <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                        <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                        <arguments>
+                            <arg>$SUITE</arg>
+                            <arg>${NONE}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:21.566">${SUITE} = None</msg>
+                        <status endtime="20130409 15:06:21.566" starttime="20130409 15:06:21.565" status="PASS"/>
+                    </kw>
+                    <kw name="${name} = TestHelper.Get Output Name" timeout="" type="kw">
+                        <doc/>
+                        <arguments>
+                            <arg>@{data list}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:21.566">${name} = dryrun_more_tests</msg>
+                        <status endtime="20130409 15:06:21.566" starttime="20130409 15:06:21.566" status="PASS"/>
+                    </kw>
+                    <kw name="atest_resource.Set Variables" timeout="" type="kw">
+                        <doc/>
+                        <arguments>
+                            <arg>${name}</arg>
+                        </arguments>
+                        <kw name="${OUTDIR} = OperatingSystem.Join Path" timeout="" type="kw">
+                            <doc>Joins the given path part(s) to the given base path.</doc>
+                            <arguments>
+                                <arg>${OUTPUTDIR}</arg>
+                                <arg>output</arg>
+                                <arg>${name}</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:21.568">${OUTDIR} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests</msg>
+                            <status endtime="20130409 15:06:21.568" starttime="20130409 15:06:21.567" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Global Variable" timeout="" type="kw">
+                            <doc>Makes a variable available globally in all tests and suites.</doc>
+                            <arguments>
+                                <arg>$OUTDIR</arg>
+                                <arg>${OUTDIR.encode('ascii', 'ignore').replace('?', '_') .replace('*', '_')}</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:21.569">${OUTDIR} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests</msg>
+                            <status endtime="20130409 15:06:21.569" starttime="20130409 15:06:21.568" status="PASS"/>
+                        </kw>
+                        <kw name="OperatingSystem.Create Directory" timeout="" type="kw">
+                            <doc>Creates the specified directory.</doc>
+                            <arguments>
+                                <arg>${OUTDIR}</arg>
+                            </arguments>
+                            <msg html="yes" level="INFO" timestamp="20130409 15:06:21.570">Created directory '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests&lt;/a&gt;'</msg>
+                            <status endtime="20130409 15:06:21.570" starttime="20130409 15:06:21.570" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                            <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                            <arguments>
+                                <arg>$OUTFILE</arg>
+                                <arg>${OUTDIR}${/}output.xml</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:21.571">${OUTFILE} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml</msg>
+                            <status endtime="20130409 15:06:21.571" starttime="20130409 15:06:21.570" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                            <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                            <arguments>
+                                <arg>$STDOUT_FILE</arg>
+                                <arg>${OUTDIR}${/}stdout.txt</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:21.572">${STDOUT_FILE} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stdout.txt</msg>
+                            <status endtime="20130409 15:06:21.572" starttime="20130409 15:06:21.571" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                            <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                            <arguments>
+                                <arg>$STDERR_FILE</arg>
+                                <arg>${OUTDIR}${/}stderr.txt</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:21.573">${STDERR_FILE} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt</msg>
+                            <status endtime="20130409 15:06:21.573" starttime="20130409 15:06:21.572" status="PASS"/>
+                        </kw>
+                        <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                            <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                            <arguments>
+                                <arg>$SYSLOG_FILE</arg>
+                                <arg>${OUTDIR}${/}syslog.txt</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:21.573">${SYSLOG_FILE} = /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/syslog.txt</msg>
+                            <status endtime="20130409 15:06:21.573" starttime="20130409 15:06:21.573" status="PASS"/>
+                        </kw>
+                        <kw name="OperatingSystem.Set Environment Variable" timeout="" type="kw">
+                            <doc>Sets an environment variable to a specified value.</doc>
+                            <arguments>
+                                <arg>ROBOT_SYSLOG_FILE</arg>
+                                <arg>${SYSLOG_FILE}</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:21.574">Environment variable 'ROBOT_SYSLOG_FILE' set to value '/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/syslog.txt'</msg>
+                            <status endtime="20130409 15:06:21.574" starttime="20130409 15:06:21.574" status="PASS"/>
+                        </kw>
+                        <kw name="atest_resource.Set Runners" timeout="" type="kw">
+                            <doc/>
+                            <arguments/>
+                            <kw name="${robot} = OperatingSystem.Join Path" timeout="" type="kw">
+                                <doc>Joins the given path part(s) to the given base path.</doc>
+                                <arguments>
+                                    <arg>${ROBOTPATH}</arg>
+                                    <arg>run.py</arg>
+                                </arguments>
+                                <msg level="INFO" timestamp="20130409 15:06:21.576">${robot} = /Users/asyrjasalo/eficode/robot/robotframework/src/robot/run.py</msg>
+                                <status endtime="20130409 15:06:21.575" starttime="20130409 15:06:21.575" status="PASS"/>
+                            </kw>
+                            <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                                <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                                <arguments>
+                                    <arg>$ROBOT</arg>
+                                    <arg>${INTERPRETER} ${robot}</arg>
+                                </arguments>
+                                <msg level="INFO" timestamp="20130409 15:06:21.576">${ROBOT} = python /Users/asyrjasalo/eficode/robot/robotframework/src/robot/run.py</msg>
+                                <status endtime="20130409 15:06:21.576" starttime="20130409 15:06:21.576" status="PASS"/>
+                            </kw>
+                            <kw name="${rebot} = OperatingSystem.Join Path" timeout="" type="kw">
+                                <doc>Joins the given path part(s) to the given base path.</doc>
+                                <arguments>
+                                    <arg>${ROBOTPATH}</arg>
+                                    <arg>rebot.py</arg>
+                                </arguments>
+                                <msg level="INFO" timestamp="20130409 15:06:21.577">${rebot} = /Users/asyrjasalo/eficode/robot/robotframework/src/robot/rebot.py</msg>
+                                <status endtime="20130409 15:06:21.577" starttime="20130409 15:06:21.577" status="PASS"/>
+                            </kw>
+                            <kw name="BuiltIn.Set Suite Variable" timeout="" type="kw">
+                                <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+                                <arguments>
+                                    <arg>$REBOT</arg>
+                                    <arg>${INTERPRETER} ${rebot}</arg>
+                                </arguments>
+                                <msg level="INFO" timestamp="20130409 15:06:21.578">${REBOT} = python /Users/asyrjasalo/eficode/robot/robotframework/src/robot/rebot.py</msg>
+                                <status endtime="20130409 15:06:21.578" starttime="20130409 15:06:21.577" status="PASS"/>
+                            </kw>
+                            <status endtime="20130409 15:06:21.578" starttime="20130409 15:06:21.574" status="PASS"/>
+                        </kw>
+                        <status endtime="20130409 15:06:21.578" starttime="20130409 15:06:21.567" status="PASS"/>
+                    </kw>
+                    <kw name="@{data list} = OperatingSystem.Join Paths" timeout="" type="kw">
+                        <doc>Joins given paths with base and returns resulted paths.</doc>
+                        <arguments>
+                            <arg>${DATADIR}</arg>
+                            <arg>@{data list}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:21.579">@{data list} = [ /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt | /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/more_tests.txt ]</msg>
+                        <status endtime="20130409 15:06:21.578" starttime="20130409 15:06:21.578" status="PASS"/>
+                    </kw>
+                    <kw name="${data string} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>@{data list}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:21.579">${data string} = /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/more_tests.txt</msg>
+                        <status endtime="20130409 15:06:21.579" starttime="20130409 15:06:21.579" status="PASS"/>
+                    </kw>
+                    <msg level="INFO" timestamp="20130409 15:06:21.580">${data string} = /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/more_tests.txt</msg>
+                    <status endtime="20130409 15:06:21.580" starttime="20130409 15:06:21.564" status="PASS"/>
+                </kw>
+                <kw name="${options} = BuiltIn.Catenate" timeout="" type="kw">
+                    <doc>Catenates the given items together and returns the resulted string.</doc>
+                    <arguments>
+                        <arg>--MonitorMarkers OFF</arg>
+                        <arg>${user options}</arg>
+                        <arg>--variable interpreter:${INTERPRETER}</arg>
+                        <arg>--pythonpath ${LIBPATH1}</arg>
+                        <arg>--pythonpath ${LIBPATH2}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.581">${options} = --MonitorMarkers OFF --runmode dryrun --variable interpreter:python --pythonpath /Users/asyrjasalo/eficode/robot/robotframework/atest/resources/../testresources/testlibs --pythonpath /Users/asyrjasalo...</msg>
+                    <status endtime="20130409 15:06:21.581" starttime="20130409 15:06:21.580" status="PASS"/>
+                </kw>
+                <kw name="atest_resource.Run Helper" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${ROBOT}</arg>
+                        <arg>${options}</arg>
+                        <arg>${data string}</arg>
+                    </arguments>
+                    <kw name="OperatingSystem.Remove Files" timeout="" type="kw">
+                        <doc>Uses `Remove File` to remove multiple files one-by-one.</doc>
+                        <arguments>
+                            <arg>${OUTFILE}</arg>
+                            <arg>${OUTDIR}/*.xml</arg>
+                            <arg>${OUTDIR}/*.html</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130409 15:06:21.583">File '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml&lt;/a&gt;' does not exist</msg>
+                        <msg html="yes" level="INFO" timestamp="20130409 15:06:21.583">File '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/*.xml&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/*.xml&lt;/a&gt;' does not exist</msg>
+                        <msg html="yes" level="INFO" timestamp="20130409 15:06:21.583">File '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/*.html&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/*.html&lt;/a&gt;' does not exist</msg>
+                        <status endtime="20130409 15:06:21.583" starttime="20130409 15:06:21.582" status="PASS"/>
+                    </kw>
+                    <kw name="${cmd} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>${runner}</arg>
+                            <arg>--monitorcolors OFF</arg>
+                            <arg>--outputdir ${OUTDIR}</arg>
+                            <arg>--output ${OUTFILE}</arg>
+                            <arg>--report NONE</arg>
+                            <arg>--log NONE</arg>
+                            <arg>${options}</arg>
+                            <arg>${data string}</arg>
+                            <arg>1&gt;${STDOUTFILE}</arg>
+                            <arg>2&gt;${STDERRFILE}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:21.585">${cmd} = python /Users/asyrjasalo/eficode/robot/robotframework/src/robot/run.py --monitorcolors OFF --outputdir /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests --ou...</msg>
+                        <status endtime="20130409 15:06:21.584" starttime="20130409 15:06:21.584" status="PASS"/>
+                    </kw>
+                    <kw name="${rc} = OperatingSystem.Run And Return Rc" timeout="" type="kw">
+                        <doc>Runs the given command in the system and returns the return code.</doc>
+                        <arguments>
+                            <arg>${cmd}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:21.586">Running command 'python /Users/asyrjasalo/eficode/robot/robotframework/src/robot/run.py --monitorcolors OFF --outputdir /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests --output /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml --report NONE --log NONE --MonitorMarkers OFF --runmode dryrun --variable interpreter:python --pythonpath /Users/asyrjasalo/eficode/robot/robotframework/atest/resources/../testresources/testlibs --pythonpath /Users/asyrjasalo/eficode/robot/robotframework/atest/resources/../testresources/listeners /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/more_tests.txt 1&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stdout.txt 2&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt'</msg>
+                        <msg level="INFO" timestamp="20130409 15:06:21.919">${rc} = 10</msg>
+                        <status endtime="20130409 15:06:21.919" starttime="20130409 15:06:21.585" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${OUTDIR}&quot;&gt;${OUTDIR}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130409 15:06:21.920">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests&lt;/a&gt;</msg>
+                        <status endtime="20130409 15:06:21.920" starttime="20130409 15:06:21.919" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${OUTFILE}&quot;&gt;${OUTFILE}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130409 15:06:21.921">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml&lt;/a&gt;</msg>
+                        <status endtime="20130409 15:06:21.921" starttime="20130409 15:06:21.920" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${STDOUTFILE}&quot;&gt;${STDOUTFILE}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130409 15:06:21.921">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stdout.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stdout.txt&lt;/a&gt;</msg>
+                        <status endtime="20130409 15:06:21.921" starttime="20130409 15:06:21.921" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${STDERRFILE}&quot;&gt;${STDERRFILE}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130409 15:06:21.922">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt&lt;/a&gt;</msg>
+                        <status endtime="20130409 15:06:21.922" starttime="20130409 15:06:21.922" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Log" timeout="" type="kw">
+                        <doc>Logs the given message with the given level.</doc>
+                        <arguments>
+                            <arg>&lt;a href=&quot;file://${SYSLOGFILE}&quot;&gt;${SYSLOGFILE}&lt;/a&gt;</arg>
+                            <arg>HTML</arg>
+                        </arguments>
+                        <msg html="yes" level="INFO" timestamp="20130409 15:06:21.923">&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/syslog.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/syslog.txt&lt;/a&gt;</msg>
+                        <status endtime="20130409 15:06:21.923" starttime="20130409 15:06:21.922" status="PASS"/>
+                    </kw>
+                    <status endtime="20130409 15:06:21.923" starttime="20130409 15:06:21.581" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.923" starttime="20130409 15:06:21.563" status="PASS"/>
+            </kw>
+            <kw name="TestCheckerLibrary.Process Output" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${OUTFILE}</arg>
+                </arguments>
+                <msg level="INFO" timestamp="20130409 15:06:21.932">${SUITE} = Dryrun &amp; More Tests</msg>
+                <msg level="INFO" timestamp="20130409 15:06:21.933">${STATISTICS} = &lt;robot.model.statistics.Statistics object at 0x1091c10d0&gt;</msg>
+                <msg level="INFO" timestamp="20130409 15:06:21.933">${ERRORS} = &lt;robot.result.executionerrors.ExecutionErrors object at 0x1091c1090&gt;</msg>
+                <msg level="INFO" timestamp="20130409 15:06:21.933">Processing output '/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml'</msg>
+                <status endtime="20130409 15:06:21.933" starttime="20130409 15:06:21.923" status="PASS"/>
+            </kw>
+            <status endtime="20130409 15:06:21.933" starttime="20130409 15:06:21.562" status="PASS"/>
+        </kw>
+        <test id="s1-t1" name="Passing keywords" timeout="">
+            <kw name="${tc} = atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.936">${test} = Passing keywords</msg>
+                    <status endtime="20130409 15:06:21.936" starttime="20130409 15:06:21.936" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:21.937" starttime="20130409 15:06:21.936" status="PASS"/>
+                </kw>
+                <msg level="INFO" timestamp="20130409 15:06:21.937">${tc} = Passing keywords</msg>
+                <status endtime="20130409 15:06:21.937" starttime="20130409 15:06:21.934" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc}</arg>
+                    <arg>3</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.939">[&lt;TestCheckerLibrary.NoSlotsKeyword object at 0x109182c30&gt;, &lt;TestCheckerLibrary.NoSlotsKeyword object at 0x109182d70&gt;, &lt;TestCheckerLibrary.NoSlotsKeyword object at 0x109182e10&gt;]</msg>
+                    <status endtime="20130409 15:06:21.939" starttime="20130409 15:06:21.938" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.940">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.940" starttime="20130409 15:06:21.939" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.940" starttime="20130409 15:06:21.938" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0]}</arg>
+                    <arg>BuiltIn.Log</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.942">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.942" starttime="20130409 15:06:21.942" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.943">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.943" starttime="20130409 15:06:21.942" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.943" starttime="20130409 15:06:21.940" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1]}</arg>
+                    <arg>\${contents} = OperatingSystem.List Directory</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.945">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.945" starttime="20130409 15:06:21.944" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.946">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.946" starttime="20130409 15:06:21.945" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.946" starttime="20130409 15:06:21.943" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[2]}</arg>
+                    <arg>resource.Simple UK</arg>
+                    <arg>PASS</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.948">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.948" starttime="20130409 15:06:21.947" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.949">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.949" starttime="20130409 15:06:21.948" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.949" starttime="20130409 15:06:21.946" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[2].kws[0]}</arg>
+                    <arg>BuiltIn.Log</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.951">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.951" starttime="20130409 15:06:21.950" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.951">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.951" starttime="20130409 15:06:21.951" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.952" starttime="20130409 15:06:21.949" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:21.952" starttime="20130409 15:06:21.933" status="PASS"/>
+        </test>
+        <test id="s1-t2" name="Keywords with embedded arguments" timeout="">
+            <kw name="${tc} = atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.955">${test} = Keywords with embedded arguments</msg>
+                    <status endtime="20130409 15:06:21.955" starttime="20130409 15:06:21.954" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:21.956" starttime="20130409 15:06:21.955" status="PASS"/>
+                </kw>
+                <msg level="INFO" timestamp="20130409 15:06:21.956">${tc} = Keywords with embedded arguments</msg>
+                <status endtime="20130409 15:06:21.956" starttime="20130409 15:06:21.953" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc}</arg>
+                    <arg>2</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.957">[&lt;TestCheckerLibrary.NoSlotsKeyword object at 0x109182f50&gt;, &lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091d80f0&gt;]</msg>
+                    <status endtime="20130409 15:06:21.958" starttime="20130409 15:06:21.957" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.958">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.958" starttime="20130409 15:06:21.958" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.958" starttime="20130409 15:06:21.956" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0]}</arg>
+                    <arg>Embedded arguments here</arg>
+                    <arg>PASS</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.960">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.960" starttime="20130409 15:06:21.960" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.961">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.961" starttime="20130409 15:06:21.961" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.961" starttime="20130409 15:06:21.959" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0].kws[0]}</arg>
+                    <arg>BuiltIn.No Operation</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.963">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.963" starttime="20130409 15:06:21.963" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.964">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.964" starttime="20130409 15:06:21.963" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.964" starttime="20130409 15:06:21.961" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1]}</arg>
+                    <arg>Embedded args rock here</arg>
+                    <arg>PASS</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.966">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.966" starttime="20130409 15:06:21.966" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.967">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.967" starttime="20130409 15:06:21.967" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.967" starttime="20130409 15:06:21.964" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1].kws[0]}</arg>
+                    <arg>BuiltIn.No Operation</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.970">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.970" starttime="20130409 15:06:21.969" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.971">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.971" starttime="20130409 15:06:21.970" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.971" starttime="20130409 15:06:21.968" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:21.971" starttime="20130409 15:06:21.952" status="PASS"/>
+        </test>
+        <test id="s1-t3" name="Keywords that would fail" timeout="">
+            <kw name="${tc} = atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.975">${test} = Keywords that would fail</msg>
+                    <status endtime="20130409 15:06:21.975" starttime="20130409 15:06:21.974" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:21.976" starttime="20130409 15:06:21.976" status="PASS"/>
+                </kw>
+                <msg level="INFO" timestamp="20130409 15:06:21.977">${tc} = Keywords that would fail</msg>
+                <status endtime="20130409 15:06:21.976" starttime="20130409 15:06:21.973" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc}</arg>
+                    <arg>3</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.979">[&lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091d8230&gt;, &lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091d82d0&gt;, &lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091d84b0&gt;]</msg>
+                    <status endtime="20130409 15:06:21.979" starttime="20130409 15:06:21.978" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.980">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.980" starttime="20130409 15:06:21.979" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.980" starttime="20130409 15:06:21.977" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0]}</arg>
+                    <arg>BuiltIn.Fail</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.986">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.986" starttime="20130409 15:06:21.983" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.987">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.987" starttime="20130409 15:06:21.986" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.987" starttime="20130409 15:06:21.981" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1]}</arg>
+                    <arg>resource.Fail In UK</arg>
+                    <arg>PASS</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.989">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.989" starttime="20130409 15:06:21.989" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.990">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.990" starttime="20130409 15:06:21.990" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.990" starttime="20130409 15:06:21.987" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1]}</arg>
+                    <arg>2</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.992">[BuiltIn.Fail, BuiltIn.Fail]</msg>
+                    <status endtime="20130409 15:06:21.992" starttime="20130409 15:06:21.992" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.993">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.993" starttime="20130409 15:06:21.992" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.993" starttime="20130409 15:06:21.990" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1].kws[0]}</arg>
+                    <arg>BuiltIn.Fail</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.995">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.995" starttime="20130409 15:06:21.994" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.996">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.996" starttime="20130409 15:06:21.995" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.996" starttime="20130409 15:06:21.993" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1].kws[1]}</arg>
+                    <arg>BuiltIn.Fail</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.998">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.998" starttime="20130409 15:06:21.997" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:21.999">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:21.999" starttime="20130409 15:06:21.998" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:21.999" starttime="20130409 15:06:21.996" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:21.999" starttime="20130409 15:06:21.971" status="PASS"/>
+        </test>
+        <test id="s1-t4" name="Scalar variables are not checked in keyword arguments" timeout="">
+            <kw name="${tc} = atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.004">${test} = Scalar variables are not checked in keyword arguments</msg>
+                    <status endtime="20130409 15:06:22.004" starttime="20130409 15:06:22.003" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.005" starttime="20130409 15:06:22.005" status="PASS"/>
+                </kw>
+                <msg level="INFO" timestamp="20130409 15:06:22.005">${tc} = Scalar variables are not checked in keyword arguments</msg>
+                <status endtime="20130409 15:06:22.005" starttime="20130409 15:06:22.002" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0]}</arg>
+                    <arg>BuiltIn.Log</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.008">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.008" starttime="20130409 15:06:22.007" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.009">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.009" starttime="20130409 15:06:22.008" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.010" starttime="20130409 15:06:22.006" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1]}</arg>
+                    <arg>BuiltIn.Log</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.012">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.012" starttime="20130409 15:06:22.011" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.013">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.013" starttime="20130409 15:06:22.012" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.014" starttime="20130409 15:06:22.010" status="PASS"/>
+            </kw>
+            <doc>Variables are too often set somehow dynamically that we cannot expect them to always exist.</doc>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.014" starttime="20130409 15:06:21.999" status="PASS"/>
+        </test>
+        <test id="s1-t5" name="List variables are not checked in keyword arguments" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.019">${test} = List variables are not checked in keyword arguments</msg>
+                    <status endtime="20130409 15:06:22.019" starttime="20130409 15:06:22.018" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.020" starttime="20130409 15:06:22.019" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.020" starttime="20130409 15:06:22.017" status="PASS"/>
+            </kw>
+            <doc>See the doc of the previous test</doc>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.021" starttime="20130409 15:06:22.015" status="PASS"/>
+        </test>
+        <test id="s1-t6" name="Variables are not checked in when arguments are embedded" timeout="">
+            <kw name="${tc} = atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.025">${test} = Variables are not checked in when arguments are embedded</msg>
+                    <status endtime="20130409 15:06:22.025" starttime="20130409 15:06:22.024" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.026" starttime="20130409 15:06:22.025" status="PASS"/>
+                </kw>
+                <msg level="INFO" timestamp="20130409 15:06:22.027">${tc} = Variables are not checked in when arguments are embedded</msg>
+                <status endtime="20130409 15:06:22.026" starttime="20130409 15:06:22.023" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0]}</arg>
+                    <arg>Embedded \${TESTNAME} here</arg>
+                    <arg>PASS</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.029">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.029" starttime="20130409 15:06:22.028" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.030">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.030" starttime="20130409 15:06:22.030" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.030" starttime="20130409 15:06:22.027" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0].kws[0]}</arg>
+                    <arg>BuiltIn.No Operation</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.033">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.033" starttime="20130409 15:06:22.032" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.034">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.034" starttime="20130409 15:06:22.033" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.034" starttime="20130409 15:06:22.031" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1]}</arg>
+                    <arg>Embedded \${nonex} here</arg>
+                    <arg>PASS</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.036">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.036" starttime="20130409 15:06:22.036" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.037">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.037" starttime="20130409 15:06:22.036" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.037" starttime="20130409 15:06:22.034" status="PASS"/>
+            </kw>
+            <kw name="Name and status should be" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1].kws[0]}</arg>
+                    <arg>BuiltIn.No Operation</arg>
+                    <arg>NOT_RUN</arg>
+                </arguments>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.name}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.039">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.039" starttime="20130409 15:06:22.039" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                    <doc>Fails if the given objects are unequal.</doc>
+                    <arguments>
+                        <arg>${kw.status}</arg>
+                        <arg>${status}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.040">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.040" starttime="20130409 15:06:22.039" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.040" starttime="20130409 15:06:22.037" status="PASS"/>
+            </kw>
+            <doc>See the doc of the previous test</doc>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.040" starttime="20130409 15:06:22.021" status="PASS"/>
+        </test>
+        <test id="s1-t7" name="User keyword return value" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.044">${test} = User keyword return value</msg>
+                    <status endtime="20130409 15:06:22.044" starttime="20130409 15:06:22.043" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.045" starttime="20130409 15:06:22.044" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.045" starttime="20130409 15:06:22.042" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.045" starttime="20130409 15:06:22.041" status="PASS"/>
+        </test>
+        <test id="s1-t8" name="Test Setup and Teardown" timeout="">
+            <kw name="${tc} = atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.049">${test} = Test Setup And Teardown</msg>
+                    <status endtime="20130409 15:06:22.049" starttime="20130409 15:06:22.048" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.050" starttime="20130409 15:06:22.049" status="PASS"/>
+                </kw>
+                <msg level="INFO" timestamp="20130409 15:06:22.050">${tc} = Test Setup And Teardown</msg>
+                <status endtime="20130409 15:06:22.050" starttime="20130409 15:06:22.047" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc}</arg>
+                    <arg>1</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.052">[&lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091d8eb0&gt;]</msg>
+                    <status endtime="20130409 15:06:22.052" starttime="20130409 15:06:22.051" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.053">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.053" starttime="20130409 15:06:22.052" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.053" starttime="20130409 15:06:22.050" status="PASS"/>
+            </kw>
+            <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                <doc>Fails if the given objects are unequal.</doc>
+                <arguments>
+                    <arg>${tc.setup.name}</arg>
+                    <arg>BuiltIn.Log</arg>
+                </arguments>
+                <msg level="INFO" timestamp="20130409 15:06:22.054">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                <status endtime="20130409 15:06:22.054" starttime="20130409 15:06:22.053" status="PASS"/>
+            </kw>
+            <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                <doc>Fails if the given objects are unequal.</doc>
+                <arguments>
+                    <arg>${tc.teardown.name}</arg>
+                    <arg>Does not exist</arg>
+                </arguments>
+                <msg level="INFO" timestamp="20130409 15:06:22.054">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                <status endtime="20130409 15:06:22.054" starttime="20130409 15:06:22.054" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.055" starttime="20130409 15:06:22.046" status="PASS"/>
+        </test>
+        <test id="s1-t9" name="Keyword Teardown" timeout="">
+            <kw name="${tc} = atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.058">${test} = Keyword Teardown</msg>
+                    <status endtime="20130409 15:06:22.058" starttime="20130409 15:06:22.057" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.058" starttime="20130409 15:06:22.058" status="PASS"/>
+                </kw>
+                <msg level="INFO" timestamp="20130409 15:06:22.059">${tc} = Keyword Teardown</msg>
+                <status endtime="20130409 15:06:22.059" starttime="20130409 15:06:22.056" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc}</arg>
+                    <arg>1</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.060">[&lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091da0f0&gt;]</msg>
+                    <status endtime="20130409 15:06:22.061" starttime="20130409 15:06:22.060" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.061">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.062" starttime="20130409 15:06:22.061" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.062" starttime="20130409 15:06:22.059" status="PASS"/>
+            </kw>
+            <kw name="BuiltIn.Should Be Equal" timeout="" type="kw">
+                <doc>Fails if the given objects are unequal.</doc>
+                <arguments>
+                    <arg>${tc.kws[0].kws[1].name}</arg>
+                    <arg>Does not exist</arg>
+                </arguments>
+                <msg level="INFO" timestamp="20130409 15:06:22.063">Argument types are:
+&lt;type 'str'&gt;
+&lt;type 'unicode'&gt;</msg>
+                <status endtime="20130409 15:06:22.063" starttime="20130409 15:06:22.062" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.063" starttime="20130409 15:06:22.055" status="PASS"/>
+        </test>
+        <test id="s1-t10" name="For Loops" timeout="">
+            <kw name="${tc} = atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.067">${test} = For Loops</msg>
+                    <status endtime="20130409 15:06:22.067" starttime="20130409 15:06:22.066" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.068" starttime="20130409 15:06:22.068" status="PASS"/>
+                </kw>
+                <msg level="INFO" timestamp="20130409 15:06:22.068">${tc} = For Loops</msg>
+                <status endtime="20130409 15:06:22.068" starttime="20130409 15:06:22.065" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc}</arg>
+                    <arg>3</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.070">[&lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091da2d0&gt;, &lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091da5f0&gt;, &lt;TestCheckerLibrary.NoSlotsKeyword object at 0x1091da9b0&gt;]</msg>
+                    <status endtime="20130409 15:06:22.070" starttime="20130409 15:06:22.070" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.071">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.071" starttime="20130409 15:06:22.071" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.071" starttime="20130409 15:06:22.069" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0]}</arg>
+                    <arg>1</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.073">[${i} = ${i}]</msg>
+                    <status endtime="20130409 15:06:22.073" starttime="20130409 15:06:22.073" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.074">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.074" starttime="20130409 15:06:22.073" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.074" starttime="20130409 15:06:22.072" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[0].kws[0]}</arg>
+                    <arg>2</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.076">[BuiltIn.Log, resource.Simple UK]</msg>
+                    <status endtime="20130409 15:06:22.076" starttime="20130409 15:06:22.076" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.077">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.077" starttime="20130409 15:06:22.076" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.077" starttime="20130409 15:06:22.074" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1]}</arg>
+                    <arg>3</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.079">[@{list} = BuiltIn.Create List, ${i} | ${j} | ${k} IN [ @{list} ], BuiltIn.Fail]</msg>
+                    <status endtime="20130409 15:06:22.079" starttime="20130409 15:06:22.079" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.080">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.080" starttime="20130409 15:06:22.079" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.080" starttime="20130409 15:06:22.077" status="PASS"/>
+            </kw>
+            <kw name="Should have correct number of keywords" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${tc.kws[1].kws[1]}</arg>
+                    <arg>1</arg>
+                </arguments>
+                <kw name="BuiltIn.Log" timeout="" type="kw">
+                    <doc>Logs the given message with the given level.</doc>
+                    <arguments>
+                        <arg>${test or uk.kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.083">[${i} = ${i}, ${j} = ${j}, ${k} = ${k}]</msg>
+                    <status endtime="20130409 15:06:22.083" starttime="20130409 15:06:22.082" status="PASS"/>
+                </kw>
+                <kw name="BuiltIn.Should Be Equal As Integers" timeout="" type="kw">
+                    <doc>Fails if objects are unequal after converting them to integers.</doc>
+                    <arguments>
+                        <arg>${test or uk.kw_count}</arg>
+                        <arg>${exp number of kws}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.084">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+                    <status endtime="20130409 15:06:22.084" starttime="20130409 15:06:22.083" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.084" starttime="20130409 15:06:22.081" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.084" starttime="20130409 15:06:22.063" status="PASS"/>
+        </test>
+        <test id="s1-t11" name="Non-existing keyword name" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.087">${test} = Non-existing keyword name</msg>
+                    <status endtime="20130409 15:06:22.087" starttime="20130409 15:06:22.087" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.088" starttime="20130409 15:06:22.088" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.088" starttime="20130409 15:06:22.085" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.089" starttime="20130409 15:06:22.084" status="PASS"/>
+        </test>
+        <test id="s1-t12" name="Too few arguments" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.092">${test} = Too few arguments</msg>
+                    <status endtime="20130409 15:06:22.092" starttime="20130409 15:06:22.091" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.093" starttime="20130409 15:06:22.092" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.093" starttime="20130409 15:06:22.090" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.093" starttime="20130409 15:06:22.089" status="PASS"/>
+        </test>
+        <test id="s1-t13" name="Too few arguments for UK" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.097">${test} = Too few arguments for UK</msg>
+                    <status endtime="20130409 15:06:22.096" starttime="20130409 15:06:22.096" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.097" starttime="20130409 15:06:22.097" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.097" starttime="20130409 15:06:22.095" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.098" starttime="20130409 15:06:22.094" status="PASS"/>
+        </test>
+        <test id="s1-t14" name="Too many arguments" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.101">${test} = Too many arguments</msg>
+                    <status endtime="20130409 15:06:22.101" starttime="20130409 15:06:22.100" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.102" starttime="20130409 15:06:22.101" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.102" starttime="20130409 15:06:22.099" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.102" starttime="20130409 15:06:22.098" status="PASS"/>
+        </test>
+        <test id="s1-t15" name="Invalid syntax in UK" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.109">${test} = Invalid syntax in UK</msg>
+                    <status endtime="20130409 15:06:22.109" starttime="20130409 15:06:22.107" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.110" starttime="20130409 15:06:22.109" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.111" starttime="20130409 15:06:22.104" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.111" starttime="20130409 15:06:22.103" status="PASS"/>
+        </test>
+        <test id="s1-t16" name="Multiple Failures" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.116">${test} = Multiple Failures</msg>
+                    <status endtime="20130409 15:06:22.116" starttime="20130409 15:06:22.115" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.117" starttime="20130409 15:06:22.116" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.117" starttime="20130409 15:06:22.113" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.117" starttime="20130409 15:06:22.111" status="PASS"/>
+        </test>
+        <test id="s1-t17" name="Invalid imports" timeout="">
+            <kw name="atest_resource.Check Stderr Contains" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>Importing test library 'DoesNotExist' failed: ImportError: No module named DoesNotExist</arg>
+                </arguments>
+                <kw name="atest_resource.Check File Contains" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${STDERR_FILE}</arg>
+                        <arg>@{expected}</arg>
+                    </arguments>
+                    <kw name="${exp} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>@{expected}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:22.121">${exp} = Importing test library 'DoesNotExist' failed: ImportError: No module named DoesNotExist</msg>
+                        <status endtime="20130409 15:06:22.121" starttime="20130409 15:06:22.121" status="PASS"/>
+                    </kw>
+                    <kw name="${file} = atest_resource.Get Output File" timeout="" type="kw">
+                        <doc>Output encoding avare helper</doc>
+                        <arguments>
+                            <arg>${path}</arg>
+                        </arguments>
+                        <kw name="${encoding} = BuiltIn.Evaluate" timeout="" type="kw">
+                            <doc>Evaluates the given expression in Python and returns the results.</doc>
+                            <arguments>
+                                <arg>__import__('robot').utils.encoding.OUTPUT_ENCODING</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.123">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.123" starttime="20130409 15:06:22.122" status="PASS"/>
+                        </kw>
+                        <kw name="${encoding} = BuiltIn.Set Variable If" timeout="" type="kw">
+                            <doc>Sets variable based on the given condition.</doc>
+                            <arguments>
+                                <arg>r'${path}' in [r'${STDERR FILE}',r'${STDOUT FILE}']</arg>
+                                <arg>${encoding}</arg>
+                                <arg>UTF-8</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.123">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.123" starttime="20130409 15:06:22.123" status="PASS"/>
+                        </kw>
+                        <kw name="${file} = OperatingSystem.Log File" timeout="" type="kw">
+                            <doc>Wrapper for `Get File` that also logs the returned file.</doc>
+                            <arguments>
+                                <arg>${path}</arg>
+                                <arg>${encoding}</arg>
+                            </arguments>
+                            <msg html="yes" level="INFO" timestamp="20130409 15:06:22.124">Getting file '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt&lt;/a&gt;'</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.124">[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module named DoesNotExist
+Traceback (most recent call last):
+  None
+PYTHONPATH:
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/testlibs
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/listeners
+  /Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries
+  /Users/asyrjasalo/eficode/robot/robotframework/src
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python27.zip
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-darwin
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac/lib-scriptpackages
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-tk
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-old
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload
+  /Library/Python/2.7/site-packages
+  /usr/local/lib/wxPython-unicode-2.8.12.1/lib/python2.7
+  /usr/local/lib/python2.7/site-packages
+  .
+  /Users/asyrjasalo/eficode/robot/robotframework/atest
+[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Variable file 'wrong_path.py' does not exist.
+[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Resource file 'NonExisting.tsv' does not exist.</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.125">${file} = [ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module ...</msg>
+                            <status endtime="20130409 15:06:22.125" starttime="20130409 15:06:22.124" status="PASS"/>
+                        </kw>
+                        <msg level="INFO" timestamp="20130409 15:06:22.125">${file} = [ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module ...</msg>
+                        <status endtime="20130409 15:06:22.125" starttime="20130409 15:06:22.121" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Should Contain" timeout="" type="kw">
+                        <doc>Fails if `item1` does not contain `item2` one or more times.</doc>
+                        <arguments>
+                            <arg>${file}</arg>
+                            <arg>${exp}</arg>
+                        </arguments>
+                        <status endtime="20130409 15:06:22.126" starttime="20130409 15:06:22.125" status="PASS"/>
+                    </kw>
+                    <status endtime="20130409 15:06:22.126" starttime="20130409 15:06:22.120" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.126" starttime="20130409 15:06:22.119" status="PASS"/>
+            </kw>
+            <kw name="atest_resource.Check Stderr Contains" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>Variable file 'wrong_path.py' does not exist</arg>
+                </arguments>
+                <kw name="atest_resource.Check File Contains" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${STDERR_FILE}</arg>
+                        <arg>@{expected}</arg>
+                    </arguments>
+                    <kw name="${exp} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>@{expected}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:22.128">${exp} = Variable file 'wrong_path.py' does not exist</msg>
+                        <status endtime="20130409 15:06:22.128" starttime="20130409 15:06:22.128" status="PASS"/>
+                    </kw>
+                    <kw name="${file} = atest_resource.Get Output File" timeout="" type="kw">
+                        <doc>Output encoding avare helper</doc>
+                        <arguments>
+                            <arg>${path}</arg>
+                        </arguments>
+                        <kw name="${encoding} = BuiltIn.Evaluate" timeout="" type="kw">
+                            <doc>Evaluates the given expression in Python and returns the results.</doc>
+                            <arguments>
+                                <arg>__import__('robot').utils.encoding.OUTPUT_ENCODING</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.130">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.129" starttime="20130409 15:06:22.129" status="PASS"/>
+                        </kw>
+                        <kw name="${encoding} = BuiltIn.Set Variable If" timeout="" type="kw">
+                            <doc>Sets variable based on the given condition.</doc>
+                            <arguments>
+                                <arg>r'${path}' in [r'${STDERR FILE}',r'${STDOUT FILE}']</arg>
+                                <arg>${encoding}</arg>
+                                <arg>UTF-8</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.130">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.130" starttime="20130409 15:06:22.130" status="PASS"/>
+                        </kw>
+                        <kw name="${file} = OperatingSystem.Log File" timeout="" type="kw">
+                            <doc>Wrapper for `Get File` that also logs the returned file.</doc>
+                            <arguments>
+                                <arg>${path}</arg>
+                                <arg>${encoding}</arg>
+                            </arguments>
+                            <msg html="yes" level="INFO" timestamp="20130409 15:06:22.131">Getting file '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt&lt;/a&gt;'</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.131">[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module named DoesNotExist
+Traceback (most recent call last):
+  None
+PYTHONPATH:
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/testlibs
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/listeners
+  /Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries
+  /Users/asyrjasalo/eficode/robot/robotframework/src
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python27.zip
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-darwin
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac/lib-scriptpackages
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-tk
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-old
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload
+  /Library/Python/2.7/site-packages
+  /usr/local/lib/wxPython-unicode-2.8.12.1/lib/python2.7
+  /usr/local/lib/python2.7/site-packages
+  .
+  /Users/asyrjasalo/eficode/robot/robotframework/atest
+[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Variable file 'wrong_path.py' does not exist.
+[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Resource file 'NonExisting.tsv' does not exist.</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.131">${file} = [ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module ...</msg>
+                            <status endtime="20130409 15:06:22.131" starttime="20130409 15:06:22.131" status="PASS"/>
+                        </kw>
+                        <msg level="INFO" timestamp="20130409 15:06:22.132">${file} = [ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module ...</msg>
+                        <status endtime="20130409 15:06:22.131" starttime="20130409 15:06:22.128" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Should Contain" timeout="" type="kw">
+                        <doc>Fails if `item1` does not contain `item2` one or more times.</doc>
+                        <arguments>
+                            <arg>${file}</arg>
+                            <arg>${exp}</arg>
+                        </arguments>
+                        <status endtime="20130409 15:06:22.132" starttime="20130409 15:06:22.132" status="PASS"/>
+                    </kw>
+                    <status endtime="20130409 15:06:22.132" starttime="20130409 15:06:22.127" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.132" starttime="20130409 15:06:22.126" status="PASS"/>
+            </kw>
+            <kw name="atest_resource.Check Stderr Contains" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>Resource file 'NonExisting.tsv' does not exist</arg>
+                </arguments>
+                <kw name="atest_resource.Check File Contains" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${STDERR_FILE}</arg>
+                        <arg>@{expected}</arg>
+                    </arguments>
+                    <kw name="${exp} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>@{expected}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:22.135">${exp} = Resource file 'NonExisting.tsv' does not exist</msg>
+                        <status endtime="20130409 15:06:22.135" starttime="20130409 15:06:22.134" status="PASS"/>
+                    </kw>
+                    <kw name="${file} = atest_resource.Get Output File" timeout="" type="kw">
+                        <doc>Output encoding avare helper</doc>
+                        <arguments>
+                            <arg>${path}</arg>
+                        </arguments>
+                        <kw name="${encoding} = BuiltIn.Evaluate" timeout="" type="kw">
+                            <doc>Evaluates the given expression in Python and returns the results.</doc>
+                            <arguments>
+                                <arg>__import__('robot').utils.encoding.OUTPUT_ENCODING</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.136">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.136" starttime="20130409 15:06:22.136" status="PASS"/>
+                        </kw>
+                        <kw name="${encoding} = BuiltIn.Set Variable If" timeout="" type="kw">
+                            <doc>Sets variable based on the given condition.</doc>
+                            <arguments>
+                                <arg>r'${path}' in [r'${STDERR FILE}',r'${STDOUT FILE}']</arg>
+                                <arg>${encoding}</arg>
+                                <arg>UTF-8</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.137">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.137" starttime="20130409 15:06:22.136" status="PASS"/>
+                        </kw>
+                        <kw name="${file} = OperatingSystem.Log File" timeout="" type="kw">
+                            <doc>Wrapper for `Get File` that also logs the returned file.</doc>
+                            <arguments>
+                                <arg>${path}</arg>
+                                <arg>${encoding}</arg>
+                            </arguments>
+                            <msg html="yes" level="INFO" timestamp="20130409 15:06:22.137">Getting file '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/stderr.txt&lt;/a&gt;'</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.138">[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module named DoesNotExist
+Traceback (most recent call last):
+  None
+PYTHONPATH:
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/testlibs
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/listeners
+  /Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries
+  /Users/asyrjasalo/eficode/robot/robotframework/src
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python27.zip
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-darwin
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac/lib-scriptpackages
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-tk
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-old
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload
+  /Library/Python/2.7/site-packages
+  /usr/local/lib/wxPython-unicode-2.8.12.1/lib/python2.7
+  /usr/local/lib/python2.7/site-packages
+  .
+  /Users/asyrjasalo/eficode/robot/robotframework/atest
+[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Variable file 'wrong_path.py' does not exist.
+[ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Resource file 'NonExisting.tsv' does not exist.</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.138">${file} = [ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module ...</msg>
+                            <status endtime="20130409 15:06:22.138" starttime="20130409 15:06:22.137" status="PASS"/>
+                        </kw>
+                        <msg level="INFO" timestamp="20130409 15:06:22.138">${file} = [ ERROR ] Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module ...</msg>
+                        <status endtime="20130409 15:06:22.138" starttime="20130409 15:06:22.135" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Should Contain" timeout="" type="kw">
+                        <doc>Fails if `item1` does not contain `item2` one or more times.</doc>
+                        <arguments>
+                            <arg>${file}</arg>
+                            <arg>${exp}</arg>
+                        </arguments>
+                        <status endtime="20130409 15:06:22.139" starttime="20130409 15:06:22.138" status="PASS"/>
+                    </kw>
+                    <status endtime="20130409 15:06:22.139" starttime="20130409 15:06:22.133" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.139" starttime="20130409 15:06:22.132" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.139" starttime="20130409 15:06:22.118" status="PASS"/>
+        </test>
+        <test id="s1-t18" name="Test from other suite" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>Some Other Test</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.142">${test} = Some other test</msg>
+                    <status endtime="20130409 15:06:22.142" starttime="20130409 15:06:22.142" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.143" starttime="20130409 15:06:22.143" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.143" starttime="20130409 15:06:22.141" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.143" starttime="20130409 15:06:22.139" status="PASS"/>
+        </test>
+        <test id="s1-t19" name="Import Library Keyword is Called" timeout="">
+            <kw name="atest_resource.Check Test Case" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>${TESTNAME}</arg>
+                </arguments>
+                <kw name="${test} = TestCheckerLibrary.Get Test From Suite" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SUITE}</arg>
+                        <arg>${name}</arg>
+                    </arguments>
+                    <msg level="INFO" timestamp="20130409 15:06:22.146">${test} = Import Library Keyword is Called</msg>
+                    <status endtime="20130409 15:06:22.146" starttime="20130409 15:06:22.146" status="PASS"/>
+                </kw>
+                <kw name="TestCheckerLibrary.Check Test Status" timeout="" type="kw">
+                    <doc>Verifies that test's status and message are as expected.</doc>
+                    <arguments>
+                        <arg>${test}</arg>
+                        <arg>${status}</arg>
+                        <arg>${message}</arg>
+                    </arguments>
+                    <status endtime="20130409 15:06:22.147" starttime="20130409 15:06:22.147" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.147" starttime="20130409 15:06:22.145" status="PASS"/>
+            </kw>
+            <kw name="atest_resource.Check Syslog Contains" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>Imported library 'String' with arguments [ ]</arg>
+                </arguments>
+                <kw name="atest_resource.Check File Contains" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SYSLOG_FILE}</arg>
+                        <arg>@{expected}</arg>
+                    </arguments>
+                    <kw name="${exp} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>@{expected}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:22.150">${exp} = Imported library 'String' with arguments [ ]</msg>
+                        <status endtime="20130409 15:06:22.150" starttime="20130409 15:06:22.149" status="PASS"/>
+                    </kw>
+                    <kw name="${file} = atest_resource.Get Output File" timeout="" type="kw">
+                        <doc>Output encoding avare helper</doc>
+                        <arguments>
+                            <arg>${path}</arg>
+                        </arguments>
+                        <kw name="${encoding} = BuiltIn.Evaluate" timeout="" type="kw">
+                            <doc>Evaluates the given expression in Python and returns the results.</doc>
+                            <arguments>
+                                <arg>__import__('robot').utils.encoding.OUTPUT_ENCODING</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.151">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.151" starttime="20130409 15:06:22.151" status="PASS"/>
+                        </kw>
+                        <kw name="${encoding} = BuiltIn.Set Variable If" timeout="" type="kw">
+                            <doc>Sets variable based on the given condition.</doc>
+                            <arguments>
+                                <arg>r'${path}' in [r'${STDERR FILE}',r'${STDOUT FILE}']</arg>
+                                <arg>${encoding}</arg>
+                                <arg>UTF-8</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.152">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.152" starttime="20130409 15:06:22.152" status="PASS"/>
+                        </kw>
+                        <kw name="${file} = OperatingSystem.Log File" timeout="" type="kw">
+                            <doc>Wrapper for `Get File` that also logs the returned file.</doc>
+                            <arguments>
+                                <arg>${path}</arg>
+                                <arg>${encoding}</arg>
+                            </arguments>
+                            <msg html="yes" level="INFO" timestamp="20130409 15:06:22.153">Getting file '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/syslog.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/syslog.txt&lt;/a&gt;'</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.154">20130409 15:06:21.761 | INFO  | Robot Framework trunk 20130226 (Python 2.7.4 on darwin)
+20130409 15:06:21.762 | INFO  | Arguments: /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt,/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/more_tests.txt
+20130409 15:06:21.762 | INFO  | Settings:
+Critical: None
+DebugFile: NONE
+Doc: None
+Exclude: []
+Include: []
+Listeners: []
+Log: NONE
+LogLevel: INFO
+LogTitle: None
+Metadata: []
+MonitorColors: OFF
+MonitorMarkers: OFF
+MonitorWidth: 78
+Name: None
+NoStatusRC: False
+NonCritical: None
+Output: /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml
+OutputDir: /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests
+RemoveKeywords: []
+Report: NONE
+ReportBackground: ('#99FF66', '#99FF66', '#FF3333')
+ReportTitle: None
+RunEmptySuite: False
+RunMode: [u'dryrun']
+SetTag: []
+SplitLog: False
+StdErr: None
+StdOut: None
+SuiteNames: []
+SuiteStatLevel: -1
+TagDoc: []
+TagStatCombine: []
+TagStatExclude: []
+TagStatInclude: []
+TagStatLink: []
+TestNames: []
+TimestampOutputs: False
+VariableFiles: []
+Variables: [u'interpreter:python']
+VisibleLogLevel: INFO
+WarnOnSkipped: False
+XUnitFile: NONE
+20130409 15:06:21.764 | INFO  | Parsing file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt'.
+20130409 15:06:21.775 | INFO  | Parsing file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/more_tests.txt'.
+20130409 15:06:21.779 | INFO  | No debug file
+20130409 15:06:21.779 | INFO  | Initializing namespace for test suite 'Dryrun &amp; More Tests'
+20130409 15:06:21.781 | INFO  | Imported test library class 'BuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/BuiltIn.pyc'.
+20130409 15:06:21.798 | INFO  | Imported library 'BuiltIn' with arguments [ ] (version trunk 20130226, class type, global scope, 88 keywords)
+20130409 15:06:21.799 | INFO  | Imported test library class 'DeprecatedBuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/DeprecatedBuiltIn.pyc'.
+20130409 15:06:21.807 | INFO  | Imported library 'DeprecatedBuiltIn' with arguments [ ] (version &lt;unknown&gt;, class type, global scope, 52 keywords)
+20130409 15:06:21.807 | INFO  | Imported test library class 'Reserved' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Reserved.pyc'.
+20130409 15:06:21.808 | INFO  | Imported library 'Reserved' with arguments [ ] (version &lt;unknown&gt;, dynamic type, global scope, 10 keywords)
+20130409 15:06:21.809 | INFO  | Imported test library module 'Easter' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Easter.pyc'.
+20130409 15:06:21.809 | INFO  | Imported library 'Easter' with arguments [ ] (version &lt;unknown&gt;, module type, global scope, 1 keywords)
+20130409 15:06:21.810 | INFO  | Started test suite 'Dryrun &amp; More Tests'
+20130409 15:06:21.810 | INFO  | Initializing namespace for test suite 'Dryrun &amp; More Tests.Dryrun'
+20130409 15:06:21.810 | INFO  | Imported test library class 'BuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/BuiltIn.pyc'.
+20130409 15:06:21.811 | INFO  | Found test library 'BuiltIn' with arguments [ ] from cache
+20130409 15:06:21.811 | INFO  | Imported test library class 'DeprecatedBuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/DeprecatedBuiltIn.pyc'.
+20130409 15:06:21.811 | INFO  | Found test library 'DeprecatedBuiltIn' with arguments [ ] from cache
+20130409 15:06:21.811 | INFO  | Imported test library class 'Reserved' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Reserved.pyc'.
+20130409 15:06:21.811 | INFO  | Found test library 'Reserved' with arguments [ ] from cache
+20130409 15:06:21.812 | INFO  | Imported test library module 'Easter' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Easter.pyc'.
+20130409 15:06:21.812 | INFO  | Found test library 'Easter' with arguments [ ] from cache
+20130409 15:06:21.817 | INFO  | Imported test library class 'OperatingSystem' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/OperatingSystem.pyc'.
+20130409 15:06:21.826 | INFO  | Imported library 'OperatingSystem' with arguments [ ] (version trunk 20130226, class type, global scope, 57 keywords)
+20130409 15:06:21.827 | INFO  | Imported test library class 'DeprecatedOperatingSystem' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/DeprecatedOperatingSystem.pyc'.
+20130409 15:06:21.830 | INFO  | Imported library 'DeprecatedOperatingSystem' with arguments [ ] (version &lt;unknown&gt;, class type, global scope, 24 keywords)
+20130409 15:06:21.831 | INFO  | Importing variable file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/vars.py' with args []
+20130409 15:06:21.831 | INFO  | Imported variable file module 'vars' from '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/vars.py'.
+20130409 15:06:21.831 | INFO  | Parsing file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/resource.txt'.
+20130409 15:06:21.833 | INFO  | Imported resource file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/resource.txt' (4 keywords).
+20130409 15:06:21.836 | ERROR | Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module named DoesNotExist
+Traceback (most recent call last):
+  None
+PYTHONPATH:
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/testlibs
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/listeners
+  /Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries
+  /Users/asyrjasalo/eficode/robot/robotframework/src
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python27.zip
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-darwin
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac/lib-scriptpackages
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-tk
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-old
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload
+  /Library/Python/2.7/site-packages
+  /usr/local/lib/wxPython-unicode-2.8.12.1/lib/python2.7
+  /usr/local/lib/python2.7/site-packages
+  .
+  /Users/asyrjasalo/eficode/robot/robotframework/atest
+20130409 15:06:21.838 | ERROR | Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Variable file 'wrong_path.py' does not exist.
+20130409 15:06:21.839 | ERROR | Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Resource file 'NonExisting.tsv' does not exist.
+20130409 15:06:21.839 | INFO  | Started test suite 'Dryrun'
+20130409 15:06:21.840 | INFO  | Started test case 'Passing keywords'
+20130409 15:06:21.842 | INFO  | Ended test case 'Passing keywords'
+20130409 15:06:21.843 | INFO  | Started test case 'Keywords with embedded arguments'
+20130409 15:06:21.845 | INFO  | Ended test case 'Keywords with embedded arguments'
+20130409 15:06:21.846 | INFO  | Started test case 'Keywords that would fail'
+20130409 15:06:21.848 | INFO  | Ended test case 'Keywords that would fail'
+20130409 15:06:21.849 | INFO  | Started test case 'Scalar variables are not checked in keyword arguments'
+20130409 15:06:21.850 | INFO  | Ended test case 'Scalar variables are not checked in keyword arguments'
+20130409 15:06:21.851 | INFO  | Started test case 'List variables are not checked in keyword arguments'
+20130409 15:06:21.854 | INFO  | Ended test case 'List variables are not checked in keyword arguments'
+20130409 15:06:21.855 | INFO  | Started test case 'Variables are not checked in when arguments are embedded'
+20130409 15:06:21.857 | INFO  | Ended test case 'Variables are not checked in when arguments are embedded'
+20130409 15:06:21.858 | INFO  | Started test case 'User keyword return value'
+20130409 15:06:21.859 | INFO  | Ended test case 'User keyword return value'
+20130409 15:06:21.860 | INFO  | Started test case 'Test Setup And Teardown'
+20130409 15:06:21.861 | INFO  | Ended test case 'Test Setup And Teardown'
+20130409 15:06:21.862 | INFO  | Started test case 'Keyword Teardown'
+20130409 15:06:21.864 | INFO  | Ended test case 'Keyword Teardown'
+20130409 15:06:21.865 | INFO  | Started test case 'For Loops'
+20130409 15:06:21.870 | INFO  | Ended test case 'For Loops'
+20130409 15:06:21.871 | INFO  | Started test case 'Non-existing keyword name'
+20130409 15:06:21.872 | INFO  | Ended test case 'Non-existing keyword name'
+20130409 15:06:21.872 | INFO  | Started test case 'Too few arguments'
+20130409 15:06:21.873 | INFO  | Ended test case 'Too few arguments'
+20130409 15:06:21.874 | INFO  | Started test case 'Too few arguments for UK'
+20130409 15:06:21.875 | INFO  | Ended test case 'Too few arguments for UK'
+20130409 15:06:21.876 | INFO  | Started test case 'Too many arguments'
+20130409 15:06:21.877 | INFO  | Ended test case 'Too many arguments'
+20130409 15:06:21.878 | INFO  | Started test case 'Invalid syntax in UK'
+20130409 15:06:21.879 | INFO  | Ended test case 'Invalid syntax in UK'
+20130409 15:06:21.880 | INFO  | Started test case 'Multiple Failures'
+20130409 15:06:21.883 | INFO  | Ended test case 'Multiple Failures'
+20130409 15:06:21.884 | INFO  | Started test case 'Import Library Keyword is Called'
+20130409 15:06:21.885 | INFO  | Imported test library class 'String' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/String.pyc'.
+20130409 15:06:21.889 | INFO  | Imported library 'String' with arguments [ ] (version trunk 20130226, class type, global scope, 24 keywords)
+20130409 15:06:21.891 | INFO  | Imported test library class 'ParameterLibrary' from '/Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/testlibs/ParameterLibrary.pyc'.
+20130409 15:06:21.891 | INFO  | Adding keyword 'host' to library 'ParameterLibrary' failed: Not a method or function
+20130409 15:06:21.891 | INFO  | Adding keyword 'port' to library 'ParameterLibrary' failed: Not a method or function
+20130409 15:06:21.891 | INFO  | Imported library 'ParameterLibrary' with arguments [ value | 42 ] (version &lt;unknown&gt;, class type, testcase scope, 1 keywords)
+20130409 15:06:21.892 | INFO  | Ended test case 'Import Library Keyword is Called'
+20130409 15:06:21.893 | INFO  | Ended test suite 'Dryrun'
+20130409 15:06:21.893 | INFO  | Initializing namespace for test suite 'Dryrun &amp; More Tests.More Tests'
+20130409 15:06:21.894 | INFO  | Imported test library class 'BuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/BuiltIn.pyc'.
+20130409 15:06:21.894 | INFO  | Found test library 'BuiltIn' with arguments [ ] from cache
+20130409 15:06:21.894 | INFO  | Imported test library class 'DeprecatedBuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/DeprecatedBuiltIn.pyc'.
+20130409 15:06:21.894 | INFO  | Found test library 'DeprecatedBuiltIn' with arguments [ ] from cache
+20130409 15:06:21.894 | INFO  | Imported test library class 'Reserved' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Reserved.pyc'.
+20130409 15:06:21.895 | INFO  | Found test library 'Reserved' with arguments [ ] from cache
+20130409 15:06:21.895 | INFO  | Imported test library module 'Easter' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Easter.pyc'.
+20130409 15:06:21.895 | INFO  | Found test library 'Easter' with arguments [ ] from cache
+20130409 15:06:21.895 | INFO  | Found resource file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/resource.txt' from cache
+20130409 15:06:21.896 | INFO  | Started test suite 'More Tests'
+20130409 15:06:21.897 | INFO  | Started test case 'Some other test'
+20130409 15:06:21.898 | INFO  | Ended test case 'Some other test'
+20130409 15:06:21.899 | INFO  | Ended test suite 'More Tests'
+20130409 15:06:21.900 | INFO  | Ended test suite 'Dryrun &amp; More Tests'
+20130409 15:06:21.900 | INFO  | Tests execution ended. Statistics:
+18 critical tests, 8 passed, 10 failed
+18 tests total, 8 passed, 10 failed
+20130409 15:06:21.901 | INFO  | Output: /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.154">${file} = 20130409 15:06:21.761 | INFO  | Robot Framework trunk 20130226 (Python 2.7.4 on darwin)
+20130409 15:06:21.762 | INFO  | Arguments: /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dry...</msg>
+                            <status endtime="20130409 15:06:22.154" starttime="20130409 15:06:22.153" status="PASS"/>
+                        </kw>
+                        <msg level="INFO" timestamp="20130409 15:06:22.155">${file} = 20130409 15:06:21.761 | INFO  | Robot Framework trunk 20130226 (Python 2.7.4 on darwin)
+20130409 15:06:21.762 | INFO  | Arguments: /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dry...</msg>
+                        <status endtime="20130409 15:06:22.155" starttime="20130409 15:06:22.150" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Should Contain" timeout="" type="kw">
+                        <doc>Fails if `item1` does not contain `item2` one or more times.</doc>
+                        <arguments>
+                            <arg>${file}</arg>
+                            <arg>${exp}</arg>
+                        </arguments>
+                        <status endtime="20130409 15:06:22.156" starttime="20130409 15:06:22.155" status="PASS"/>
+                    </kw>
+                    <status endtime="20130409 15:06:22.156" starttime="20130409 15:06:22.148" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.156" starttime="20130409 15:06:22.147" status="PASS"/>
+            </kw>
+            <kw name="atest_resource.Check Syslog Contains" timeout="" type="kw">
+                <doc/>
+                <arguments>
+                    <arg>Imported library 'ParameterLibrary' with arguments [ value | 42 ]</arg>
+                </arguments>
+                <kw name="atest_resource.Check File Contains" timeout="" type="kw">
+                    <doc/>
+                    <arguments>
+                        <arg>${SYSLOG_FILE}</arg>
+                        <arg>@{expected}</arg>
+                    </arguments>
+                    <kw name="${exp} = BuiltIn.Catenate" timeout="" type="kw">
+                        <doc>Catenates the given items together and returns the resulted string.</doc>
+                        <arguments>
+                            <arg>@{expected}</arg>
+                        </arguments>
+                        <msg level="INFO" timestamp="20130409 15:06:22.159">${exp} = Imported library 'ParameterLibrary' with arguments [ value | 42 ]</msg>
+                        <status endtime="20130409 15:06:22.159" starttime="20130409 15:06:22.159" status="PASS"/>
+                    </kw>
+                    <kw name="${file} = atest_resource.Get Output File" timeout="" type="kw">
+                        <doc>Output encoding avare helper</doc>
+                        <arguments>
+                            <arg>${path}</arg>
+                        </arguments>
+                        <kw name="${encoding} = BuiltIn.Evaluate" timeout="" type="kw">
+                            <doc>Evaluates the given expression in Python and returns the results.</doc>
+                            <arguments>
+                                <arg>__import__('robot').utils.encoding.OUTPUT_ENCODING</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.161">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.161" starttime="20130409 15:06:22.161" status="PASS"/>
+                        </kw>
+                        <kw name="${encoding} = BuiltIn.Set Variable If" timeout="" type="kw">
+                            <doc>Sets variable based on the given condition.</doc>
+                            <arguments>
+                                <arg>r'${path}' in [r'${STDERR FILE}',r'${STDOUT FILE}']</arg>
+                                <arg>${encoding}</arg>
+                                <arg>UTF-8</arg>
+                            </arguments>
+                            <msg level="INFO" timestamp="20130409 15:06:22.162">${encoding} = UTF-8</msg>
+                            <status endtime="20130409 15:06:22.162" starttime="20130409 15:06:22.161" status="PASS"/>
+                        </kw>
+                        <kw name="${file} = OperatingSystem.Log File" timeout="" type="kw">
+                            <doc>Wrapper for `Get File` that also logs the returned file.</doc>
+                            <arguments>
+                                <arg>${path}</arg>
+                                <arg>${encoding}</arg>
+                            </arguments>
+                            <msg html="yes" level="INFO" timestamp="20130409 15:06:22.163">Getting file '&lt;a href=&quot;file:///Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/syslog.txt&quot;&gt;/Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/syslog.txt&lt;/a&gt;'</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.163">20130409 15:06:21.761 | INFO  | Robot Framework trunk 20130226 (Python 2.7.4 on darwin)
+20130409 15:06:21.762 | INFO  | Arguments: /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt,/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/more_tests.txt
+20130409 15:06:21.762 | INFO  | Settings:
+Critical: None
+DebugFile: NONE
+Doc: None
+Exclude: []
+Include: []
+Listeners: []
+Log: NONE
+LogLevel: INFO
+LogTitle: None
+Metadata: []
+MonitorColors: OFF
+MonitorMarkers: OFF
+MonitorWidth: 78
+Name: None
+NoStatusRC: False
+NonCritical: None
+Output: /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml
+OutputDir: /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests
+RemoveKeywords: []
+Report: NONE
+ReportBackground: ('#99FF66', '#99FF66', '#FF3333')
+ReportTitle: None
+RunEmptySuite: False
+RunMode: [u'dryrun']
+SetTag: []
+SplitLog: False
+StdErr: None
+StdOut: None
+SuiteNames: []
+SuiteStatLevel: -1
+TagDoc: []
+TagStatCombine: []
+TagStatExclude: []
+TagStatInclude: []
+TagStatLink: []
+TestNames: []
+TimestampOutputs: False
+VariableFiles: []
+Variables: [u'interpreter:python']
+VisibleLogLevel: INFO
+WarnOnSkipped: False
+XUnitFile: NONE
+20130409 15:06:21.764 | INFO  | Parsing file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt'.
+20130409 15:06:21.775 | INFO  | Parsing file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/more_tests.txt'.
+20130409 15:06:21.779 | INFO  | No debug file
+20130409 15:06:21.779 | INFO  | Initializing namespace for test suite 'Dryrun &amp; More Tests'
+20130409 15:06:21.781 | INFO  | Imported test library class 'BuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/BuiltIn.pyc'.
+20130409 15:06:21.798 | INFO  | Imported library 'BuiltIn' with arguments [ ] (version trunk 20130226, class type, global scope, 88 keywords)
+20130409 15:06:21.799 | INFO  | Imported test library class 'DeprecatedBuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/DeprecatedBuiltIn.pyc'.
+20130409 15:06:21.807 | INFO  | Imported library 'DeprecatedBuiltIn' with arguments [ ] (version &lt;unknown&gt;, class type, global scope, 52 keywords)
+20130409 15:06:21.807 | INFO  | Imported test library class 'Reserved' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Reserved.pyc'.
+20130409 15:06:21.808 | INFO  | Imported library 'Reserved' with arguments [ ] (version &lt;unknown&gt;, dynamic type, global scope, 10 keywords)
+20130409 15:06:21.809 | INFO  | Imported test library module 'Easter' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Easter.pyc'.
+20130409 15:06:21.809 | INFO  | Imported library 'Easter' with arguments [ ] (version &lt;unknown&gt;, module type, global scope, 1 keywords)
+20130409 15:06:21.810 | INFO  | Started test suite 'Dryrun &amp; More Tests'
+20130409 15:06:21.810 | INFO  | Initializing namespace for test suite 'Dryrun &amp; More Tests.Dryrun'
+20130409 15:06:21.810 | INFO  | Imported test library class 'BuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/BuiltIn.pyc'.
+20130409 15:06:21.811 | INFO  | Found test library 'BuiltIn' with arguments [ ] from cache
+20130409 15:06:21.811 | INFO  | Imported test library class 'DeprecatedBuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/DeprecatedBuiltIn.pyc'.
+20130409 15:06:21.811 | INFO  | Found test library 'DeprecatedBuiltIn' with arguments [ ] from cache
+20130409 15:06:21.811 | INFO  | Imported test library class 'Reserved' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Reserved.pyc'.
+20130409 15:06:21.811 | INFO  | Found test library 'Reserved' with arguments [ ] from cache
+20130409 15:06:21.812 | INFO  | Imported test library module 'Easter' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Easter.pyc'.
+20130409 15:06:21.812 | INFO  | Found test library 'Easter' with arguments [ ] from cache
+20130409 15:06:21.817 | INFO  | Imported test library class 'OperatingSystem' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/OperatingSystem.pyc'.
+20130409 15:06:21.826 | INFO  | Imported library 'OperatingSystem' with arguments [ ] (version trunk 20130226, class type, global scope, 57 keywords)
+20130409 15:06:21.827 | INFO  | Imported test library class 'DeprecatedOperatingSystem' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/DeprecatedOperatingSystem.pyc'.
+20130409 15:06:21.830 | INFO  | Imported library 'DeprecatedOperatingSystem' with arguments [ ] (version &lt;unknown&gt;, class type, global scope, 24 keywords)
+20130409 15:06:21.831 | INFO  | Importing variable file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/vars.py' with args []
+20130409 15:06:21.831 | INFO  | Imported variable file module 'vars' from '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/vars.py'.
+20130409 15:06:21.831 | INFO  | Parsing file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/resource.txt'.
+20130409 15:06:21.833 | INFO  | Imported resource file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/resource.txt' (4 keywords).
+20130409 15:06:21.836 | ERROR | Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Importing test library 'DoesNotExist' failed: ImportError: No module named DoesNotExist
+Traceback (most recent call last):
+  None
+PYTHONPATH:
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/testlibs
+  /Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/listeners
+  /Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries
+  /Users/asyrjasalo/eficode/robot/robotframework/src
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg
+  /usr/local/lib/python2.7/site-packages/distribute-0.6.36-py2.7.egg
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python27.zip
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-darwin
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/plat-mac/lib-scriptpackages
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-tk
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-old
+  /usr/local/Cellar/python/2.7.4/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload
+  /Library/Python/2.7/site-packages
+  /usr/local/lib/wxPython-unicode-2.8.12.1/lib/python2.7
+  /usr/local/lib/python2.7/site-packages
+  .
+  /Users/asyrjasalo/eficode/robot/robotframework/atest
+20130409 15:06:21.838 | ERROR | Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Variable file 'wrong_path.py' does not exist.
+20130409 15:06:21.839 | ERROR | Error in file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/dryrun.txt' in table 'Settings': Resource file 'NonExisting.tsv' does not exist.
+20130409 15:06:21.839 | INFO  | Started test suite 'Dryrun'
+20130409 15:06:21.840 | INFO  | Started test case 'Passing keywords'
+20130409 15:06:21.842 | INFO  | Ended test case 'Passing keywords'
+20130409 15:06:21.843 | INFO  | Started test case 'Keywords with embedded arguments'
+20130409 15:06:21.845 | INFO  | Ended test case 'Keywords with embedded arguments'
+20130409 15:06:21.846 | INFO  | Started test case 'Keywords that would fail'
+20130409 15:06:21.848 | INFO  | Ended test case 'Keywords that would fail'
+20130409 15:06:21.849 | INFO  | Started test case 'Scalar variables are not checked in keyword arguments'
+20130409 15:06:21.850 | INFO  | Ended test case 'Scalar variables are not checked in keyword arguments'
+20130409 15:06:21.851 | INFO  | Started test case 'List variables are not checked in keyword arguments'
+20130409 15:06:21.854 | INFO  | Ended test case 'List variables are not checked in keyword arguments'
+20130409 15:06:21.855 | INFO  | Started test case 'Variables are not checked in when arguments are embedded'
+20130409 15:06:21.857 | INFO  | Ended test case 'Variables are not checked in when arguments are embedded'
+20130409 15:06:21.858 | INFO  | Started test case 'User keyword return value'
+20130409 15:06:21.859 | INFO  | Ended test case 'User keyword return value'
+20130409 15:06:21.860 | INFO  | Started test case 'Test Setup And Teardown'
+20130409 15:06:21.861 | INFO  | Ended test case 'Test Setup And Teardown'
+20130409 15:06:21.862 | INFO  | Started test case 'Keyword Teardown'
+20130409 15:06:21.864 | INFO  | Ended test case 'Keyword Teardown'
+20130409 15:06:21.865 | INFO  | Started test case 'For Loops'
+20130409 15:06:21.870 | INFO  | Ended test case 'For Loops'
+20130409 15:06:21.871 | INFO  | Started test case 'Non-existing keyword name'
+20130409 15:06:21.872 | INFO  | Ended test case 'Non-existing keyword name'
+20130409 15:06:21.872 | INFO  | Started test case 'Too few arguments'
+20130409 15:06:21.873 | INFO  | Ended test case 'Too few arguments'
+20130409 15:06:21.874 | INFO  | Started test case 'Too few arguments for UK'
+20130409 15:06:21.875 | INFO  | Ended test case 'Too few arguments for UK'
+20130409 15:06:21.876 | INFO  | Started test case 'Too many arguments'
+20130409 15:06:21.877 | INFO  | Ended test case 'Too many arguments'
+20130409 15:06:21.878 | INFO  | Started test case 'Invalid syntax in UK'
+20130409 15:06:21.879 | INFO  | Ended test case 'Invalid syntax in UK'
+20130409 15:06:21.880 | INFO  | Started test case 'Multiple Failures'
+20130409 15:06:21.883 | INFO  | Ended test case 'Multiple Failures'
+20130409 15:06:21.884 | INFO  | Started test case 'Import Library Keyword is Called'
+20130409 15:06:21.885 | INFO  | Imported test library class 'String' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/String.pyc'.
+20130409 15:06:21.889 | INFO  | Imported library 'String' with arguments [ ] (version trunk 20130226, class type, global scope, 24 keywords)
+20130409 15:06:21.891 | INFO  | Imported test library class 'ParameterLibrary' from '/Users/asyrjasalo/eficode/robot/robotframework/atest/testresources/testlibs/ParameterLibrary.pyc'.
+20130409 15:06:21.891 | INFO  | Adding keyword 'host' to library 'ParameterLibrary' failed: Not a method or function
+20130409 15:06:21.891 | INFO  | Adding keyword 'port' to library 'ParameterLibrary' failed: Not a method or function
+20130409 15:06:21.891 | INFO  | Imported library 'ParameterLibrary' with arguments [ value | 42 ] (version &lt;unknown&gt;, class type, testcase scope, 1 keywords)
+20130409 15:06:21.892 | INFO  | Ended test case 'Import Library Keyword is Called'
+20130409 15:06:21.893 | INFO  | Ended test suite 'Dryrun'
+20130409 15:06:21.893 | INFO  | Initializing namespace for test suite 'Dryrun &amp; More Tests.More Tests'
+20130409 15:06:21.894 | INFO  | Imported test library class 'BuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/BuiltIn.pyc'.
+20130409 15:06:21.894 | INFO  | Found test library 'BuiltIn' with arguments [ ] from cache
+20130409 15:06:21.894 | INFO  | Imported test library class 'DeprecatedBuiltIn' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/DeprecatedBuiltIn.pyc'.
+20130409 15:06:21.894 | INFO  | Found test library 'DeprecatedBuiltIn' with arguments [ ] from cache
+20130409 15:06:21.894 | INFO  | Imported test library class 'Reserved' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Reserved.pyc'.
+20130409 15:06:21.895 | INFO  | Found test library 'Reserved' with arguments [ ] from cache
+20130409 15:06:21.895 | INFO  | Imported test library module 'Easter' from '/Users/asyrjasalo/eficode/robot/robotframework/src/robot/libraries/Easter.pyc'.
+20130409 15:06:21.895 | INFO  | Found test library 'Easter' with arguments [ ] from cache
+20130409 15:06:21.895 | INFO  | Found resource file '/Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dryrun/resource.txt' from cache
+20130409 15:06:21.896 | INFO  | Started test suite 'More Tests'
+20130409 15:06:21.897 | INFO  | Started test case 'Some other test'
+20130409 15:06:21.898 | INFO  | Ended test case 'Some other test'
+20130409 15:06:21.899 | INFO  | Ended test suite 'More Tests'
+20130409 15:06:21.900 | INFO  | Ended test suite 'Dryrun &amp; More Tests'
+20130409 15:06:21.900 | INFO  | Tests execution ended. Statistics:
+18 critical tests, 8 passed, 10 failed
+18 tests total, 8 passed, 10 failed
+20130409 15:06:21.901 | INFO  | Output: /Users/asyrjasalo/eficode/robot/robotframework/atest/results/python/output/dryrun_more_tests/output.xml</msg>
+                            <msg level="INFO" timestamp="20130409 15:06:22.164">${file} = 20130409 15:06:21.761 | INFO  | Robot Framework trunk 20130226 (Python 2.7.4 on darwin)
+20130409 15:06:21.762 | INFO  | Arguments: /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dry...</msg>
+                            <status endtime="20130409 15:06:22.164" starttime="20130409 15:06:22.163" status="PASS"/>
+                        </kw>
+                        <msg level="INFO" timestamp="20130409 15:06:22.165">${file} = 20130409 15:06:21.761 | INFO  | Robot Framework trunk 20130226 (Python 2.7.4 on darwin)
+20130409 15:06:21.762 | INFO  | Arguments: /Users/asyrjasalo/eficode/robot/robotframework/atest/testdata/cli/dry...</msg>
+                        <status endtime="20130409 15:06:22.165" starttime="20130409 15:06:22.160" status="PASS"/>
+                    </kw>
+                    <kw name="BuiltIn.Should Contain" timeout="" type="kw">
+                        <doc>Fails if `item1` does not contain `item2` one or more times.</doc>
+                        <arguments>
+                            <arg>${file}</arg>
+                            <arg>${exp}</arg>
+                        </arguments>
+                        <status endtime="20130409 15:06:22.166" starttime="20130409 15:06:22.165" status="PASS"/>
+                    </kw>
+                    <status endtime="20130409 15:06:22.166" starttime="20130409 15:06:22.158" status="PASS"/>
+                </kw>
+                <status endtime="20130409 15:06:22.166" starttime="20130409 15:06:22.157" status="PASS"/>
+            </kw>
+            <doc/>
+            <tags>
+                <tag>jybot</tag>
+                <tag>pybot</tag>
+                <tag>regression</tag>
+            </tags>
+            <status critical="yes" endtime="20130409 15:06:22.167" starttime="20130409 15:06:22.144" status="PASS"/>
+        </test>
+        <doc>Robot Framework acceptance tests</doc>
+        <metadata>
+            <item name="Interpreter">python</item>
+            <item name="Platform">darwin</item>
+        </metadata>
+        <status endtime="20130409 15:06:22.167" starttime="20130409 15:06:21.461" status="PASS"/>
+    </suite>
+    <statistics>
+        <total>
+            <stat fail="0" pass="19">Critical Tests</stat>
+            <stat fail="0" pass="19">All Tests</stat>
+        </total>
+        <tag>
+            <stat combined="" doc="" fail="0" info="critical" links="" pass="19">regression</stat>
+            <stat combined="jybot NOT pybot" doc="" fail="0" info="combined" links="" pass="0">jybot NOT pybot</stat>
+            <stat combined="pybot NOT jybot" doc="" fail="0" info="combined" links="" pass="0">pybot NOT jybot</stat>
+        </tag>
+        <suite>
+            <stat fail="0" id="s1" name="Dryrun" pass="19">Dryrun</stat>
+        </suite>
+    </statistics>
+    <errors/>
+</robot>

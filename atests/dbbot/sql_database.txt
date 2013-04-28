@@ -6,9 +6,9 @@ Resource  ../resources/database.txt
 
 
 *** Variables ***
-${test_run}                 ${CURDIR}${/}..${/}testdata${/}one_suite${/}output.xml
+${test_run}                 ${CURDIR}${/}..${/}testdata${/}one_suite${/}test_output.xml
 ${latter_test_run}          ${CURDIR}${/}..${/}testdata${/}one_suite${/}output_latter.xml
-${test_run_with_subsuites}  ${CURDIR}${/}..${/}testdata${/}multiple${/}output.xml
+${test_run_with_subsuites}  ${CURDIR}${/}..${/}testdata${/}multiple${/}test_output.xml
 
 
 *** Keywords ***
