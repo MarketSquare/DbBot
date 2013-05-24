@@ -9,55 +9,37 @@ class DatabaseReader(RobotDatabase):
         super(DatabaseReader, self).__init__(db_file_path, verbose_stream)
         self._connection.row_factory = sqlite3.Row
 
-    def most_failed_suites(self):
+    def source_files(self):
         sql_statement = '''
-            SELECT count() as count, suites.id, suites.name, suites.source
-            FROM suites, suite_status
-            WHERE suites.id == suite_status.suite_id AND
-            suite_status.status == "FAIL"
-            GROUP BY suites.source
+            SELECT DISTINCT source_file
+            FROM test_runs
         '''
         return self._fetch_by(sql_statement)
 
-    def most_failed_tests(self):
+    def test_runs_for_source_file(self, source_file):
         sql_statement = '''
-            SELECT count() as count, tests.id, tests.name, tests.suite_id
+            SELECT id, finished_at
+            FROM test_runs
+            WHERE source_file == ?
+        '''
+        return self._fetch_by(sql_statement, [source_file])
+
+    def test_cases_for_source_file(self, source_file):
+        sql_statement = '''
+            SELECT tests.id, tests.xml_id, tests.name
             FROM tests, test_status
-            WHERE tests.id == test_status.test_id AND
-            test_status.status == "FAIL"
-            GROUP BY tests.name, tests.suite_id
+            WHERE test_status.test_run_id in (
+                SELECT id FROM test_runs WHERE
+                test_runs.source_file == ?
+            )
         '''
-        return self._fetch_by(sql_statement)
+        return self._fetch_by(sql_statement, [source_file])
 
-    def most_failed_keywords(self):
+    def test_results_for_test(self, test_id):
         sql_statement = '''
-            SELECT count() as count, keywords.name, keywords.type
-            FROM keywords, keyword_status
-            WHERE keywords.id == keyword_status.keyword_id AND
-            keyword_status.status == "FAIL"
-            GROUP BY keywords.name, keywords.type
-        '''
-        return self._fetch_by(sql_statement)
-
-    def failed_tests_for_suite(self, suite_id):
-        sql_statement = '''
-            SELECT count() as count, tests.id, tests.name, tests.suite_id
-            FROM tests, test_status
-            WHERE tests.id == test_status.test_id AND
-            tests.suite_id == ? AND
-            test_status.status == "FAIL"
-            GROUP BY tests.name
-        '''
-        return self._fetch_by(sql_statement, [suite_id])
-
-    def failed_keywords_for_test(self, test_id):
-        sql_statement = '''
-            SELECT count() as count, keywords.name, keywords.type
-            FROM keywords, keyword_status
-            WHERE keywords.id == keyword_status.keyword_id AND
-            keywords.test_id == ? AND
-            keyword_status.status == "FAIL"
-            GROUP BY keywords.name, keywords.type
+            SELECT test_status.status
+            FROM test_status
+            WHERE test_status.test_id == ?
         '''
         return self._fetch_by(sql_statement, [test_id])
 
