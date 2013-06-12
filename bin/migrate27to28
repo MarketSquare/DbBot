@@ -2,7 +2,6 @@
 
 import os
 import sys
-import sqlite3
 
 sys.path.append(os.path.abspath(__file__ + '/../..'))
 
