@@ -16,8 +16,8 @@ Robot Framework version 2.7.4 or later is recommended as versions prior to 2.7.4
 do not support storing total elapsed time for test runs or tags.
 
 
-Migrating from Robot Framework 2.7 to 2.8
------------------------------------------
+### Migrating from Robot Framework 2.7 to 2.8
+
 In Robot Framework 2.8, output.xml has changed slightly. Due this,
 the databases created with 2.7 need to migrated to be 2.8 compatible.
 
