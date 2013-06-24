@@ -66,7 +66,7 @@ class DatabaseWriter(RobotDatabase):
             'xml_id': 'TEXT NOT NULL',
             'name': 'TEXT NOT NULL',
             'source': 'TEXT NOT NULL',
-            'doc': 'TEXT NOT NULL'
+            'doc': 'TEXT'
         }, ('name', 'source'))
 
     def _create_table_suite_status(self):
@@ -85,7 +85,7 @@ class DatabaseWriter(RobotDatabase):
             'xml_id': 'TEXT NOT NULL',
             'name': 'TEXT NOT NULL',
             'timeout': 'TEXT',
-            'doc': 'TEXT NOT NULL'
+            'doc': 'TEXT'
         }, ('suite_id', 'name'))
 
     def _create_table_test_status(self):
@@ -104,7 +104,7 @@ class DatabaseWriter(RobotDatabase):
             'name': 'TEXT NOT NULL',
             'type': 'TEXT NOT NULL',
             'timeout': 'TEXT',
-            'doc': 'TEXT NOT NULL'
+            'doc': 'TEXT'
         }, ('name', 'type'))
 
     def _create_table_keyword_status(self):
