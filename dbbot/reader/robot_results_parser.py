@@ -1,5 +1,5 @@
 from datetime import datetime
-from robot.result import ExecutionResult
+from robot.api import ExecutionResult
 from sqlite3 import IntegrityError
 
 from dbbot import Logger
@@ -18,7 +18,6 @@ class RobotResultsParser(object):
         try:
             test_run_id = self._db.insert('test_runs', {
                 'source_file': test_run.source,
-                'generator': test_run.generator,
                 'started_at': self._format_robot_timestamp(test_run.suite.starttime),
                 'finished_at': self._format_robot_timestamp(test_run.suite.endtime),
                 'imported_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -26,7 +25,6 @@ class RobotResultsParser(object):
         except IntegrityError:
             test_run_id = self._db.fetch_id('test_runs', {
                 'source_file': test_run.source,
-                'generator': test_run.generator,
                 'started_at': self._format_robot_timestamp(test_run.suite.starttime),
                 'finished_at': self._format_robot_timestamp(test_run.suite.endtime)
             })

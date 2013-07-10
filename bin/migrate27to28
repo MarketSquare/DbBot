@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+sys.path.append(os.path.abspath(__file__ + '/../..'))
+
+from dbbot import CommandLineOptions
+from dbbot.reader import DatabaseWriter
+
+
+class MigratorOptions(CommandLineOptions):
+
+    def _get_validated_options(self):
+        if len(sys.argv) < 2:
+            self._exit_with_help()
+        options = super(MigratorOptions, self)._get_validated_options()
+        if not os.path.exists(options.db_file_path):
+            self._parser.error('database %s not exists' % options.db_file_path)
+        return options
+
+
+class Migrate27to28(object):
+
+    def __init__(self):
+        self._options = MigratorOptions()
+        verbose_stream = sys.stdout if self._options.be_verbose else None
+        self._db = DatabaseWriter(self._options.db_file_path, verbose_stream)
+
+    def run(self):
+        try:
+            self._run_migrations()
+            self._db.commit()
+        finally:
+            self._db.close()
+
+    def _run_migrations(self):
+        self._migrate_test_runs()
+        self._migrate_tests()
+        self._migrate_keywords()
+
+    def _migrate_test_runs(self):
+        old_table_name = 'old_27_test_runs'
+        self._db.rename_table('test_runs', old_table_name)
+        self._db._create_table_test_runs()
+        self._db.copy_table(old_table_name, 'test_runs', (
+            'source_file',
+            'started_at',
+            'finished_at',
+            'imported_at'
+        ))
+        self._db.drop_table(old_table_name)
+
+    def _migrate_tests(self):
+        old_table_name = 'old_27_tests'
+        self._db.rename_table('tests', old_table_name)
+        self._db._create_table_tests()
+        self._db.copy_table(old_table_name, 'tests', (
+            'suite_id',
+            'xml_id',
+            'name',
+            'timeout',
+            'doc'
+        ))
+        self._db.drop_table(old_table_name)
+
+    def _migrate_keywords(self):
+        old_table_name = 'old_27_keywords'
+        self._db.rename_table('keywords', old_table_name)
+        self._db._create_table_keywords()
+        self._db.copy_table(old_table_name, 'keywords', (
+            'suite_id',
+            'test_id',
+            'keyword_id',
+            'name',
+            'type',
+            'timeout',
+            'doc'
+        ))
+        self._db.drop_table(old_table_name)
+
+
+if __name__ == '__main__':
+    Migrate27to28().run()

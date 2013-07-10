@@ -12,10 +12,18 @@ Requirements
 * Python 2.6 or newer installed
 * Robot Framework 2.7 or newer installed
 
-Tested and verified on Python 2.7.4 and Robot Framework 2.7.7.
-
 Robot Framework version 2.7.4 or later is recommended as versions prior to 2.7.4
 do not support storing total elapsed time for test runs or tags.
+
+
+### Migrating from Robot Framework 2.7 to 2.8
+
+In Robot Framework 2.8, output.xml has changed slightly. Due this,
+the databases created with 2.7 need to migrated to be 2.8 compatible.
+
+To migrate the existing database, issue the following script:
+
+    bin/migrate27to28 -b <path_to_robot_results_db>
 
 
 How it works
@@ -146,9 +154,9 @@ You may also want to append the DbBot root directory to your PYTHONPATH
 if you are developing something that uses the classes.
 
 
-Troubleshooting
----------------
+License
+-------
+DbBot is released under the [Apache License, Version 2.0](http://www.tldrlegal.com/license/apache-license-2.0).
 
-Problem: TO BE ASKED
+See LICENSE.TXT for details.
 
-Solution: TO BE ANSWERED
