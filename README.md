@@ -156,7 +156,7 @@ if you are developing something that uses the classes.
 
 License
 -------
-DbBot is released under the [Apache License, Version 2.0](http://www.tldrlegal.com/license/apache-license-2.0-(apache-2.0)).
+DbBot is released under the [Apache License, Version 2.0](http://www.tldrlegal.com/license/apache-license-2.0).
 
 See LICENSE.TXT for details.
 
