@@ -154,9 +154,9 @@ You may also want to append the DbBot root directory to your PYTHONPATH
 if you are developing something that uses the classes.
 
 
-Troubleshooting
----------------
+License
+-------
+DbBot is released under the [Apache License, Version 2.0](http://www.tldrlegal.com/license/apache-license-2.0-(apache-2.0)).
 
-Problem: TO BE ASKED
+See LICENSE.TXT for details.
 
-Solution: TO BE ANSWERED
