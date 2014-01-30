@@ -27,43 +27,43 @@ Disconnect And Cleanup
     Remove Database  ${default_database}
 
 Should Have ${n} Test Runs
-    Row Count Is Equal To  ${n}  test_runs  ${default_database}
+    Row Count Is Equal To  ${n}  test_runs
 
 Should Have ${n} Test Run Statuses
-    Row Count Is Equal To  ${n}  test_run_status  ${default_database}
+    Row Count Is Equal To  ${n}  test_run_status
 
 Should Have ${n} Test Run Errors
-    Row Count Is Equal To  ${n}  test_run_errors  ${default_database}
+    Row Count Is Equal To  ${n}  test_run_errors
 
 Should Have ${n} Suites
-    Row Count Is Equal To  ${n}  suites  ${default_database}
+    Row Count Is Equal To  ${n}  suites
 
 Should Have ${n} Suite Statuses
-    Row Count Is Equal To  ${n}  suite_status  ${default_database}
+    Row Count Is Equal To  ${n}  suite_status
 
 Should Have ${n} Tests
-    Row Count Is Equal To  ${n}  tests  ${default_database}
+    Row Count Is Equal To  ${n}  tests
 
 Should Have ${n} Test Statuses
-    Row Count Is Equal To  ${n}  test_status  ${default_database}
+    Row Count Is Equal To  ${n}  test_status
 
 Should Have ${n} Tags
-    Row Count Is Equal To  ${n}  tags  ${default_database}
+    Row Count Is Equal To  ${n}  tags
 
 Should Have ${n} Tag Statuses
-    Row Count Is Equal To  ${n}  tag_status  ${default_database}
+    Row Count Is Equal To  ${n}  tag_status
 
 Should Have ${n} Keywords
-    Row Count Is Equal To  ${n}  keywords  ${default_database}
+    Row Count Is Equal To  ${n}  keywords
 
 Should Have ${n} Keyword Statuses
-    Row Count Is Equal To  ${n}  keyword_status  ${default_database}
+    Row Count Is Equal To  ${n}  keyword_status
 
 Should Have ${n} Arguments
-    Row Count Is Equal To  ${n}  arguments  ${default_database}
+    Row Count Is Equal To  ${n}  arguments
 
 Should Have ${n} Messages
-    Row Count Is Equal To  ${n}  messages  ${default_database}
+    Row Count Is Equal To  ${n}  messages
 
 Should Have Suites and Tests
     Should Have 1 Test Runs

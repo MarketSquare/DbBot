@@ -12,10 +12,11 @@ class RobotSqliteDatabase:
     def close_connection(self):
         self._connection.close()
 
-    def row_count_is_equal_to(self, count, db_table_name, db_file_path):
-        if not self._number_of_rows_in(db_table_name) == int(count):
+    def row_count_is_equal_to(self, count, db_table_name):
+        actual_count = self._number_of_rows_in(db_table_name)
+        if not actual_count == int(count):
             raise AssertionError('Expected to have %s rows but was %s' %
-                (count, number_of_items))
+                (count, actual_count))
 
     def _number_of_rows_in(self, db_table_name):
         cursor = self._execute('SELECT count() FROM %s' % db_table_name)
