@@ -1,5 +1,3 @@
-import sqlite3
-
 from dbbot import RobotDatabase
 
 
