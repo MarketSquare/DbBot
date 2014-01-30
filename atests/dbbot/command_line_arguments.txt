@@ -1,122 +1,68 @@
 *** Settings ***
 Library   OperatingSystem
-Resource  ../resources/commandline.txt
 Resource  ../resources/database.txt
-
 
 *** Variables ***
 ${valid_output}       ${CURDIR}${/}..${/}testdata${/}one_suite${/}test_output.xml
 ${invalid_output}     ${CURDIR}${/}..${/}testdata${/}invalid_output.xml
 ${not_existing_file}  ${CURDIR}${/}..${/}testdata${/}not_existing.xml
-
-
-*** Keywords ***
-Exits With ${value}
-    Should Be Equal As Integers  ${rc}  ${value}
-
-Exits With Success
-    Should Not Contain  ${output}  error:
-    Should Be Equal As Integers  ${rc}  0
-
-Exits With Error
-    Should Contain  ${output}  ${program_name}: error:
-    Should Be Equal As Integers  ${rc}  1
-
-Exits With Misused Arguments
-    Should Contain  ${output}  ${program_name}: error:
-    Should Be Equal As Integers  ${rc}  2
-
-Exits With Help
-    Prints Help
-    Should Be Equal As Integers  ${rc}  1
-
-Prints Help
-    Should Contain  ${output}  Options:
-
-Prints Usage
-    Should Contain  ${output}  Usage: ${program_name} [options]
-
-Prints No Such Option ${option}
-    Prints Usage
-    Should Contain  ${output}  ${program_name}: error: no such option: ${option}
-
-Prints Input Files Required
-    Prints Usage
-    Should Contain  ${output}  ${program_name}: error: at least one input file is required
-
-Prints ${option} Requires Argument
-    Prints Usage
-    Should Contain  ${output}  ${program_name}: error: ${option} option requires an argument
-
-Prints File ${filename} Not Exists
-    Should Contain  ${output}  ${program_name}: error: file ${filename} not exists
-
-Prints Parse Error In ${filename}
-    Should Contain  ${output}  ${program_name}: error: Invalid XML: Reading XML source '${filename}' failed:
-
-Is Verbose
-    Should Contain  ${output}  Database |
-    Should Contain  ${output}  Parser   |
-
+${program name}=    run.py
+${program_path}=    ${CURDIR}${/}..${/}..${/}dbbot${/}${program name}
 
 *** Test Cases ***
+
 Without arguments
-    ${rc}  ${output}=  Run With ${EMPTY}
-    Exits With Help
+    Run With ${EMPTY}
+    Exits With Misused Arguments
 
 With -h
-    ${rc}  ${output}=  Run With -h
+    Run With -h
     Prints Help
     Exits With Success
 
 With --help
-    ${rc}  ${output}=  Run With --help
+    Run With --help
     Prints Help
     Exits With Success
 
 With invalid option
-    ${rc}  ${output}=  Run With --invalid
+    Run With --invalid
     Prints No Such Option --invalid
     Exits With Misused Arguments
 
-With --files and an existing file
-    ${rc}  ${output}=  Run with --files ${valid_output}
+With an existing file
+    Run with ${valid_output}
     Exits With Success
     [Teardown]  Remove Database
 
-With --files and multiple existing files
-    ${rc}  ${output}=  Run with --files ${valid_output} ${valid_output}
+With multiple existing files
+    Run with ${valid_output} ${valid_output}
     Exits With Success
     [Teardown]  Remove Database
 
-With -f and no file names
-    ${rc}  ${output}=  Run With -f
+With no file names
+    Run With ${EMPTY}
     Prints Input Files Required
     Exits With Misused Arguments
 
-With --files and no file names
-    ${rc}  ${output}=  Run With --files
-    Prints Input Files Required
-    Exits With Misused Arguments
-
-With --files and not existing file
-    ${rc}  ${output}=  Run With --files ${not_existing_file}
+With not existing file
+    Run With ${not_existing_file}
     Prints File ${not_existing_file} Not Exists
     Exits With Misused Arguments
 
-With --files and one of the files not existing
-    ${rc}  ${output}=  Run with --files ${valid_output} ${not_existing_file}
+With one of the files not existing
+    Run with ${valid_output} ${not_existing_file}
     Exits With Misused Arguments
 
-With --files and an invalid XML file
-    ${rc}  ${output}=  Run With --files ${invalid_output}
+With an invalid XML file
+    Run With ${invalid_output}
     Prints Parse Error In ${invalid_output}
     Exits With Error
     [Teardown]  Remove Database
 
 With --database and database name
     [Setup]  Remove Database  ${own_database}
-    ${rc}  ${output}=  Run With --database=${own_database} --files ${valid_output}
+    ${rc}  ${output}=  Run With --database=${own_database} ${valid_output}
     Should Create Database  ${own_database}
     Should Not Create Default Database
     Exits With Success
@@ -131,7 +77,7 @@ With --database and no database name
 
 With -b and database name
     [Setup]  Remove Database  ${own_database}
-    ${rc}  ${output}=  Run With -b ${own_database} --files ${valid_output}
+    ${rc}  ${output}=  Run With -b ${own_database} ${valid_output}
     Should Create Database  ${own_database}
     Should Not Create Default Database
     Exits With Success
@@ -145,31 +91,86 @@ With -b and no database file name
     Exits With Misused Arguments
 
 With -v
-    ${rc}  ${output}=  Run With -v --files ${valid_output}
+    ${rc}  ${output}=  Run With -v ${valid_output}
     Is Verbose
     Exits With Success
 
 With --verbose
-    ${rc}  ${output}=  Run With --verbose --files ${valid_output}
+    ${rc}  ${output}=  Run With --verbose ${valid_output}
     Is Verbose
     Exits With Success
 
 With -d
     [Setup]  Remove Database
-    ${rc}  ${output}=  Run With -d --files ${valid_output}
+    ${rc}  ${output}=  Run With -d ${valid_output}
     Should Not Create Default Database
     Exits With Success
 
 With --dry-run
     [Setup]  Remove Database
-    ${rc}  ${output}=  Run With --dry-run --files ${valid_output}
+    ${rc}  ${output}=  Run With --dry-run ${valid_output}
     Should Not Create Default Database
     Exits With Success
 
 With -k
-    ${rc}  ${output}=  Run With -k --files ${valid_output}
+    ${rc}  ${output}=  Run With -k ${valid_output}
     Exits With Success
 
 With --also-keywords
-    ${rc}  ${output}=  Run With --also-keywords --files ${valid_output}
+    ${rc}  ${output}=  Run With --also-keywords ${valid_output}
     Exits With Success
+
+
+*** Keywords ***
+
+Exits With ${value}
+    Should Be Equal As Integers  ${TEST RC}  ${value}
+
+Exits With Success
+    Should Not Contain  ${TEST OUTPUT}  error:
+    Should Be Equal As Integers  ${TEST RC}  0
+
+Exits With Error
+    Should Contain  ${TEST OUTPUT}  : error:
+    Should Be Equal As Integers  ${TEST RC}  1
+
+Exits With Misused Arguments
+    Should Contain  ${TEST OUTPUT}  ${program_name}: error:
+    Should Be Equal As Integers  ${TEST RC}  2
+
+Exits With Help
+    Prints Help
+    Should Be Equal As Integers  ${TEST RC}  1
+
+Prints Help
+    Should Contain  ${TEST OUTPUT}  Options:
+
+Prints Usage
+    Should Contain  ${TEST OUTPUT}  Usage: ${program_name} [options]
+
+Prints No Such Option ${option}
+    Prints Usage
+    Should Contain  ${TEST OUTPUT}  ${program_name}: error: no such option: ${option}
+
+Prints Input Files Required
+    Prints Usage
+    Should Contain  ${TEST OUTPUT}  ${program_name}: error: at least one input file is required
+
+Prints ${option} Requires Argument
+    Prints Usage
+    Should Contain  ${TEST OUTPUT}  ${program_name}: error: ${option} option requires an argument
+
+Prints File ${filename} Not Exists
+    Should Contain  ${TEST OUTPUT}  ${program_name}: error: file "${filename}" does not exist
+
+Prints Parse Error In ${filename}
+    Should Contain    ${TEST OUTPUT}    dbbot: error: Invalid XML: Reading XML source '${filename}' failed:
+
+Is Verbose
+    Should Contain    ${TEST OUTPUT}  Database |
+    Should Contain    ${TEST OUTPUT}  Parser   |
+
+Run With ${arguments}
+    ${rc}  ${output}=  Run And Return Rc And Output  ${program_path} ${arguments}
+    Set Test Variable    ${TEST RC}    ${rc}
+    Set Test Variable    ${TEST OUTPUT}    ${output}
