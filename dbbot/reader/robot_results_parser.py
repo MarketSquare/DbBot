@@ -1,6 +1,9 @@
+from __future__ import with_statement
 from datetime import datetime
+from hashlib import sha1
 from robot.api import ExecutionResult
 from sqlite3 import IntegrityError
+
 
 from dbbot import Logger
 
@@ -15,12 +18,14 @@ class RobotResultsParser(object):
     def xml_to_db(self, xml_file):
         self._verbose('- Parsing %s' % xml_file)
         test_run = ExecutionResult(xml_file)
+        hash = self._hash(xml_file)
         try:
             test_run_id = self._db.insert('test_runs', {
+                'hash': hash,
+                'imported_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
                 'source_file': test_run.source,
                 'started_at': self._format_robot_timestamp(test_run.suite.starttime),
-                'finished_at': self._format_robot_timestamp(test_run.suite.endtime),
-                'imported_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
+                'finished_at': self._format_robot_timestamp(test_run.suite.endtime)
             })
         except IntegrityError:
             test_run_id = self._db.fetch_id('test_runs', {
@@ -31,6 +36,16 @@ class RobotResultsParser(object):
         self._parse_errors(test_run.errors.messages, test_run_id)
         self._parse_statistics(test_run.statistics, test_run_id)
         self._parse_suite(test_run.suite, test_run_id)
+
+    def _hash(self, xml_file):
+        block_size = 68157440
+        hasher = sha1()
+        with open(xml_file, 'rb') as f:
+            chunk = f.read(block_size)
+            while len(chunk) > 0:
+                hasher.update(chunk)
+                chunk = f.read(block_size)
+        return hasher.hexdigest()
 
     def _parse_errors(self, errors, test_run_id):
         self._db.insert_many_or_ignore('test_run_errors',

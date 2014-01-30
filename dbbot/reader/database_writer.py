@@ -27,11 +27,12 @@ class DatabaseWriter(RobotDatabase):
 
     def _create_table_test_runs(self):
         self._create_table('test_runs', {
-            'source_file': 'TEXT NOT NULL',
-            'started_at': 'DATETIME NOT NULL',
-            'finished_at': 'DATETIME NOT NULL',
+            'hash': 'TEXT NOT NULL',
             'imported_at': 'DATETIME NOT NULL',
-        }, ('source_file', 'started_at', 'finished_at'))
+            'source_file': 'TEXT',
+            'started_at': 'DATETIME',
+            'finished_at': 'DATETIME',
+        }, ('hash',))
 
     def _create_table_test_run_status(self):
         self._create_table('test_run_status', {
@@ -65,7 +66,7 @@ class DatabaseWriter(RobotDatabase):
             'suite_id': 'INTEGER REFERENCES suites',
             'xml_id': 'TEXT NOT NULL',
             'name': 'TEXT NOT NULL',
-            'source': 'TEXT NOT NULL',
+            'source': 'TEXT',
             'doc': 'TEXT'
         }, ('name', 'source'))
 
@@ -168,7 +169,10 @@ class DatabaseWriter(RobotDatabase):
     def fetch_id(self, table_name, criteria):
         sql_statement = 'SELECT id FROM %s WHERE ' % table_name
         sql_statement += ' AND '.join('%s=?' % key for key in criteria.keys())
-        return self._connection.execute(sql_statement, criteria.values()).fetchone()[0]
+        res = self._connection.execute(sql_statement, criteria.values()).fetchone()
+        if not res:
+            raise Exception('ASDASD')
+        return res[0]
 
     def insert(self, table_name, criteria):
         sql_statement = self._format_insert_statement(table_name, criteria.keys())
