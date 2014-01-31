@@ -6,8 +6,6 @@ Resource  ../resources/database.txt
 ${valid_output}       ${CURDIR}${/}..${/}testdata${/}one_suite${/}test_output.xml
 ${invalid_output}     ${CURDIR}${/}..${/}testdata${/}invalid_output.xml
 ${not_existing_file}  ${CURDIR}${/}..${/}testdata${/}not_existing.xml
-${program name}=    run.py
-${program_path}=    ${CURDIR}${/}..${/}..${/}dbbot${/}${program name}
 
 *** Test Cases ***
 
