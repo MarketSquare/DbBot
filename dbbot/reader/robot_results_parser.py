@@ -17,7 +17,7 @@ class RobotResultsParser(object):
 
     def xml_to_db(self, xml_file):
         self._verbose('- Parsing %s' % xml_file)
-        test_run = ExecutionResult(xml_file)
+        test_run = ExecutionResult(xml_file, include_keywords=self._include_keywords)
         hash = self._hash(xml_file)
         try:
             test_run_id = self._db.insert('test_runs', {
