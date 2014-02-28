@@ -42,7 +42,7 @@ Single test run with subsuites
     Should Have 150 Tags
     Should Have 3 Tag Statuses
     Should Have 41 Keywords
-    Should Have 41 Keyword Statuses
+    Should Have 381 Keyword Statuses
     Should Have 139 Arguments
     Should Have 176 Messages
 
@@ -58,12 +58,13 @@ Multiple test runs with the same root suite
     Should Have 57 Tags
     Should Have ${2*3} Tag Statuses
     Should Have 39 Keywords
-    Should Have ${2*39} Keyword Statuses
+    Should Have ${2*216} Keyword Statuses
     Should Have 131 Arguments
     Should Have 99 Messages
     [Teardown]  Disconnect And Cleanup
 
 *** Keywords ***
+
 Parse Without Keywords ${files}
     Remove Database
     Run  ${program_path} ${files}
@@ -130,7 +131,7 @@ Should Have Suites and Tests
 
 Should Have Keywords
     Should Have 39 Keywords
-    Should Have 39 Keyword Statuses
+    Should Have 216 Keyword Statuses
     Should Have 131 Arguments
     Should Have 87 Messages
 

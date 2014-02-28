@@ -125,7 +125,7 @@ class DatabaseWriter(RobotDatabase):
             'keyword_id': 'INTEGER NOT NULL REFERENCES keyword',
             'status': 'TEXT NOT NULL',
             'elapsed': 'INTEGER NOT NULL'
-        }, ('test_run_id', 'keyword_id'))
+        })
 
     def _create_table_messages(self):
         self._create_table('messages', {
