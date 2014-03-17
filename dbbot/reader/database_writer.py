@@ -122,7 +122,7 @@ class DatabaseWriter(RobotDatabase):
     def _create_table_keyword_status(self):
         self._create_table('keyword_status', {
             'test_run_id': 'INTEGER NOT NULL REFERENCES test_runs',
-            'keyword_id': 'INTEGER NOT NULL REFERENCES keyword',
+            'keyword_id': 'INTEGER NOT NULL REFERENCES keywords',
             'status': 'TEXT NOT NULL',
             'elapsed': 'INTEGER NOT NULL'
         })
