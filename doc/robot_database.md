@@ -16,15 +16,14 @@ test_runs
 column      | type     | not null | description
 ------------|----------|----------|------------
 id          | INTEGER  | X        | primary key
-source_file | TEXT     | X        | absolute path to the original output.xml file
-generator   | TEXT     | X        | generator of output.xml file
-started_at  | DATETIME | X        | when was the root suite started at
-finished_at | DATETIME | X        | when was the root suite finished at
+source_file | TEXT     |          | absolute path to the original output.xml file
+started_at  | DATETIME |          | when was the root suite started at
+finished_at | DATETIME |          | when was the root suite finished at
 imported_at | DATETIME | X        | when was the output.xml serialized into database
+hash        | TEXT     | X        | a SHA1 hash of the source file
 
 Row is unique if the combination of following is unique:
-    generator, source_file, started_at, finished_at
-
+    hash
 
 test_run_status
 ---------------
@@ -82,8 +81,8 @@ column      | type     | not null | description
 id          | INTEGER  | X        | primary key
 suite_id    | INTEGER  |          | FOREIGN KEY to parent suite if has one
 xml_id      | TEXT     | X        | suite id attribute in the xml file, e.g. 's1' or 's1-s1'
-name        | TEXT     | X        | full name of the suite
-source      | TEXT     | X        | absolute path to the suite ran
+name        | TEXT     |          | full name of the suite
+source      | TEXT     |          | absolute path to the suite ran
 doc         | TEXT     | X        | optional suite documentation, otherwise ''
 
 A row is unique if the combination of following is unique:
@@ -104,7 +103,7 @@ passed      | INTEGER  | X        | number of tests passed
 status      | TEXT     | X        | either 'PASS' or 'FAIL'
 
 A row is unique if the combination of following is unique:
-    name, source
+    test_run_id, suite_id
 
 
 tests
@@ -116,8 +115,8 @@ id          | INTEGER  | X        | primary key
 suite_id    | INTEGER  | X        | FOREIGN KEY to the suite
 xml_id      | TEXT     | X        | test id attribute in the xml file, e.g. 's1-t1' or 's1-s1-t1'
 name        | TEXT     | X        | full name of the test
-timeout     | TEXT     | X        | '' by default
-doc         | TEXT     | X        | optional test documentation, otherwise ''
+timeout     | TEXT     |          | '' by default
+doc         | TEXT     |          | optional test documentation, otherwise ''
 
 A row is unique if the combination of following is unique:
     suite_id, name
@@ -149,8 +148,8 @@ test_id     | INTEGER  |          | FOREIGN KEY to the test if is test keyword
 keyword_id  | INTEGER  |          | FOREIGN KEY to the parent keyword if is sub-keyword
 name        | TEXT     | X        | full name of the keyword
 type        | TEXT     | X        | usually '', either 'setup' or 'teardown' for suite keywords
-timeout     | TEXT     | X        | '' by default
-doc         | TEXT     | X        | optional keyword documentation, otherwise ''
+timeout     | TEXT     |          | '' by default
+doc         | TEXT     |          | optional keyword documentation, otherwise ''
 
 A row is unique if the combination of following is unique:
     name, type
@@ -167,9 +166,7 @@ keyword_id  | INTEGER  | X        | FOREIGN KEY to the keyword
 status      | TEXT     | X        | either 'PASS' or 'FAIL'
 elapsed     | INTEGER  | X        | number of milliseconds keyword took to run
 
-A row is unique if the combination of following is unique:
-    name, type
-
+A row is unique has no unique constraints.
 
 messages
 --------------
