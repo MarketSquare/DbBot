@@ -1,0 +1,5 @@
+All tests are contained under `dbbot`-folder.
+
+$ pybot dbbot
+
+
