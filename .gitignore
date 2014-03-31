@@ -6,3 +6,5 @@ log.html
 report.html
 build
 *.swp
+dist
+MANIFEST
