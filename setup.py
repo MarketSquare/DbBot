@@ -23,8 +23,8 @@ setup(
     version          = VERSION,
     author           = 'Robot Framework Developers',
     author_email     = 'robotframework@gmail.com',
-    url              = 'TODO',
-    download_url     = 'TODO',
+    url              = 'https://github.com/robotframework/DbBot',
+    download_url     = 'https://pypi.python.org/pypi/dbbot',
     license          = 'Apache License 2.0',
     description      = 'A tool for serializing Robot Framework test run '
                        'results into an sqlite3 database.',
