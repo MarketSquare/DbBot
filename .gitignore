@@ -5,3 +5,4 @@ output.xml
 log.html
 report.html
 build
+*.swp
