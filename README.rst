@@ -32,7 +32,7 @@ This tool is installed with pip with command:
 
     $ pip install dbbot
 
-Alternatively you can download the source distribution, extract it and
+Alternatively you can download the `source distribution`__, extract it and
 install using:
 
 ::
@@ -168,6 +168,7 @@ DbBot is released under the `Apache License, Version 2.0`__.
 See LICENSE.TXT for details.
 
 __ https://www.python.org/
+__ https://pypi.python.org/pypi/dbbot
 __ https://github.com/robotframework/DbBot/blob/master/doc/robot_database.md
 __ http://www.tldrlegal.com/license/apache-license-2.0
 .. _`Robot Framework`: http://www.robotframework.org
