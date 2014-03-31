@@ -5,9 +5,9 @@ Releasing DbBot
        '-devel' suffix)
     #. Commit, push, add git tag with version number and push tags
     #. Upload to PyPi with: `python setup.py sdist upload`
+    #. Check that page in PyPi looks good and `pip install dbbot` works.
     #. Change __version__ to 'x.x-devel' in `dbbot/__init__.py`, commit and 
        push
-    #. Check that page in PyPi looks good and `pip install robotfixml` works.
     #. Send emails to: `announce`__- and `devel`__-lists. Tweet and add news to 
        Confluence.
        
