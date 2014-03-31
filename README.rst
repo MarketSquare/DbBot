@@ -30,7 +30,7 @@ This tool is installed with pip with command:
 
 ::
 
-    $ pip install robotframework-dbbot
+    $ pip install dbbot
 
 Alternatively you can download the source distribution, extract it and
 install using:
