@@ -37,8 +37,8 @@ class RobotResultsParser(object):
                 'hash': hash,
                 'imported_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
                 'source_file': test_run.source,
-                'started_at': self._format_robot_timestamp(test_run.suite.starttime),
-                'finished_at': self._format_robot_timestamp(test_run.suite.endtime)
+                'started_at': self._format_robot_timestamp(test_run.suite.starttime) if test_run.suite.starttime else 'NULL',
+                'finished_at': self._format_robot_timestamp(test_run.suite.endtime) if test_run.suite.starttime else 'NULL'
             })
         except IntegrityError:
             test_run_id = self._db.fetch_id('test_runs', {
