@@ -1,4 +1,4 @@
-.. note:: This project is currently not maintained.
+  **This project is currently not maintained.**
 
 DbBot
 =====
