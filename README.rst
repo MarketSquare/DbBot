@@ -3,9 +3,9 @@
 DbBot
 =====
 
-DbBot is a Python script to serialize `Robot Framework`_  output files into
-a SQLite database. This way the future `Robot Framework`_ related tools and
-plugins will have a unified storage for the test run results.
+DbBot is a Python script that serializes `Robot Framework`_  output files into
+a SQLite database. This would allow future `Robot Framework`_ related tools and
+plugins to have unified storage space for test run results.
 
 Requirements
 ------------
@@ -19,11 +19,12 @@ Requirements
 How it works
 ------------
 
-The script takes one or more `output.xml` files as input, initializes the
-database schema, and stores the respective results into a database
-(`robot\_results.db` by default, can be changed with options `-b` or
-`--database`). If database file is already existing, it will insert the new 
-results into that database.
+1. The script takes one or more `output.xml` files as input. 
+
+2. It initializes the database schema, and stores the respective results into a database
+(`robot\_results.db` by default, can be changed with options `-b` or `--database`). 
+
+3. If a database file already exists, it will insert the new results into that database.
 
 Installation
 ------------
@@ -47,8 +48,9 @@ What is stored
 Both the test data (names, content) and test statistics (how many did pass or
 fail, possible errors occurred, how long it took to run, etc.) related to
 suites and test cases are stored by default. However, keywords and related
-data are not stored as it might take order of magnitude longer for massive
-test runs. You can choose to store keywords and related data by using `-k` or
+data are not stored as they might make massive test runs become slower.
+
+You can choose to store keywords and related data by using `-k` or
 `--also-keywords` flag.
 
 Usage examples
@@ -60,9 +62,9 @@ Typical usage with a single output.xml file:
 
     python -m dbbot.run atest/testdata/one_suite/output.xml
 
-If the database does not already exist, it's created. Otherwise the test
-results are just inserted into the existing database. Only new results are
-inserted.
+If the database does not already exist, it will automatically be created. 
+Otherwise the test results are just inserted into the existing database. 
+Only the new results are inserted.
 
 The default database is a file named `robot_results.db`.
 
@@ -125,7 +127,7 @@ You can inspect the created database using the `sqlite3`_ command-line tool:
             GROUP BY tests.name;
 
 Please note that when database is initialized, no indices are created by
-DbBot. This is to avoid slowing down the inserts. You might want to add
+DbBot. This is done to avoid slowing down the inserts. You might want to add
 indices to the database by hand to speed up certain queries in your own
 scripts.
 
@@ -134,8 +136,8 @@ For information about the database schema, see `doc/robot_database.md`__.
 Migrating from Robot Framework 2.7 to 2.8
 -----------------------------------------
 
-In Robot Framework 2.8, output.xml has changed slightly. Due this, the
-databases created with 2.7 need to migrated to be 2.8 compatible.
+In Robot Framework 2.8, output.xml has changed slightly. Due to this, the
+databases created with 2.7 need to be migrated in order to be 2.8 compatible.
 
 To migrate the existing database, issue the following script:
 
